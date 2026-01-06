@@ -1,0 +1,28 @@
+# Environnement
+.env
+.env.*
+*.env
+
+# Python / Django
+__pycache__/
+*.pyc
+*.pyo
+
+venv/
+.envrc
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
