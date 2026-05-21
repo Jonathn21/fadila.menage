@@ -2,8 +2,13 @@
 Templates d'emails additionnels pour d'autres fonctionnalités
 Fichier: services/email_templates_extended.py
 """
+from typing import Dict
 from django.conf import settings
 from django.utils import timezone
+# Remplacer par :
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from services.email_service import EmailTemplateService, EmailContentService
 
 def get_user_display_name(user) -> str:
     """Fonction utilitaire pour récupérer le nom d'affichage"""
@@ -93,52 +98,53 @@ class SecurityEmailTemplates:
     
     @staticmethod
     def two_factor_code(user, code: str) -> dict:
-        """Email avec code de vérification 2FA"""
+        """Génère l'email contenant le code de vérification 2FA"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Code de vérification requis
-    </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Un code de vérification à deux facteurs vous a été envoyé pour sécuriser votre accès.
-    </p>
-</div>
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
 
-<div style="text-align: center; margin: 40px 0;">
-    <div style="background: #FFFFFF; border: 1px solid #0D652D; border-radius: 6px; padding: 25px; display: inline-block;">
-        <div style="font-size: 14px; color: #0D652D; margin-bottom: 15px;">
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Un code de vérification à deux facteurs vous a été envoyé pour sécuriser votre accès.
+        </p>
+    </div>
+    
+    <!-- Code de sécurité -->
+    <div style="text-align: center; margin: 30px 0; padding: 25px; background-color: #f0f7f0; border-radius: 8px;">
+        <div style="font-size: 16px; color: #0D652D; margin-bottom: 15px; font-weight: bold;">
             Votre code de sécurité
         </div>
-        <div style="font-size: 28px; font-weight: bold; color: #0D652D; font-family: 'Courier New', monospace;">
+        <div style="font-size: 32px; font-weight: bold; color: #0D652D; letter-spacing: 8px; font-family: monospace;">
             {code}
         </div>
-        <div style="font-size: 13px; color: #666666; margin-top: 15px;">
-            Valable 5 minutes
-        </div>
     </div>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Informations importantes
+    
+    <!-- Informations importantes -->
+    <div style="background-color: #fff8f8; border: 1px solid #ffebee; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Informations importantes
+        </h3>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 10px;">Ce code expire dans 5 minutes</li>
+            <li style="margin-bottom: 10px;">Ne partagez jamais ce code avec qui que ce soit</li>
+            <li style="margin-bottom: 10px;">5 tentatives maximum autorisées</li>
+            <li>En cas de doute, contactez-nous immédiatement</li>
+        </ul>
     </div>
-    <ul style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Ce code expire dans 5 minutes</li>
-        <li style="margin-bottom: 8px;">Ne partagez jamais ce code</li>
-        <li style="margin-bottom: 8px;">5 tentatives maximum autorisées</li>
-        <li>En cas de doute, contactez-nous immédiatement</li>
-    </ul>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6;">
-        Si vous n'avez pas demandé ce code, veuillez sécuriser votre compte.
-    </p>
+    
+    <!-- Pied de page -->
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+            Si vous n'avez pas demandé ce code, veuillez sécuriser votre compte.<br>
+            Cet email a été envoyé automatiquement. Veuillez ne pas y répondre.
+        </p>
+    </div>
 </div>
         """
         
-        # Pour les utilisateurs généraux, on utilise Bonjour
         greeting = f"Bonjour {user.first_name}," if user.first_name else "Bonjour,"
         subject = "Code de vérification - GES STAGE"
         
@@ -149,26 +155,25 @@ class SecurityEmailTemplates:
                 content, 
                 "Service d'Authentification Sécurisée"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting}
 
-Votre code de vérification à deux facteurs :
+Un code de vérification à deux facteurs vous a été envoyé pour sécuriser votre accès.
 
-    {code}
+VOTRE CODE DE SÉCURITÉ : {code}
 
-SECURITE :
-• Valable 5 minutes seulement
-• 5 tentatives maximum
+IMPORTANT :
+• Ce code expire dans 5 minutes
 • Ne partagez jamais ce code
+• 5 tentatives maximum autorisées
 
-Si vous n'avez pas demandé ce code, sécurisez votre compte.
+Si vous n'avez pas demandé ce code, sécurisez immédiatement votre compte.
 
 ---
-Service de Sécurité
+Service d'Authentification Sécurisée
 Communauté Électrique du Bénin
-"""
+Email: securite@ceb.bj"""
         }
     
     @staticmethod
@@ -176,58 +181,67 @@ Communauté Électrique du Bénin
         """Email d'alerte de connexion"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Nouvelle connexion détectée
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+   
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Une nouvelle connexion à votre compte a été détectée depuis un appareil non reconnu.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Une nouvelle connexion à votre compte a été détectée depuis un appareil non reconnu.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Détails de la connexion
+    
+    <!-- Détails de connexion -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Détails de la connexion
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 180px; color: #666; font-weight: 600;">Date et heure :</td>
+                <td style="padding: 10px 0; color: #333;">{user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'N/A'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Adresse IP :</td>
+                <td style="padding: 10px 0; color: #333;">{ip_address}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Appareil :</td>
+                <td style="padding: 10px 0; color: #333;">{user_agent[:80]}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Compte :</td>
+                <td style="padding: 10px 0; color: #333;">{user.email}</td>
+            </tr>
+        </table>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Date et heure</th>
-            <td>{user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'N/A'}</td>
-        </tr>
-        <tr>
-            <th>Adresse IP</th>
-            <td>{ip_address}</td>
-        </tr>
-        <tr>
-            <th>Appareil</th>
-            <td>{user_agent[:80]}</td>
-        </tr>
-        <tr>
-            <th>Compte</th>
-            <td>{user.email}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Si ce n'était pas vous
+    
+    <!-- Section sécurité -->
+    <div style="background-color: #fff8f8; border: 1px solid #ffebee; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Si ce n'était pas vous
+        </h3>
+        
+        <ol style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 10px;">Changez immédiatement votre mot de passe</li>
+            <li style="margin-bottom: 10px;">Contactez l'administrateur système</li>
+            <li>Activez l'authentification à deux facteurs pour plus de sécurité</li>
+        </ol>
     </div>
-    <ol style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Changez immédiatement votre mot de passe</li>
-        <li style="margin-bottom: 8px;">Contactez l'administrateur système</li>
-        <li style="margin-bottom: 8px;">Activez l'authentification à deux facteurs</li>
-    </ol>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Nous recommandons de maintenir l'authentification à deux facteurs activée.
-    </p>
+    
+    <!-- Recommandation -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 14px; margin: 0; font-weight: bold;">
+            Recommandation de sécurité
+        </p>
+        <p style="color: #666; font-size: 14px; margin: 10px 0 0 0; line-height: 1.5;">
+            Nous recommandons de maintenir l'authentification à deux facteurs activée pour une meilleure protection.
+        </p>
+    </div>
 </div>
         """
         
-        # Pour les alertes de sécurité, on utilise une salutation formelle
         greeting = f"Bonjour {user.first_name}," if user.first_name else "Bonjour,"
         subject = "Alerte de sécurité - Nouvelle connexion détectée"
         
@@ -238,15 +252,14 @@ Communauté Électrique du Bénin
                 content, 
                 "Service de Sécurité et Authentification"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting}
 
-Une nouvelle connexion à votre compte a été détectée.
+Une nouvelle connexion à votre compte a été détectée depuis un appareil non reconnu.
 
 DÉTAILS DE LA CONNEXION :
-• Date : {user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'N/A'}
+• Date et heure : {user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'N/A'}
 • Adresse IP : {ip_address}
 • Appareil : {user_agent[:80]}
 • Compte : {user.email}
@@ -254,13 +267,14 @@ DÉTAILS DE LA CONNEXION :
 ACTIONS RECOMMANDÉES :
 Si ce n'était pas vous :
 1. Changez immédiatement votre mot de passe
-2. Contactez l'administrateur
-3. Activez l'authentification 2FA
+2. Contactez l'administrateur système
+3. Activez l'authentification à deux facteurs
 
 ---
-Service de Sécurité
+Service de Sécurité et Authentification
 Communauté Électrique du Bénin
-"""
+Email: securite@ceb.bj
+Téléphone: +229 21 30 05 06"""
         }
     
     @staticmethod
@@ -268,51 +282,65 @@ Communauté Électrique du Bénin
         """Email de confirmation de changement de mot de passe"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Mot de passe modifié
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+   
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Votre mot de passe a été modifié avec succès.
+        </p>
+        
+        <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 15px;">
+            <p style="margin: 0; color: #0D652D; font-size: 14px; font-weight: bold; margin-bottom: 10px;">
+                Détails de l'opération
+            </p>
+            <table style="width: 100%; font-size: 14px;">
+                <tr>
+                    <td style="padding: 8px 0; width: 160px; color: #666; font-weight: 600;">Date et heure :</td>
+                    <td style="padding: 8px 0; color: #333;">{user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'Maintenant'}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-weight: 600;">Compte :</td>
+                    <td style="padding: 8px 0; color: #333;">{user.email}</td>
+                </tr>
+            </table>
+        </div>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Votre mot de passe a été changé avec succès.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Détails de l'action
+    
+    <!-- Section sécurité -->
+    <div style="background-color: #fff8f8; border: 1px solid #ffebee; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Important : vérification de sécurité
+        </h3>
+        
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
+            Si vous n'avez pas initié ce changement de mot de passe, veuillez :
+        </p>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 8px;">Contacter immédiatement l'administrateur système</li>
+            <li style="margin-bottom: 8px;">Réinitialiser votre mot de passe via la procédure de récupération</li>
+            <li>Activer l'authentification à deux facteurs pour renforcer la sécurité</li>
+        </ul>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Date et heure</th>
-            <td>{user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'Maintenant'}</td>
-        </tr>
-        <tr>
-            <th>Compte</th>
-            <td>{user.email}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Si vous n'êtes pas à l'origine de cette action
+    
+    <!-- Bonnes pratiques -->
+    <div style="background-color: #f0f7f0; border-radius: 6px; padding: 18px; margin-bottom: 25px;">
+        <h4 style="color: #0D652D; margin: 0 0 10px 0; font-size: 15px; font-weight: bold;">
+            Recommandations de sécurité
+        </h4>
+        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.5;">
+            Pour protéger votre compte, utilisez un mot de passe unique et complexe, 
+            différent de ceux utilisés sur d'autres services. L'authentification à deux 
+            facteurs est fortement recommandée pour une sécurité optimale.
+        </p>
     </div>
-    <ol style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Contactez immédiatement l'administrateur</li>
-        <li style="margin-bottom: 8px;">Réinitialisez votre mot de passe</li>
-        <li>Activez l'authentification à deux facteurs</li>
-    </ol>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Bonnes pratiques : Utilisez un mot de passe unique et complexe.
-    </p>
 </div>
         """
         
         greeting = f"Bonjour {user.first_name}," if user.first_name else "Bonjour,"
-        subject = "Alerte Sécurité - Mot de passe modifié"
+        subject = "Confirmation de modification de votre mot de passe"
         
         return {
             'subject': subject,
@@ -321,24 +349,32 @@ Communauté Électrique du Bénin
                 content, 
                 "Service de Sécurité"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
+{'-' * 50}
 
 {greeting}
 
-Votre mot de passe a été changé avec succès.
+Votre mot de passe a été modifié avec succès.
 
-DÉTAILS :
-• Date : {user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'Maintenant'}
-• Compte : {user.email}
+INFORMATIONS SUR L'OPERATION :
+• Date et heure : {user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'Maintenant'}
+• Compte concerné : {user.email}
 
-IMPORTANT :
-Si ce n'était pas vous, contactez immédiatement l'administrateur.
+IMPORTANT - VERIFICATION DE SECURITE :
+Si vous n'êtes pas à l'origine de cette modification :
+1. Contactez immédiatement l'administrateur système
+2. Réinitialisez votre mot de passe via la procédure de récupération
+3. Activez l'authentification à deux facteurs
+
+RECOMMANDATIONS :
+- Utilisez un mot de passe unique et complexe
+- N'utilisez pas le même mot de passe sur plusieurs services
+- Activez l'authentification à deux facteurs pour plus de sécurité
 
 ---
 Service de Sécurité
 Communauté Électrique du Bénin
-"""
+Email: securite@ceb.bj"""
         }
     
     @staticmethod
@@ -348,57 +384,67 @@ Communauté Électrique du Bénin
         FRONTEND_URL = getattr(settings, 'FRONTEND_URL', 'http://localhost:8080')
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Bienvenue sur GES STAGE
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+   
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Votre compte a été créé avec succès. Vous avez maintenant accès à la plateforme de gestion des stages.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Votre compte a été créé avec succès. Vous avez maintenant accès à la plateforme de gestion des stages.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Vos identifiants de connexion
+    
+    <!-- Identifiants -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Vos identifiants de connexion
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 180px; color: #666; font-weight: 600;">Adresse email :</td>
+                <td style="padding: 10px 0; color: #333;">{user.email}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Mot de passe temporaire :</td>
+                <td style="padding: 10px 0; color: #333; font-family: monospace;">{password}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Rôle :</td>
+                <td style="padding: 10px 0; color: #333;">{user.role}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de création :</td>
+                <td style="padding: 10px 0; color: #333;">{user.date_joined.strftime('%d/%m/%Y')}</td>
+            </tr>
+        </table>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 180px;">Adresse email</th>
-            <td>{user.email}</td>
-        </tr>
-        <tr>
-            <th>Mot de passe temporaire</th>
-            <td>{password}</td>
-        </tr>
-        <tr>
-            <th>Rôle</th>
-            <td>{user.role}</td>
-        </tr>
-        <tr>
-            <th>Date de création</th>
-            <td>{user.date_joined.strftime('%d/%m/%Y')}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Consignes de sécurité
+    
+    <!-- Consignes de sécurité -->
+    <div style="background-color: #fff8f8; border: 1px solid #ffebee; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Consignes de sécurité importantes
+        </h3>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 10px;">Changez votre mot de passe dès votre première connexion</li>
+            <li style="margin-bottom: 10px;">Utilisez un mot de passe fort et unique</li>
+            <li style="margin-bottom: 10px;">Ne partagez jamais vos identifiants</li>
+            <li>Signalez toute activité suspecte</li>
+        </ul>
     </div>
-    <ul style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Changez votre mot de passe dès votre première connexion</li>
-        <li style="margin-bottom: 8px;">Utilisez un mot de passe fort et unique</li>
-        <li style="margin-bottom: 8px;">Ne partagez jamais vos identifiants</li>
-        <li>Signalez toute activité suspecte</li>
-    </ul>
-</div>
-
-<div style="text-align: center; margin: 40px 0;">
-    <p style="color: #666666; font-size: 14px; margin-top: 12px;">
-        <a href="{FRONTEND_URL}/login/" style="color: #0D652D; text-decoration: none;">
-            {FRONTEND_URL}/login/
-        </a>
-    </p>
+    
+    <!-- Lien de connexion -->
+    <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #f0f7f0; border-radius: 6px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0 0 10px 0; font-weight: bold;">
+            Accédez à la plateforme
+        </p>
+        <p style="color: #666; font-size: 14px; margin: 0;">
+            <a href="stageemploi@cebnet.org" style="color: #0D652D; text-decoration: underline;">
+                stageemploi@cebnet.org/
+            </a>
+        </p>
+    </div>
 </div>
         """
         
@@ -412,31 +458,29 @@ Communauté Électrique du Bénin
                 content, 
                 "Plateforme GES STAGE"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting}
 
 Votre compte a été créé avec succès sur la plateforme de gestion des stages.
 
-IDENTIFIANTS :
+VOS IDENTIFIANTS :
 • Email : {user.email}
 • Mot de passe temporaire : {password}
 • Rôle : {user.role}
 • Date de création : {user.date_joined.strftime('%d/%m/%Y')}
 
-IMPORTANT :
-Changez votre mot de passe dès votre première connexion.
+IMPORTANT - SÉCURITÉ :
+Changez votre mot de passe dès votre première connexion et utilisez un mot de passe fort et unique.
 
-CONNEXION :
-{FRONTEND_URL}/login/
+ACCÈS À LA PLATEFORME :
+stageemploi@cebnet.org/
 
 ---
 Service des Stages
 Communauté Électrique du Bénin
-Email: stages@ceb.bj
-Téléphone: +229 21 30 05 06
-"""
+Email: stageemploi@cebnet.org
+Téléphone: +229 21 30 05 06"""
         }
 
     @staticmethod
@@ -444,48 +488,48 @@ Téléphone: +229 21 30 05 06
         """Email de demande de réinitialisation de mot de passe"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Demande de réinitialisation de mot de passe
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+ 
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Vous avez demandé la réinitialisation de votre mot de passe GES STAGE.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Vous avez demandé la réinitialisation de votre mot de passe GES STAGE.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Important
+    
+    <!-- Lien de réinitialisation -->
+    <div style="background-color: #f0f7f0; border-radius: 6px; padding: 25px; text-align: center; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0 0 15px 0; font-weight: bold;">
+            Lien de réinitialisation
+        </p>
+        <p style="color: #666; font-size: 14px; margin: 0; word-break: break-all;">
+            <a href="{reset_link}" style="color: #0D652D; text-decoration: underline;">
+                {reset_link}
+            </a>
+        </p>
     </div>
-    <p style="color: #383838; margin: 0; line-height: 1.6;">
-        Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email. 
-        Votre mot de passe actuel reste inchangé.
-    </p>
-</div>
-
-<div style="text-align: center; margin: 40px 0;">
-    <p style="color: #666666; font-size: 14px; margin-top: 12px; word-break: break-all;">
-        <a href="{reset_link}" style="color: #0D652D; text-decoration: none;">
-            {reset_link}
-        </a>
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Informations importantes
+    
+    <!-- Informations importantes -->
+    <div style="background-color: #fff8f8; border: 1px solid #ffebee; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Informations importantes
+        </h3>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 10px;">Ce lien est valable pendant 24 heures</li>
+            <li style="margin-bottom: 10px;">Le lien ne peut être utilisé qu'une seule fois</li>
+            <li>Si vous n'avez pas fait cette demande, ignorez cet email</li>
+        </ul>
     </div>
-    <ul style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Ce lien est valable pendant 24 heures</li>
-        <li style="margin-bottom: 8px;">Le lien ne peut être utilisé qu'une seule fois</li>
-        <li>Si vous n'avez pas fait cette demande, ignorez cet email</li>
-    </ul>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Si vous n'avez pas demandé cette réinitialisation, contactez le support.
-    </p>
+    
+    <!-- Note de sécurité -->
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+            Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement le support.<br>
+            Cet email a été envoyé automatiquement. Veuillez ne pas y répondre.
+        </p>
+    </div>
 </div>
         """
         
@@ -499,8 +543,7 @@ Téléphone: +229 21 30 05 06
                 content, 
                 "Service de Sécurité"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting}
 
@@ -520,8 +563,7 @@ CONSEILS DE SÉCURITÉ :
 ---
 Service de Sécurité - GES STAGE
 Email: securite@ceb.bj
-Téléphone: +229 21 30 05 06
-"""
+Téléphone: +229 21 30 05 06"""
         }
 
 
@@ -533,53 +575,56 @@ class StageEmailTemplates:
         """Email de renouvellement de stage"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Renouvellement de votre stage
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+   
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Votre stage au sein de la CEB a été renouvelé pour une nouvelle période.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Votre stage au sein de la CEB a été renouvelé pour une nouvelle période.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Détails de votre nouveau stage
+    
+    <!-- Détails du nouveau stage -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Détails de votre nouveau stage
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
+                <td style="padding: 10px 0; color: #333;">{nouveau_stage.nom} {nouveau_stage.prenom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Type de stage :</td>
+                <td style="padding: 10px 0; color: #333;">{nouveau_stage.type_stage}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Service :</td>
+                <td style="padding: 10px 0; color: #333;">{nouveau_stage.service}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Période :</td>
+                <td style="padding: 10px 0; color: #333;">Du {nouveau_stage.date_debut.strftime('%d/%m/%Y')} au {nouveau_stage.date_fin.strftime('%d/%m/%Y')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Durée :</td>
+                <td style="padding: 10px 0; color: #333;">{(nouveau_stage.date_fin - nouveau_stage.date_debut).days} jours</td>
+            </tr>
+        </table>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Stagiaire</th>
-            <td>{nouveau_stage.nom} {nouveau_stage.prenom}</td>
-        </tr>
-        <tr>
-            <th>Type de stage</th>
-            <td>{nouveau_stage.type_stage}</td>
-        </tr>
-        <tr>
-            <th>Service</th>
-            <td>{nouveau_stage.service}</td>
-        </tr>
-        <tr>
-            <th>Période</th>
-            <td>Du {nouveau_stage.date_debut.strftime('%d/%m/%Y')} au {nouveau_stage.date_fin.strftime('%d/%m/%Y')}</td>
-        </tr>
-        <tr>
-            <th>Durée</th>
-            <td>{(nouveau_stage.date_fin - nouveau_stage.date_debut).days} jours</td>
-        </tr>
-    </table>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Nous vous souhaitons une excellente continuation dans votre stage.
-    </p>
+    
+    <!-- Message de fin -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous souhaitons une excellente continuation dans votre stage
+        </p>
+    </div>
 </div>
         """
         
-        # Utilisation du genre du stagiaire pour la salutation
         greeting = get_gender_based_greeting(nouveau_stage.prenom, nouveau_stage.genre)
-        
         subject = "Renouvellement de votre stage - Communauté Électrique du Bénin"
         
         return {
@@ -589,8 +634,7 @@ class StageEmailTemplates:
                 content, 
                 "Service des Stages"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting},
 
@@ -610,8 +654,7 @@ PROCHAINES ÉTAPES :
 ---
 Service des Stages
 Communauté Électrique du Bénin
-Email: stages@ceb.bj
-"""
+Email: stages@ceb.bj"""
         }
     
     @staticmethod
@@ -619,61 +662,66 @@ Email: stages@ceb.bj
         """Email de fin anticipée de stage"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Fin de stage
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+  
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Votre stage a pris fin de manière anticipée. Nous vous remercions pour votre contribution.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Votre stage a pris fin de manière anticipée. Nous vous remercions pour votre contribution.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Détails de votre stage
+    
+    <!-- Détails du stage -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Détails de votre stage
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.prenom} {stagiaire.nom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Service :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.service}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de début :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.date_debut.strftime('%d/%m/%Y') if stagiaire.date_debut else 'N/A'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de fin :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
+            </tr>
+        </table>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Stagiaire</th>
-            <td>{stagiaire.prenom} {stagiaire.nom}</td>
-        </tr>
-        <tr>
-            <th>Service</th>
-            <td>{stagiaire.service}</td>
-        </tr>
-        <tr>
-            <th>Date de début</th>
-            <td>{stagiaire.date_debut.strftime('%d/%m/%Y') if stagiaire.date_debut else 'N/A'}</td>
-        </tr>
-        <tr>
-            <th>Date de fin</th>
-            <td>{stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Prochaines étapes
+    
+    <!-- Prochaines étapes -->
+    <div style="background-color: #fff8f8; border: 1px solid #ffebee; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Prochaines étapes
+        </h3>
+        
+        <ol style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 10px;">Restituer tout équipement emprunté</li>
+            <li style="margin-bottom: 10px;">Soumettre votre rapport de stage</li>
+            <li style="margin-bottom: 10px;">Contacter le service des stages pour attestation</li>
+            <li>Débriefing final avec tuteur</li>
+        </ol>
     </div>
-    <ol style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Restituer tout équipement emprunté</li>
-        <li style="margin-bottom: 8px;">Soumettre votre rapport de stage</li>
-        <li style="margin-bottom: 8px;">Contacter le service des stages pour attestation</li>
-        <li>Débriefing final avec tuteur</li>
-    </ol>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Nous vous remercions pour votre contribution.
-    </p>
+    
+    <!-- Message de remerciement -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions pour votre contribution
+        </p>
+    </div>
 </div>
         """
         
-        # Utilisation du genre du stagiaire pour la salutation
         greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
-        
         subject = "Fin de stage - Communauté Électrique du Bénin"
         
         return {
@@ -683,8 +731,7 @@ Email: stages@ceb.bj
                 content, 
                 "Service des Stages"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting},
 
@@ -705,8 +752,7 @@ DÉTAILS :
 ---
 Service des Stages
 Communauté Électrique du Bénin
-Email: stages@ceb.bj
-"""
+Email: stages@ceb.bj"""
         }
     
     @staticmethod
@@ -714,49 +760,52 @@ Email: stages@ceb.bj
         """Email de modification de période de stage"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Modification de votre période de stage
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+   
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Les dates de votre stage ont été modifiées.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Les dates de votre stage ont été modifiées.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Comparaison des dates
+    
+    <!-- Comparaison des dates -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Comparaison des dates
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 180px; color: #666; font-weight: 600;">Ancienne date de début :</td>
+                <td style="padding: 10px 0; color: #333;">{ancienne_debut.strftime('%d/%m/%Y') if ancienne_debut else 'N/A'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Nouvelle date de début :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.date_debut.strftime('%d/%m/%Y')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Ancienne date de fin :</td>
+                <td style="padding: 10px 0; color: #333;">{ancienne_fin.strftime('%d/%m/%Y') if ancienne_fin else 'N/A'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Nouvelle date de fin :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
+            </tr>
+        </table>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 180px;">Ancienne date de début</th>
-            <td>{ancienne_debut.strftime('%d/%m/%Y') if ancienne_debut else 'N/A'}</td>
-        </tr>
-        <tr>
-            <th>Nouvelle date de début</th>
-            <td>{stagiaire.date_debut.strftime('%d/%m/%Y')}</td>
-        </tr>
-        <tr>
-            <th>Ancienne date de fin</th>
-            <td>{ancienne_fin.strftime('%d/%m/%Y') if ancienne_fin else 'N/A'}</td>
-        </tr>
-        <tr>
-            <th>Nouvelle date de fin</th>
-            <td>{stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
-        </tr>
-    </table>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Pour toute question, contactez votre responsable ou le service des stages.
-    </p>
+    
+    <!-- Note -->
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+            Pour toute question, contactez votre responsable ou le service des stages.
+        </p>
+    </div>
 </div>
         """
         
-        # Utilisation du genre du stagiaire pour la salutation
         greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
-        
         subject = "Modification de votre période de stage - CEB"
         
         return {
@@ -766,8 +815,7 @@ Email: stages@ceb.bj
                 content, 
                 "Service des Stages"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting},
 
@@ -784,8 +832,7 @@ NOUVELLES DATES :
 
 ---
 Service des Stages
-Communauté Électrique du Bénin
-"""
+Communauté Électrique du Bénin"""
         }
     
     @staticmethod
@@ -793,64 +840,69 @@ Communauté Électrique du Bénin
         """Email de bienvenue pour le premier jour de stage"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Bienvenue pour votre premier jour de stage
-    </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Nous sommes ravis de vous accueillir au sein de la Communauté Électrique du Bénin.
-    </p>
-</div>
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
 
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Informations de votre stage
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous sommes ravis de vous accueillir au sein de la Communauté Électrique du Bénin.
+        </p>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Stagiaire</th>
-            <td>{stagiaire.prenom} {stagiaire.nom}</td>
-        </tr>
-        <tr>
-            <th>Service</th>
-            <td>{stagiaire.service}</td>
-        </tr>
-        <tr>
-            <th>Direction</th>
-            <td>{stagiaire.direction}</td>
-        </tr>
-        <tr>
-            <th>Période</th>
-            <td>Du {stagiaire.date_debut.strftime('%d/%m/%Y')} au {stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
-        </tr>
-        <tr>
-            <th>Durée</th>
-            <td>{stagiaire.duree_jours} jours</td>
-        </tr>
-    </table>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Informations pratiques
+    
+    <!-- Informations du stage -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Informations de votre stage
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.prenom} {stagiaire.nom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Service :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.service}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Direction :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.direction}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Période :</td>
+                <td style="padding: 10px 0; color: #333;">Du {stagiaire.date_debut.strftime('%d/%m/%Y')} au {stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Durée :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.duree_jours} jours</td>
+            </tr>
+        </table>
     </div>
-    <ul style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Présentez-vous à l'accueil avec convention de stage</li>
-        <li style="margin-bottom: 8px;">Horaires : 7h00 - 16h00</li>
-        <li>Pause déjeuner : 12h00 - 13h00</li>
-    </ul>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Nous vous souhaitons un excellent stage.
-    </p>
+    
+    <!-- Informations pratiques -->
+    <div style="background-color: #f0f7f0; border-radius: 6px; padding: 18px; margin-bottom: 25px;">
+        <h4 style="color: #0D652D; margin: 0 0 10px 0; font-size: 15px; font-weight: bold;">
+            Informations pratiques
+        </h4>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 8px;">Présentez-vous à l'accueil avec convention de stage</li>
+            <li style="margin-bottom: 8px;">Horaires : 7h00 - 16h00</li>
+            <li>Pause déjeuner : 12h00 - 13h00</li>
+        </ul>
+    </div>
+    
+    <!-- Message de bienvenue -->
+    <div style="text-align: center; background-color: #fff8f8; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous souhaitons un excellent stage
+        </p>
+    </div>
 </div>
         """
         
-        # Utilisation du genre du stagiaire pour la salutation
         greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
-        
         subject = "Bienvenue pour votre premier jour de stage - CEB"
         
         return {
@@ -860,8 +912,7 @@ Communauté Électrique du Bénin
                 content, 
                 "Service des Stages"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting},
 
@@ -883,268 +934,7 @@ INFORMATIONS PRATIQUES :
 Service des Stages
 Communauté Électrique du Bénin
 Email: stages@ceb.bj
-Téléphone: +229 21 30 05 06
-"""
-        }
-    
-    @staticmethod
-    def demande_attestation_confirmation(stagiaire, demande_attestation):
-        """Email de confirmation de demande d'attestation au stagiaire"""
-        
-        # Utilisation du genre du stagiaire pour la salutation
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
-        
-        subject = f"✅ Demande d'attestation enregistrée - CEB"
-        
-        html = f"""
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 30px; text-align: center; color: white;">
-                <h1 style="margin: 0; font-size: 28px;">✅ Demande Enregistrée</h1>
-            </div>
-            
-            <div style="padding: 30px; background-color: #f9fafb;">
-                <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
-                    {greeting} {stagiaire.nom},
-                </p>
-                
-                <p style="font-size: 14px; color: #6b7280; line-height: 1.6;">
-                    Votre demande d'attestation de stage a été enregistrée avec succès 
-                    le <strong>{demande_attestation.date_demande.strftime('%d/%m/%Y à %H:%M')}</strong>.
-                </p>
-                
-                <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0;">
-                    <h3 style="margin: 0 0 10px 0; color: #1e40af; font-size: 16px;">
-                        📋 Statut actuel
-                    </h3>
-                    <p style="margin: 0; color: #1e3a8a; font-size: 14px;">
-                        <strong>En attente de traitement</strong>
-                    </p>
-                </div>
-                
-                <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
-                    <h3 style="margin: 0 0 10px 0; color: #92400e; font-size: 16px;">
-                        ⏳ Prochaines étapes
-                    </h3>
-                    <ul style="margin: 5px 0; padding-left: 20px; color: #78350f; font-size: 14px;">
-                        <li>Votre demande sera examinée par notre service administratif</li>
-                        <li>Vous recevrez une notification par email dès qu'elle sera traitée</li>
-                        <li>Si votre demande est approuvée, l'attestation sera générée automatiquement</li>
-                        <li>Vous pourrez télécharger votre attestation depuis votre espace de suivi</li>
-                    </ul>
-                </div>
-                
-                <div style="background-color: #e0f2fe; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                    <h3 style="margin: 0 0 10px 0; color: #0c4a6e; font-size: 16px;">
-                        📄 Informations de votre stage
-                    </h3>
-                    <table style="width: 100%; font-size: 14px; color: #475569;">
-                        <tr>
-                            <td style="padding: 5px 0;"><strong>Type de stage:</strong></td>
-                            <td style="padding: 5px 0;">{stagiaire.type_stage}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px 0;"><strong>Période:</strong></td>
-                            <td style="padding: 5px 0;">
-                                {stagiaire.date_debut.strftime('%d/%m/%Y')} - {stagiaire.date_fin.strftime('%d/%m/%Y')}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px 0;"><strong>Direction:</strong></td>
-                            <td style="padding: 5px 0;">{stagiaire.direction}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px 0;"><strong>Service:</strong></td>
-                            <td style="padding: 5px 0;">{stagiaire.service}</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                    <p style="font-size: 12px; color: #9ca3af; margin: 5px 0;">
-                        Vous avez des questions ? Contactez-nous à contact@ceb-benin.org
-                    </p>
-                    <p style="font-size: 12px; color: #9ca3af; margin: 5px 0;">
-                        © 2025 Communauté Électrique du Bénin - Tous droits réservés
-                    </p>
-                </div>
-            </div>
-        </div>
-        """
-        
-        text = f"""
-Demande d'Attestation Enregistrée - CEB
-
-{greeting} {stagiaire.nom},
-
-Votre demande d'attestation de stage a été enregistrée avec succès 
-le {demande_attestation.date_demande.strftime('%d/%m/%Y à %H:%M')}.
-
-STATUT ACTUEL
-En attente de traitement
-
-PROCHAINES ÉTAPES
-- Votre demande sera examinée par notre service administratif
-- Vous recevrez une notification par email dès qu'elle sera traitée
-- Si votre demande est approuvée, l'attestation sera générée automatiquement
-- Vous pourrez télécharger votre attestation depuis votre espace de suivi
-
-INFORMATIONS DE VOTRE STAGE
-Type de stage: {stagiaire.type_stage}
-Période: {stagiaire.date_debut.strftime('%d/%m/%Y')} - {stagiaire.date_fin.strftime('%d/%m/%Y')}
-Direction: {stagiaire.direction}
-Service: {stagiaire.service}
-
-Vous avez des questions ? Contactez-nous à contact@ceb-benin.org
-
-© 2025 Communauté Électrique du Bénin - Tous droits réservés
-        """
-        
-        return {
-            'subject': subject,
-            'html': html,
-            'text': text
-        }
-    
-    @staticmethod
-    def nouvelle_demande_attestation_admin(stagiaire, demande_attestation):
-        """Email de notification aux administrateurs pour nouvelle demande d'attestation"""
-        
-        # Pour les administrateurs, on utilise une salutation collective
-        greeting = "Chers administrateurs,"
-        
-        subject = f"Nouvelle demande d'attestation - {stagiaire.prenom} {stagiaire.nom}"
-        
-        html = f"""
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; text-align: center; color: white;">
-                <h1 style="margin: 0; font-size: 28px;">🔔 Nouvelle Demande d'Attestation</h1>
-            </div>
-            
-            <div style="padding: 30px; background-color: #f9fafb;">
-                <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
-                    <p style="margin: 0; color: #92400e; font-size: 14px;">
-                        Une nouvelle demande d'attestation nécessite votre attention.
-                    </p>
-                </div>
-                
-                <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
-                    <h3 style="margin: 0 0 15px 0; color: #111827; font-size: 18px;">
-                        👤 Informations du stagiaire
-                    </h3>
-                    <table style="width: 100%; font-size: 14px; color: #475569;">
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Nom complet:</strong></td>
-                            <td style="padding: 8px 0;">{stagiaire.prenom} {stagiaire.nom}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Email:</strong></td>
-                            <td style="padding: 8px 0;">{stagiaire.email}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Téléphone:</strong></td>
-                            <td style="padding: 8px 0;">{stagiaire.telephone}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Genre:</strong></td>
-                            <td style="padding: 8px 0;">{stagiaire.genre}</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
-                    <h3 style="margin: 0 0 15px 0; color: #111827; font-size: 18px;">
-                        📋 Détails du stage
-                    </h3>
-                    <table style="width: 100%; font-size: 14px; color: #475569;">
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Type:</strong></td>
-                            <td style="padding: 8px 0;">{stagiaire.type_stage}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Période:</strong></td>
-                            <td style="padding: 8px 0;">
-                                {stagiaire.date_debut.strftime('%d/%m/%Y')} - {stagiaire.date_fin.strftime('%d/%m/%Y')}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Direction:</strong></td>
-                            <td style="padding: 8px 0;">{stagiaire.direction}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Service:</strong></td>
-                            <td style="padding: 8px 0;">{stagiaire.service}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Statut:</strong></td>
-                            <td style="padding: 8px 0;">
-                                <span style="background-color: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-weight: bold;">
-                                    {getattr(stagiaire, 'statut_actuel', 'Actif')}
-                                </span>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
-                    <h3 style="margin: 0 0 15px 0; color: #111827; font-size: 18px;">
-                        📄 Détails de la demande
-                    </h3>
-                    <table style="width: 100%; font-size: 14px; color: #475569;">
-                        <tr>
-                            <td style="padding: 8px 0;"><strong>Date de demande:</strong></td>
-                            <td style="padding: 8px 0;">{demande_attestation.date_demande.strftime('%d/%m/%Y à %H:%M')}</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                    <a href="https://votre-domaine.com/admin/stages" 
-                       style="display: inline-block; background-color: #f59e0b; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                        Traiter la demande
-                    </a>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                    <p style="font-size: 12px; color: #9ca3af; margin: 5px 0;">
-                        Cet email a été envoyé automatiquement par le système de gestion des stages CEB
-                    </p>
-                </div>
-            </div>
-        </div>
-        """
-        
-        text = f"""
-Nouvelle Demande d'Attestation - CEB
-
-Chers administrateurs,
-
-Une nouvelle demande d'attestation nécessite votre attention.
-
-INFORMATIONS DU STAGIAIRE
-Nom complet: {stagiaire.prenom} {stagiaire.nom}
-Email: {stagiaire.email}
-Téléphone: {stagiaire.telephone}
-Genre: {stagiaire.genre}
-
-DÉTAILS DU STAGE
-Type: {stagiaire.type_stage}
-Période: {stagiaire.date_debut.strftime('%d/%m/%Y')} - {stagiaire.date_fin.strftime('%d/%m/%Y')}
-Direction: {stagiaire.direction}
-Service: {stagiaire.service}
-Statut: {getattr(stagiaire, 'statut_actuel', 'Actif')}
-
-DÉTAILS DE LA DEMANDE
-Date de demande: {demande_attestation.date_demande.strftime('%d/%m/%Y à %H:%M')}
-
-Connectez-vous à votre espace administrateur pour traiter cette demande.
-
-Cet email a été envoyé automatiquement par le système de gestion des stages CEB
-        """
-        
-        return {
-            'subject': subject,
-            'html': html,
-            'text': text
+Téléphone: +229 21 30 05 06"""
         }
 
 
@@ -1158,35 +948,42 @@ class PreferenceEmailTemplates:
         user_name = get_user_display_name(user)
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Abonnement activé
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+   
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Vous êtes maintenant abonné(e) aux emails des nouveautés de la plateforme Stages CEB.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Vous êtes maintenant abonné(e) aux emails des nouveautés de la plateforme Stages CEB.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Ce que vous recevrez
+    
+    <!-- Contenu des newsletters -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Ce que vous recevrez
+        </h3>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 10px;">Nouvelles fonctionnalités de la plateforme</li>
+            <li style="margin-bottom: 10px;">Mises à jour importantes</li>
+            <li style="margin-bottom: 10px;">Conseils d'utilisation</li>
+            <li>Annonces importantes de la CEB</li>
+        </ul>
     </div>
-    <ul style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Nouvelles fonctionnalités de la plateforme</li>
-        <li style="margin-bottom: 8px;">Mises à jour importantes</li>
-        <li style="margin-bottom: 8px;">Conseils d'utilisation</li>
-        <li>Annonces importantes de la CEB</li>
-    </ul>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Vous pouvez modifier vos préférences dans la section "Paramètres" de votre profil.
-    </p>
+    
+    <!-- Gestion des préférences -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Gestion de vos préférences
+        </p>
+        <p style="color: #666; font-size: 14px; margin: 10px 0 0 0; line-height: 1.5;">
+            Vous pouvez modifier vos préférences dans la section "Paramètres" de votre profil.
+        </p>
+    </div>
 </div>
         """
         
-        # Pour les newsletters, on utilise Bonjour
         greeting = f"Bonjour {user_name}," if user_name else "Bonjour,"
         subject = "Bienvenue dans les nouveautés CEB"
         
@@ -1197,8 +994,7 @@ class PreferenceEmailTemplates:
                 content, 
                 "Service Communication"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting}
 
@@ -1211,12 +1007,11 @@ CE QUE VOUS RECEVREZ :
 • Annonces importantes de la CEB
 
 GESTION DE VOS PRÉFÉRENCES :
-Vous pouvez modifier vos préférences dans la section "Paramètres".
+Vous pouvez modifier vos préférences dans la section "Paramètres" de votre profil.
 
 ---
 Service Communication
-Communauté Électrique du Bénin
-"""
+Communauté Électrique du Bénin"""
         }
 
 
@@ -1228,69 +1023,75 @@ class DemandeEmailTemplates:
         """Email de notification aux admins pour une nouvelle demande"""
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Nouvelle demande de stage
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Une nouvelle candidature a été soumise et nécessite votre attention.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Une nouvelle candidature a été soumise et nécessite votre attention.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Informations du candidat
+    
+    <!-- Informations du candidat -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Informations du candidat
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Nom complet :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.etudiant_nom} {demande.etudiant_prenom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Email :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.etudiant_email}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Téléphone :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.etudiant_telephone}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Domaine d'étude :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.etudiant_specialite}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Type de stage :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.type_stage or 'Non spécifié'}</td>
+            </tr>
+            {f'''
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Établissement :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.etablissement.nom}</td>
+            </tr>
+            ''' if demande.etablissement else ''}
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Genre :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.genre}</td>
+            </tr>
+        </table>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Nom complet</th>
-            <td>{demande.etudiant_nom} {demande.etudiant_prenom}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{demande.etudiant_email}</td>
-        </tr>
-        <tr>
-            <th>Téléphone</th>
-            <td>{demande.etudiant_telephone}</td>
-        </tr>
-        <tr>
-            <th>Domaine d'étude</th>
-            <td>{demande.etudiant_specialite}</td>
-        </tr>
-        <tr>
-            <th>Type de stage</th>
-            <td>{demande.type_stage or 'Non spécifié'}</td>
-        </tr>
-        {f'''
-        <tr>
-            <th>Établissement</th>
-            <td>{demande.etablissement.nom}</td>
-        </tr>
-        ''' if demande.etablissement else ''}
-        <tr>
-            <th>Genre</th>
-            <td>{demande.genre}</td>
-        </tr>
-    </table>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <div style="font-size: 14px; color: #0D652D; margin-bottom: 10px;">
-        Numéro de suivi
+    
+    <!-- Numéro de suivi -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 25px; border-radius: 6px; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+            Numéro de suivi
+        </p>
+        <p style="color: #333; font-size: 20px; margin: 0; font-family: monospace; font-weight: bold;">
+            {demande.tracking_id}
+        </p>
+        <p style="color: #666; font-size: 13px; margin: 10px 0 0 0;">
+            Soumis le {demande.date_soumission.strftime('%d/%m/%Y à %H:%M')}
+        </p>
     </div>
-    <div style="font-size: 16px; font-weight: 600; color: #0D652D; font-family: 'Courier New', monospace;">
-        {demande.tracking_id}
+    
+    <!-- Note -->
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+            Cette demande est en attente de traitement.
+        </p>
     </div>
-    <div style="font-size: 13px; color: #666666; margin-top: 8px;">
-        Soumis le {demande.date_soumission.strftime('%d/%m/%Y à %H:%M')}
-    </div>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Cette demande est en attente de traitement.
-    </p>
 </div>
         """
         
@@ -1304,8 +1105,7 @@ class DemandeEmailTemplates:
                 content, 
                 "Service de Gestion des Candidatures"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting}
 
@@ -1331,172 +1131,154 @@ Cette demande est en attente de traitement.
 
 ---
 Service de Gestion des Stages
-Communauté Électrique du Bénin
-"""
+Communauté Électrique du Bénin"""
         }
     
     @staticmethod
     def confirmation_reception_candidat(demande) -> dict:
         """Email de confirmation de réception au candidat"""
         
-        # Utilisation du genre du candidat pour la salutation
         greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Votre demande de stage est enregistrée
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+ 
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous vous confirmons la prise en compte de votre candidature 
+            auprès de la Communauté Électrique du Bénin.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Nous accusons réception de votre candidature pour un stage au sein de la Communauté Électrique du Bénin.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Informations de votre candidature
+    
+    <!-- Numéro de suivi -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 25px; border-radius: 6px; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+            Votre référence de dossier
+        </p>
+        <p style="color: #333; font-size: 20px; margin: 0; font-family: monospace; font-weight: bold;">
+            {demande.tracking_id}
+        </p>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Nom complet</th>
-            <td>{demande.etudiant_nom} {demande.etudiant_prenom}</td>
-        </tr>
-        <tr>
-            <th>Numéro de suivi</th>
-            <td><strong>{demande.tracking_id}</strong></td>
-        </tr>
-        <tr>
-            <th>Date de soumission</th>
-            <td>{demande.date_soumission.strftime('%d/%m/%Y à %H:%M')}</td>
-        </tr>
-        <tr>
-            <th>Domaine d'étude</th>
-            <td>{demande.etudiant_specialite}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Prochaines étapes
+    
+    <!-- Instruction administrative -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Instruction administrative
+        </h3>
+        
+        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+            Votre dossier sera examiné conformément à notre procédure de sélection. 
+            Vous serez informé(e) de l'avancement du traitement dans les délais réglementaires.
+        </p>
     </div>
-    <ol style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 8px;">Notre équipe examinera votre candidature</li>
-        <li style="margin-bottom: 8px;">Vous recevrez une réponse sous 15 jours ouvrés</li>
-        <li style="margin-bottom: 8px;">Si retenu, vous serez contacté pour un entretien</li>
-        <li>Vous pouvez suivre l'état de votre demande sur la plateforme</li>
-    </ol>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Nous vous remercions de l'intérêt que vous portez à la CEB.
-    </p>
+    
+    <!-- Message de remerciement -->
+    <div style="text-align: center; background-color: #fff8f8; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions de l'intérêt manifesté pour la Communauté Électrique du Bénin
+        </p>
+    </div>
 </div>
         """
         
-        subject = f"Accusé de réception - Demande de stage n°{demande.tracking_id}"
+        subject = f"Accusé de réception - Candidature n°{demande.tracking_id}"
         
         return {
             'subject': subject,
             'html': BenchmarkEmailTemplateService.build_benchmark_email(
                 greeting, 
                 content, 
-                "Service des Stages - CEB"
+                "Direction des Ressources Humaines - CEB"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting},
 
-Nous accusons réception de votre candidature pour un stage au sein de la Communauté Électrique du Bénin.
+Nous vous confirmons la prise en compte de votre candidature auprès de la Communauté Électrique du Bénin.
 
-INFORMATIONS DE VOTRE CANDIDATURE :
-• Nom : {demande.etudiant_nom} {demande.etudiant_prenom}
-• Numéro de suivi : {demande.tracking_id}
-• Date : {demande.date_soumission.strftime('%d/%m/%Y à %H:%M')}
-• Domaine : {demande.etudiant_specialite}
+RÉFÉRENCE DE DOSSIER : {demande.tracking_id}
 
-PROCHAINES ÉTAPES :
-1. Notre équipe examinera votre candidature
-2. Vous recevrez une réponse sous 15 jours ouvrés
-3. Si retenu, vous serez contacté pour un entretien
-4. Vous pouvez suivre l'état de votre demande sur la plateforme
+Votre dossier sera examiné conformément à notre procédure de sélection. 
+Vous serez informé(e) de l'avancement du traitement dans les délais réglementaires.
 
-Nous vous remercions de l'intérêt que vous portez à la CEB.
+Nous vous remercions de l'intérêt manifesté pour la Communauté Électrique du Bénin.
 
 ---
-Service des Stages
+Direction des Ressources Humaines
 Communauté Électrique du Bénin
-Email: stages@ceb.bj
-Téléphone: +229 21 30 05 06
-"""
+Email: drh@ceb.bj
+Téléphone: +229 21 30 05 06"""
         }
-    
-    
     
     @staticmethod
     def rejection_notification(demande, raison_refus=None) -> dict:
         """Email de notification de refus au candidat"""
         
-        # Utilisation du genre du candidat pour la salutation
         greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
-        
         raison = raison_refus or demande.raison_refus or "Le nombre de places disponibles est limité."
         
         content = f"""
-<div class="content-box">
-    <div style="color: #dc2626; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Réponse à votre candidature de stage
-    </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Nous vous remercions de l'intérêt que vous avez porté à la Communauté Électrique du Bénin.
-    </p>
-</div>
-
-<div class="content-box">
-    <div style="color: #dc2626; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Décision
-    </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 15px; line-height: 1.6;">
-        Après un examen attentif de votre dossier, nous regrettons de vous informer que votre candidature n'a pas été retenue pour cette session.
-    </p>
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+ 
     
-    <div style="background-color: #fef2f2; padding: 15px; border-radius: 6px; margin: 15px 0;">
-        <p style="color: #7f1d1d; font-size: 14px; margin: 0; line-height: 1.6;">
-            <strong>Motif :</strong> {raison}
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous vous remercions de l'intérêt que vous avez porté à la Communauté Électrique du Bénin.
         </p>
     </div>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Informations de votre candidature
+    
+    <!-- Décision -->
+    <div style="margin-bottom: 30px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Décision
+        </h3>
+        
+        <p style="color: #383838; font-size: 14px; margin-bottom: 15px; line-height: 1.6;">
+            Après un examen attentif de votre dossier, nous regrettons de vous informer que votre candidature n'a pas été retenue pour cette session.
+        </p>
+        
+        <div style="background-color: #ffebee; padding: 15px; border-radius: 6px; margin: 15px 0;">
+            <p style="color: #c62828; font-size: 14px; margin: 0; line-height: 1.6;">
+                <strong>Motif :</strong> {raison}
+            </p>
+        </div>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Nom complet</th>
-            <td>{demande.etudiant_nom} {demande.etudiant_prenom}</td>
-        </tr>
-        <tr>
-            <th>Numéro de suivi</th>
-            <td><strong>{demande.tracking_id}</strong></td>
-        </tr>
-        <tr>
-            <th>Date de soumission</th>
-            <td>{demande.date_soumission.strftime('%d/%m/%Y à %H:%M')}</td>
-        </tr>
-        <tr>
-            <th>Type de stage</th>
-            <td>{demande.type_stage}</td>
-        </tr>
-    </table>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px; background-color: #f8fafc; border-radius: 8px;">
-    <p style="color: #475569; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Nous vous remercions encore pour votre candidature et vous souhaitons plein succès dans vos recherches futures.
-    </p>
+    
+    <!-- Informations de la candidature -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Informations de votre candidature
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Nom complet :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.etudiant_nom} {demande.etudiant_prenom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Numéro de suivi :</td>
+                <td style="padding: 10px 0; color: #333; font-weight: bold;">{demande.tracking_id}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de soumission :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.date_soumission.strftime('%d/%m/%Y à %H:%M')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Type de stage :</td>
+                <td style="padding: 10px 0; color: #333;">{demande.type_stage}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- Message de fin -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions encore pour votre candidature et vous souhaitons plein succès dans vos recherches futures
+        </p>
+    </div>
 </div>
         """
         
@@ -1509,8 +1291,7 @@ Téléphone: +229 21 30 05 06
                 content, 
                 "Service des Stages - CEB"
             ),
-            'text': f"""
-{subject}
+            'text': f"""{subject}
 
 {greeting},
 
@@ -1534,6 +1315,370 @@ Nous vous remercions encore pour votre candidature et vous souhaitons plein succ
 Service des Stages
 Communauté Électrique du Bénin
 Email: stages@ceb.bj
-Téléphone: +229 21 30 05 06
-"""
+Téléphone: +229 21 30 05 06"""
         }
+
+
+class AttestationEmailTemplates:
+    """Templates d'emails pour les attestations"""
+    
+    @staticmethod
+    def attestation_approuvee(stagiaire, demande_attestation) -> Dict[str, str]:
+        """Email pour attestation approuvée"""
+        from services.email_service import EmailTemplateService, EmailContentService
+        
+        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+ 
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous avons le plaisir de vous informer que votre demande d'attestation de stage 
+            a été approuvée par nos services.
+        </p>
+    </div>
+    
+    <!-- Détails du stage -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Détails de votre stage
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.nom} {stagiaire.prenom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de début :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.date_debut.strftime('%d/%m/%Y')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de fin :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Direction/Service :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.direction} / {stagiaire.service}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date d'approbation :</td>
+                <td style="padding: 10px 0; color: #333;">{demande_attestation.date_traitement.strftime('%d/%m/%Y') if demande_attestation.date_traitement else "Aujourd'hui"}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- Prochaines étapes -->
+    <div style="background-color: #fff3e0; border: 1px solid #ffe0b2; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #f57c00; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Prochaines étapes
+        </h3>
+        
+        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.6;">
+            Votre attestation est en cours de préparation par le service des stages. 
+            Vous recevrez une nouvelle notification dès qu'elle sera disponible pour retrait.
+        </p>
+    </div>
+    
+    <!-- Délai de traitement -->
+    <div style="margin-bottom: 25px;">
+        <h4 style="color: #0D652D; margin: 0 0 10px 0; font-size: 15px; font-weight: bold;">
+            Délai de traitement
+        </h4>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 8px;">La préparation de votre attestation prendra quelques jours ouvrables</li>
+            <li style="margin-bottom: 8px;">Vous serez informé(e) par email dès qu'elle sera prête</li>
+            <li>Aucune action n'est requise de votre part pour le moment</li>
+        </ul>
+    </div>
+    
+    <!-- Message de fin -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions pour votre contribution à la CEB
+        </p>
+    </div>
+</div>
+        """
+        
+        subject = f"Attestation de stage approuvée - {stagiaire.nom} {stagiaire.prenom}"
+        
+        return {
+            'subject': subject,
+            'html': EmailTemplateService.build_email(greeting, content, "Service des Attestations"),
+            'text': EmailContentService._generate_text_version(subject, greeting, content)
+        }
+    
+    @staticmethod
+    def attestation_refusee(stagiaire, demande_attestation) -> Dict[str, str]:
+        """Email pour attestation refusée"""
+        from services.email_service import EmailTemplateService, EmailContentService
+        
+        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous avons examiné votre demande d'attestation de stage et regrettons de vous informer 
+            qu'elle n'a pas été approuvée.
+        </p>
+    </div>
+    
+    <!-- Motif du refus -->
+    <div style="background-color: #ffebee; border: 1px solid #ffcdd2; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Motif du refus
+        </h3>
+        
+        <p style="color: #c62828; font-size: 14px; margin: 0; line-height: 1.6;">
+            {demande_attestation.motif_refus or "Raison non spécifiée"}
+        </p>
+    </div>
+    
+    <!-- Détails de la demande -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Détails de la demande
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.nom} {stagiaire.prenom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de demande :</td>
+                <td style="padding: 10px 0; color: #333;">{demande_attestation.date_demande.strftime('%d/%m/%Y')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de traitement :</td>
+                <td style="padding: 10px 0; color: #333;">{demande_attestation.date_traitement.strftime('%d/%m/%Y') if demande_attestation.date_traitement else "Aujourd'hui"}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Statut :</td>
+                <td style="padding: 10px 0; color: #d32f2f; font-weight: bold;">Refusée</td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- Prochaines étapes -->
+    <div style="background-color: #fff3e0; border: 1px solid #ffe0b2; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #f57c00; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Prochaines étapes
+        </h3>
+        
+        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.6;">
+            Vous pouvez soumettre une nouvelle demande d'attestation après avoir pris en compte 
+            les remarques mentionnées ci-dessus.
+        </p>
+    </div>
+    
+    <!-- Note -->
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+            Nous restons à votre disposition pour toute information complémentaire.
+        </p>
+    </div>
+</div>
+        """
+        
+        subject = f"Décision concernant votre attestation de stage - {stagiaire.nom} {stagiaire.prenom}"
+        
+        return {
+            'subject': subject,
+            'html': EmailTemplateService.build_email(greeting, content, "Service des Attestations"),
+            'text': EmailContentService._generate_text_version(subject, greeting, content)
+        }
+
+    @staticmethod
+    def attestation_disponible(stagiaire, demande_attestation, lien_telechargement=None) -> Dict[str, str]:
+        """Email pour attestation disponible au retrait ou téléchargement"""
+        from services.email_service import EmailTemplateService, EmailContentService
+        
+        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        
+        # Section téléchargement si lien fourni
+        section_telechargement = ""
+        if lien_telechargement:
+            section_telechargement = f"""
+    <div style="text-align: center; margin: 30px 0; padding: 25px; background-color: #f0f7f0; border-radius: 6px;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 15px 0; font-weight: bold;">
+            Télécharger votre attestation
+        </p>
+        <a href="{lien_telechargement}" 
+        style="display: inline-block; background-color: #0D652D; color: white; padding: 12px 30px; 
+                text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 15px;">
+            Télécharger mon attestation
+        </a>
+    </div>
+            """
+        
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Bonne nouvelle ! Votre attestation de stage a été générée et est désormais 
+            disponible pour retrait.
+        </p>
+    </div>
+    
+    <!-- Informations de l'attestation -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Informations de votre attestation
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.nom} {stagiaire.prenom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Période de stage :</td>
+                <td style="padding: 10px 0; color: #333;">Du {stagiaire.date_debut.strftime('%d/%m/%Y')} au {stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Direction/Service :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.direction} / {stagiaire.service}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de génération :</td>
+                <td style="padding: 10px 0; color: #333;">{demande_attestation.date_traitement.strftime('%d/%m/%Y') if demande_attestation.date_traitement else "Aujourd'hui"}</td>
+            </tr>
+        </table>
+    </div>
+    
+    {section_telechargement}
+    
+    <!-- Modalités de retrait -->
+    <div style="background-color: #e8f5e8; border: 1px solid #c8e6c9; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Modalités de retrait
+        </h3>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 10px;">Présentez-vous au service des stages de la CEB</li>
+            <li style="margin-bottom: 10px;">Munissez-vous d'une pièce d'identité valide</li>
+            <li style="margin-bottom: 10px;">Horaires : Lundi à Vendredi, 7h00 - 16h00</li>
+            <li>Contact : stages@ceb.bj / +229 21 30 05 06</li>
+        </ul>
+    </div>
+    
+    <!-- Message de fin -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions pour votre contribution à la CEB et vous souhaitons plein succès
+        </p>
+    </div>
+</div>
+        """
+        
+        subject = f"Votre attestation de stage est disponible - {stagiaire.nom} {stagiaire.prenom}"
+        
+        return {
+            'subject': subject,
+            'html': EmailTemplateService.build_email(greeting, content, "Service des Attestations"),
+            'text': EmailContentService._generate_text_version(subject, greeting, content)
+        }
+    
+    @staticmethod
+    def attestation_signee(stagiaire, demande_attestation, attestation_path: str = None) -> Dict[str, str]:
+        """Email pour attestation signée envoyée"""
+        from services.email_service import EmailTemplateService, EmailContentService
+        
+        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous avons le plaisir de vous informer que votre attestation de stage a été signée 
+            et est désormais disponible en téléchargement.
+        </p>
+        
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Votre attestation signée est jointe à cet email au format PDF. 
+            Conservez précieusement ce document qui pourra vous être demandé pour vos démarches administratives.
+        </p>
+    </div>
+
+    <!-- Pièce jointe -->
+    <div style="background-color: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p style="color: #2e7d32; font-size: 14px; margin: 0;">
+            📎 <strong>Pièce jointe :</strong> Votre attestation de stage signée est jointe à cet email.
+        </p>
+    </div>
+
+    <!-- Détails de l'attestation -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Détails de votre attestation
+        </h3>
+        
+        <table style="width: 100%; font-size: 14px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.nom} {stagiaire.prenom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Référence :</td>
+                <td style="padding: 10px 0; color: #333;">ATT-{demande_attestation.id:06d}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Date de signature :</td>
+                <td style="padding: 10px 0; color: #333;">{timezone.now().strftime("%d/%m/%Y")}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Période de stage :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.date_debut.strftime('%d/%m/%Y') if stagiaire.date_debut else 'N/A'} au {stagiaire.date_fin.strftime('%d/%m/%Y') if stagiaire.date_fin else 'N/A'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Direction/Service :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.direction or 'N/A'} / {stagiaire.service or 'N/A'}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Conseils importants -->
+    <div style="background-color: #fff3e0; border: 1px solid #ffe0b2; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #f57c00; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Conseils importants
+        </h3>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 8px;">Conservez précieusement ce document</li>
+            <li style="margin-bottom: 8px;">Faites des copies pour vos dossiers personnels</li>
+            <li style="margin-bottom: 8px;">L'attestation originale peut vous être demandée pour vos démarches</li>
+            <li>Il est recommandé de ne pas partager ce document en ligne</li>
+        </ul>
+    </div>
+
+    <!-- Message de remerciement -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions pour votre stage au sein de notre organisation et vous souhaitons plein succès dans vos futures entreprises
+        </p>
+    </div>
+</div>
+        """
+        
+        subject = f"Votre attestation de stage signée - {stagiaire.nom} {stagiaire.prenom}"
+        
+        return {
+            'subject': subject,
+            'html': EmailTemplateService.build_email(greeting, content, "Service des Attestations"),
+            'text': EmailContentService._generate_text_version(subject, greeting, content)
+        }
+    
+    

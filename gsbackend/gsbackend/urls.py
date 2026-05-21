@@ -1,45 +1,74 @@
 """
 URL configuration for gsbackend project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import FileResponse, Http404
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+import os
+import re
 
 # Configuration de l'admin
 admin.site.has_permission = lambda request: True
 
+
+def serve_media_with_cors(request, path):
+    """
+    Sert les fichiers média avec les headers CORS appropriés.
+    Remplace static() qui est désactivé par Django quand DEBUG=False.
+    """
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+
+    if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        raise Http404("Fichier introuvable")
+
+    response = FileResponse(open(file_path, 'rb'))
+
+    # Ajouter les headers CORS manuellement sur les fichiers média
+    origin = request.META.get('HTTP_ORIGIN', '')
+    allowed_origins = getattr(settings, 'CORS_ALLOWED_ORIGINS', [])
+    allowed_regexes = getattr(settings, 'CORS_ALLOWED_ORIGIN_REGEXES', [])
+
+    origin_allowed = origin in allowed_origins or any(
+        re.match(pattern, origin) for pattern in allowed_regexes
+    )
+
+    if origin_allowed:
+        response['Access-Control-Allow-Origin'] = origin
+        response['Access-Control-Allow-Credentials'] = 'true'
+        response['Access-Control-Allow-Headers'] = 'Authorization, Content-Type'
+        response['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+
+    return response
+
+
 urlpatterns = [
     # Admin Django
     path('admin/', admin.site.urls),
-    
+
     # ✅ JWT Authentication endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
+
     # ✅ API Routes
     path('api/', include('stages.urls')),
-    
-    # ✅ Utilisateurs routes (si nécessaires)
+
+    # ✅ Utilisateurs routes
     path('', include('utilisateurs.urls')),
+
+    # ✅ CRITIQUE : Fichiers média avec CORS — fonctionne en dev ET en production
+    re_path(r'^media/(?P<path>.*)$', serve_media_with_cors),
 ]
 
-# ✅ CRITIQUE : Servir les fichiers média et static en mode DEBUG
+# Fichiers statiques (uniquement en dev, Nginx gère en prod)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 if settings.DEBUG:
-    # Servir les fichiers média (uploads, documents, photos)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    
-    # Servir les fichiers statiques (CSS, JS, images)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    
-    # Django browser reload (si installé)
     try:
         urlpatterns += [
             path("__reload__/", include("django_browser_reload.urls")),
         ]
-    except:
-        pass  # Ignore si django_browser_reload n'est pas installé
+    except Exception:
+        pass

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Django
+.env
+*.log
+db.sqlite3
+
+# Médias (uploads utilisateurs)
+media/
+
+# Secrets
+*.pem
+*.key
+
+# Divers
+*.save
+*copy/
+curl
+ping

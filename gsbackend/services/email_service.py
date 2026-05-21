@@ -16,143 +16,143 @@ class EmailTemplateService:
     @staticmethod
     def get_base_styles() -> str:
         """Retourne les styles CSS de base pour tous les emails"""
-        return f"""
+        return """
         <style>
-            body {{
+            body {
                 background-color: #EBF5FE !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 width: 100% !important;
                 min-width: 100% !important;
                 font-family: Arial, Helvetica, sans-serif;
-            }}
+            }
             
-            table {{
+            table {
                 border-collapse: collapse;
                 mso-table-lspace: 0pt;
                 mso-table-rspace: 0pt;
-            }}
+            }
             
-            img {{
+            img {
                 border: 0;
                 height: auto;
                 line-height: 100%;
                 outline: none;
                 text-decoration: none;
                 -ms-interpolation-mode: bicubic;
-            }}
+            }
             
-            .container {{
+            .container {
                 width: 100%;
                 max-width: 600px;
                 margin: 0 auto;
-            }}
+            }
             
-            .header-container {{
+            .header-container {
                 background-color: #FFFFFF;
                 padding: 20px;
-            }}
+            }
             
-            .content-container {{
+            .content-container {
                 background-color: #FFFFFF;
                 padding: 20px 30px;
                 color: #383838;
                 font-size: 14px;
                 line-height: 1.6;
-            }}
+            }
             
-            .greeting {{
+            .greeting {
                 color: #0D652D;
                 font-size: 16px;
                 font-weight: bold;
                 margin-bottom: 20px;
-            }}
+            }
             
-            .content-box {{
+            .content-box {
                 margin: 25px 0;
                 padding: 20px;
                 background-color: #F8F9FA;
                 border-left: 4px solid #0D652D;
                 border-radius: 4px;
-            }}
+            }
             
-            .data-table {{
+            .data-table {
                 width: 100%;
                 border-collapse: collapse;
                 margin: 20px 0;
-            }}
+            }
             
-            .data-table td, .data-table th {{
+            .data-table td, .data-table th {
                 padding: 12px 8px;
                 border-bottom: 1px solid #E8EAED;
                 text-align: left;
-            }}
+            }
             
-            .data-table th {{
+            .data-table th {
                 background-color: #F8F9FA;
                 font-weight: 600;
                 color: #3C4043;
-            }}
+            }
             
-            .tracking-box {{
+            .tracking-box {
                 background: #F8F9FA;
                 border: 1px solid #E8EAED;
                 border-radius: 6px;
                 padding: 20px;
                 text-align: center;
                 margin: 25px 0;
-            }}
+            }
             
-            .tracking-label {{
+            .tracking-label {
                 font-size: 12px;
                 color: #666666;
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 margin-bottom: 8px;
-            }}
+            }
             
-            .tracking-id {{
+            .tracking-id {
                 font-size: 18px;
                 font-weight: 600;
                 color: #0D652D;
                 font-family: 'Courier New', monospace;
-            }}
+            }
             
-            .footer-container {{
+            .footer-container {
                 background-color: #E3E3E3;
                 padding: 30px 20px;
                 color: #666666;
                 font-size: 11px;
                 line-height: 1.4;
-            }}
+            }
             
-            .footer-links {{
+            .footer-links {
                 text-align: center;
                 margin: 20px 0;
-            }}
+            }
             
-            .footer-links a {{
+            .footer-links a {
                 color: #000000;
                 text-decoration: underline;
                 margin: 0 10px;
-            }}
+            }
             
-            .footer-info {{
+            .footer-info {
                 text-align: center;
                 margin-top: 20px;
                 color: #666666;
                 font-size: 11px;
-            }}
+            }
             
-            @media only screen and (max-width: 480px) {{
-                .container {{
+            @media only screen and (max-width: 480px) {
+                .container {
                     width: 95% !important;
-                }}
+                }
                 
-                .content-container {{
+                .content-container {
                     padding: 15px 20px !important;
-                }}
-            }}
+                }
+            }
         </style>
         """
     
@@ -202,7 +202,7 @@ class EmailTemplateService:
                                     <table border="0" cellpadding="0" cellspacing="0" align="center">
                                         <tr>
                                             <td align="center" valign="middle" style="padding-right: 5px;">
-                                                <img src="https://i.postimg.cc/QCxHqh37/ceb-logo.png" 
+                                                <img src="https://i.postimg.cc/zf3NTMSK/ceb-logo.png" 
                                                     alt="CEB" 
                                                     width="50" 
                                                     style="max-width: 80px; height: auto; display: block;">
@@ -235,27 +235,7 @@ class EmailTemplateService:
                     </td>
                 </tr>
                 
-                <tr>
-                    <td class="footer-container">
-                        <div class="footer-links">
-                            <a href="#" style="color: #000000; text-decoration: underline;">Plateforme Stages</a> | 
-                            <a href="#" style="color: #000000; text-decoration: underline;">Contact</a> | 
-                            <a href="#" style="color: #000000; text-decoration: underline;">Confidentialité</a> | 
-                            <a href="#" style="color: #000000; text-decoration: underline;">Aide</a>
-                        </div>
-                        
-                        <div class="footer-info">
-                            Communauté Électrique du Bénin<br>
-                            01 BP 2001 Cotonou, Bénin<br>
-                            Téléphone: +229 21 30 05 06 | Email: stages@ceb.bj
-                        </div>
-                        
-                        <div class="footer-info" style="margin-top: 15px;">
-                            © {timezone.now().year} Communauté Électrique du Bénin. Tous droits réservés.<br>
-                            Cet email a été envoyé automatiquement. Merci de ne pas y répondre.
-                        </div>
-                    </td>
-                </tr>
+               
                 
                 <tr>
                     <td height="20"></td>
@@ -311,217 +291,379 @@ def get_formal_greeting(last_name: str, gender: str = None) -> str:
         return f"Madame {last_name}"
     else:
         return f"Madame, Monsieur {last_name}"
+
 class EmailContentService:
     """Service pour générer le contenu spécifique de chaque type d'email"""
 
-    
-    
     @staticmethod
-    def confirmation_demande(demande) -> Dict[str, str]:
-        """Génère le contenu pour un email de confirmation de demande"""
+    def demande_attestation_confirmee(stagiaire, demande_attestation) -> Dict[str, str]:
+        """Génère le contenu pour un email de confirmation de demande d'attestation"""
+        from services.email_templates_extended import get_gender_based_greeting
+        
+        # Utilisation du genre du stagiaire pour la salutation
+        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
         
         content = f"""
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-        Nous accusons réception de votre candidature
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous accusons réception de votre demande d'attestation de stage. 
+            Cette dernière a été enregistrée dans notre système de traitement.
+        </p>
+
+        <p style="color: #383838; font-size: 14px; line-height: 1.6;">
+            Votre demande sera instruite selon la procédure en vigueur. 
+            Vous serez informé(e) de l'avancement du traitement dans les délais établis.
+        </p>
     </div>
-    <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-        Votre candidature pour un stage au sein de la Communauté Électrique du Bénin 
-        a bien été enregistrée dans notre système.
-    </p>
-</div>
-
-<div class="tracking-box">
-    <div class="tracking-label">Votre numéro de suivi</div>
-    <div class="tracking-id">{demande.tracking_id}</div>
-</div>
-
-<div class="content-box">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-        Récapitulatif de votre candidature
+    
+    <!-- Message de remerciement -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions de votre collaboration avec la Communauté Électrique du Bénin
+        </p>
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 140px;">Type de stage</th>
-            <td>{demande.type_stage or 'Non spécifié'}</td>
-        </tr>
-        <tr>
-            <th>Domaine</th>
-            <td>{demande.etudiant_specialite or 'Non spécifié'}</td>
-        </tr>
-        <tr>
-            <th>Niveau d'études</th>
-            <td>{demande.etudiant_niveau or 'Non spécifié'}</td>
-        </tr>
-        <tr>
-            <th>Date de soumission</th>
-            <td>{demande.date_soumission.strftime('%d/%m/%Y à %H:%M')}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="content-box" style="border-left: 4px solid #17a2b8;">
-    <div style="color: #0D652D; font-weight: bold; margin-bottom: 10px; font-size: 15px;">
-        Prochaines étapes
-    </div>
-    <p style="color: #383838; margin: 0; line-height: 1.6;">
-        Votre dossier sera examiné dans les prochains jours. 
-        Vous recevrez une notification par email dès qu'une décision sera prise.
-    </p>
-</div>
-
-<div style="text-align: center; margin: 30px 0; padding: 25px;">
-    <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-        Nous vous remercions de votre intérêt pour la CEB et vous souhaitons 
-        bonne chance dans le processus de sélection.
-    </p>
 </div>
         """
         
-        subject = f"Confirmation de réception de votre candidature - {demande.tracking_id}"
-        greeting = f"Cher(e){demande.etudiant_nom.upper()},"
+        subject = f"Accusé de réception - Demande d'attestation"
         
         return {
             'subject': subject,
-            'html': EmailTemplateService.build_email(greeting, content),
+            'html': EmailTemplateService.build_email(greeting, content, "Service des Stages"),
             'text': EmailContentService._generate_text_version(subject, greeting, content)
+        }
+    
+    @staticmethod
+    def nouvelle_demande_attestation_admin(stagiaire, demande_attestation) -> Dict[str, str]:
+        """Génère le contenu pour notifier les admins d'une nouvelle demande d'attestation"""
+        
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Une nouvelle demande d'attestation de stage nécessite votre attention.
+            Les éléments de la demande ont été systématisés dans notre application de gestion.
+        </p>
+    </div>
+    
+    <!-- Avertissement -->
+    <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 25px 0; border-radius: 4px;">
+        <p style="color: #92400e; font-size: 14px; margin: 0;">
+            ⚠️ <strong>Instruction requise :</strong> Veuillez procéder à l'examen de ce dossier.
+        </p>
+    </div>
+    
+    <!-- Référence -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 25px; border-radius: 6px; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+            Référence administrative
+        </p>
+        <p style="color: #333; font-size: 20px; margin: 0; font-family: monospace; font-weight: bold;">
+            {getattr(demande_attestation, 'reference', None) or demande_attestation.id}
+        </p>
+    </div>
+    
+    <!-- Note -->
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+            Veuillez vous connecter à la plateforme administrative pour accéder au dossier complet.
+        </p>
+    </div>
+</div>
+        """
+        
+        subject = f"Nouvelle demande d'attestation - Réf: {getattr(demande_attestation, 'reference', None) or demande_attestation.id}"
+        greeting = "Mesdames, Messieurs les administrateurs,"
+        
+        return {
+            'subject': subject,
+            'html': EmailTemplateService.build_email(greeting, content, "Service de Gestion des Attestations"),
+            'text': EmailContentService._generate_text_version(subject, greeting, content)
+        }
+    
+    @staticmethod
+    def attestation_signee(stagiaire, demande_attestation, attestation_path: str) -> Dict[str, str]:
+        """Génère le contenu pour un email d'attestation signée envoyée"""
+        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous avons le plaisir de vous informer que votre attestation de stage a été signée 
+            et est désormais disponible en téléchargement.
+        </p>
+        
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Votre attestation signée est jointe à cet email au format PDF. 
+            Conservez précieusement ce document qui pourra vous être demandé pour vos démarches administratives.
+        </p>
+    </div>
+
+    <!-- Pièce jointe -->
+    <div style="background-color: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p style="color: #2e7d32; font-size: 14px; margin: 0;">
+            📎 <strong>Pièce jointe :</strong> Votre attestation de stage signée est jointe à cet email.
+        </p>
+    </div>
+
+    <!-- Conseils importants -->
+    <div style="background-color: #fff3e0; border: 1px solid #ffe0b2; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #f57c00; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Conseils importants
+        </h3>
+        
+        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 8px;">Conservez précieusement ce document</li>
+            <li style="margin-bottom: 8px;">Faites des copies pour vos dossiers personnels</li>
+            <li style="margin-bottom: 8px;">L'attestation originale peut vous être demandée pour vos démarches</li>
+            <li>Il est recommandé de ne pas partager ce document en ligne</li>
+        </ul>
+    </div>
+
+    <!-- Message de remerciement -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions pour votre stage au sein de notre organisation et vous souhaitons plein succès dans vos futures entreprises
+        </p>
+    </div>
+</div>
+        """
+        
+        subject = f"Votre attestation de stage signée - {stagiaire.nom} {stagiaire.prenom}"
+        
+        return {
+            'subject': subject,
+            'html': EmailTemplateService.build_email(greeting, content, "Service des Attestations"),
+            'text': EmailContentService._generate_text_version(subject, greeting, content)
+        }
+
+    @staticmethod
+    def send_attestation_signee(stagiaire_email, context, attestation_path, async_send=True):
+        """
+        Envoie l'attestation signée au stagiaire
+        
+        Args:
+            stagiaire_email: Email du stagiaire
+            context: Contexte avec informations
+            attestation_path: Chemin du fichier PDF
+            async_send: Envoi asynchrone
+            
+        Note: Cette méthode est conservée pour compatibilité, mais utilisez plutôt 
+              EmailSenderService.send_attestation_signee() qui appelle attestation_signee()
+        """
+        try:
+            # Préparer le sujet et le contenu
+            subject = f"Votre attestation de stage signée est disponible"
+            
+            # Contenu texte simple
+            text_content = f"""
+Bonjour {context['stagiaire_prenom']} {context['stagiaire_nom']},
+
+Votre attestation de stage signée est disponible.
+
+Détails :
+- Référence : ATT-{context['demande_id']:06d}
+- Date de signature : {context['date_upload']}
+- Période de stage : {context['date_debut']} au {context['date_fin']}
+- Direction/Service : {context['direction']} / {context['service']}
+
+Votre attestation signée est jointe à cet email.
+
+Important :
+- Conservez précieusement ce document
+- Il peut vous être demandé pour vos démarches administratives
+- Faites-en des copies
+
+Cordialement,
+Le Service des Stages
+"""
+            
+            # Créer l'email
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[stagiaire_email],
+                cc=[settings.EMAIL_ADMIN] if hasattr(settings, 'EMAIL_ADMIN') else None,
+            )
+            
+            # Ajouter la version HTML (simplifiée pour compatibilité)
+            email.attach_alternative(f"""
+<!DOCTYPE html>
+<html>
+<body>
+<p>Bonjour {context['stagiaire_prenom']} {context['stagiaire_nom']},</p>
+<p>Votre attestation de stage signée est jointe à cet email.</p>
+</body>
+</html>
+            """, "text/html")
+            
+            # Joindre l'attestation signée
+            with open(attestation_path, 'rb') as f:
+                email.attach(
+                    f'attestation_stage_{context["stagiaire_nom"]}_{context["stagiaire_prenom"]}.pdf',
+                    f.read(),
+                    'application/pdf'
+                )
+            
+            # Envoyer l'email
+            if async_send:
+                email.send(fail_silently=False)
+            else:
+                email.send()
+            
+            logger.info(f"✅ Email attestation signée envoyé à {stagiaire_email}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Erreur envoi email attestation signée: {e}", exc_info=True)
+            return False
+
+    @staticmethod
+    def confirmation_demande(demande) -> dict:
+        """Email de confirmation de réception au candidat"""
+        
+        # Utilisation du genre du candidat pour la salutation
+        greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
+        
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous vous confirmons la prise en compte de votre candidature 
+            auprès de la Communauté Électrique du Bénin.
+        </p>
+    </div>
+    
+    <!-- Référence -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 25px; border-radius: 6px; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+            Votre référence de dossier
+        </p>
+        <p style="color: #333; font-size: 20px; margin: 0; font-family: monospace; font-weight: bold;">
+            {demande.tracking_id}
+        </p>
+    </div>
+    
+    <!-- Instruction administrative -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Instruction administrative
+        </h3>
+        
+        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+            Votre dossier sera examiné conformément à notre procédure de sélection. 
+            Vous serez informé(e) de l'avancement du traitement dans les délais réglementaires.
+        </p>
+    </div>
+    
+    <!-- Message de remerciement -->
+    <div style="text-align: center; background-color: #fff8f8; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions de l'intérêt manifesté pour la Communauté Électrique du Bénin
+        </p>
+    </div>
+</div>
+        """
+        
+        subject = f"Accusé de réception - Candidature n°{demande.tracking_id}"
+        
+        return {
+            'subject': subject,
+            'html': BenchmarkEmailTemplateService.build_benchmark_email(
+                greeting, 
+                content, 
+                "Direction des Ressources Humaines - CEB"
+            ),
+            'text': f"""
+{subject}
+
+{greeting},
+
+Nous vous confirmons la prise en compte de votre candidature auprès de la Communauté Électrique du Bénin.
+
+RÉFÉRENCE DE DOSSIER : {demande.tracking_id}
+
+Votre dossier sera examiné conformément à notre procédure de sélection. 
+Vous serez informé(e) de l'avancement du traitement dans les délais réglementaires.
+
+Nous vous remercions de l'intérêt manifesté pour la Communauté Électrique du Bénin.
+
+---
+Direction des Ressources Humaines
+Communauté Électrique du Bénin
+Email: drh@ceb.bj
+Téléphone: +229 21 30 05 06
+Site web: www.ceb.bj
+"""
         }
     
     @staticmethod
     def demande_acceptee(stagiaire, demande, convention_pdf_path=None) -> Dict[str, str]:
         """Génère le contenu pour un email d'acceptation"""
         greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
-
-        # ✅ CORRECTION: Ajouter une mention sur la convention jointe
-        mention_convention = ""
+        
+        # ✅ AJOUT : Mention de la convention en pièce jointe
+        piece_jointe_mention = ""
         if convention_pdf_path:
-            mention_convention = f"""
-            <div class="content-box" style="background-color: #f0f8ff; border-left: 4px solid #0D652D; margin: 20px 0;">
-                <p style="color: #0D652D; font-weight: bold; margin-bottom: 10px;">
-                    📎 Convention de stage jointe
-                </p>
-                <p style="color: #383838; font-size: 14px; margin: 0;">
-                    Vous trouverez en pièce jointe votre convention de stage signée. Veuillez la conserver précieusement.
-                </p>
-            </div>
+            piece_jointe_mention = """
+    <div style="background-color: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p style="color: #2e7d32; font-size: 14px; margin: 0;">
+            📎 <strong>Pièce jointe :</strong> Votre convention de stage signée est jointe à cet email.
+        </p>
+    </div>
             """
         
         content = f"""
-            <div class="content-box">
-                <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 18px;">
-                    Félicitations !
-                </div>
-                <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-                    Votre candidature pour un stage à la CEB a été acceptée.
-                </p>
-            </div>
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous avons le plaisir de vous informer que votre candidature pour un stage 
+            au sein de la Communauté Électrique du Bénin a été retenue.
+        </p>
+    </div>
 
-            {mention_convention}
+    {piece_jointe_mention}
 
-            <div class="content-box">
-                <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-                    Détails de votre stage
-                </div>
-                <table class="data-table">
-                    <tr>
-                        <th style="width: 140px;">Stagiaire</th>
-                        <td>{stagiaire.nom} {stagiaire.prenom}</td>
-                    </tr>
-                    <tr>
-                        <th>Type de stage</th>
-                        <td>{stagiaire.type_stage}</td>
-                    </tr>
-                    <tr>
-                        <th>Direction</th>
-                        <td>{stagiaire.direction}</td>
-                    </tr>
-                    <tr>
-                        <th>Service</th>
-                        <td>{stagiaire.service}</td>
-                    </tr>
-                    <tr>
-                        <th>Période</th>
-                        <td>Du {stagiaire.date_debut.strftime('%d/%m/%Y')} au {stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
-                    </tr>
-                    <tr>
-                        <th>Durée</th>
-                        <td><strong>{stagiaire.duree_jours} jours</strong></td>
-                    </tr>
-                </table>
-            </div>
+    <!-- Référence -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 25px; border-radius: 6px; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+            Référence administrative
+        </p>
+        <p style="color: #333; font-size: 20px; margin: 0; font-family: monospace; font-weight: bold;">
+            {demande.tracking_id}
+        </p>
+    </div>
 
-            <div style="text-align: center; margin: 40px 0;">
-                <div style="background: #F8F9FA; border: 1px solid #E8EAED; border-radius: 6px; padding: 25px; display: inline-block;">
-                    <div style="font-size: 14px; color: #0D652D; margin-bottom: 10px;">
-                        Prochaine étape importante
-                    </div>
-                    <div style="font-size: 16px; font-weight: 600; color: #0D652D;">
-                        Début de stage : {stagiaire.date_debut.strftime('%d/%m/%Y')}
-                    </div>
-                </div>
-            </div>
+    <!-- Information relative -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Information relative au stage
+        </h3>
+        
+        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+            Vous trouverez ci-joint votre convention de stage signée. 
+            Veuillez la conserver précieusement pour vos démarches administratives.
+        </p>
+    </div>
 
-            <div style="text-align: center; margin: 30px 0; padding: 25px;">
-                <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-                    Nous sommes ravis de vous accueillir au sein de notre institution.
-                </p>
-            </div>
+    <!-- Message de bienvenue -->
+    <div style="text-align: center; background-color: #fff8f8; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous nous réjouissons de vous accueillir au sein de notre institution
+        </p>
+    </div>
+</div>
         """
         
-        subject = f"Félicitations ! Votre candidature a été acceptée - CEB- {demande.tracking_id}"
-        
-        return {
-            'subject': subject,
-            'html': EmailTemplateService.build_email(greeting, content),
-            'text': EmailContentService._generate_text_version(subject, greeting, content)
-        }
-    
-    @staticmethod
-    def demande_refusee(demande) -> Dict[str, str]:
-        """Génère le contenu pour un email de refus"""
-        
-        content = f"""
-            <div class="content-box">
-                <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-                    Décision concernant votre candidature
-                </div>
-                <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-                    Nous vous remercions de l'intérêt que vous avez porté à la Communauté 
-                    Électrique du Bénin et du temps que vous avez consacré à votre candidature.
-                </p>
-                <p style="color: #383838; font-size: 14px; margin: 15px 0; line-height: 1.6;">
-                    Après un examen attentif de votre dossier, nous regrettons de vous informer 
-                    que votre candidature n'a pas été retenue.Le motif principal de cette décision est ci-dessous :
-                </p>
-            </div>
-
-
-
-            {f'''
-            <div class="content-box">
-                <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-                    Motif de la décision
-                </div>
-                <div style="background: white; padding: 15px; border-radius: 4px; border: 1px solid #dee2e6;">
-                    {demande.raison_refus}
-                </div>
-            </div>
-            ''' if demande.raison_refus else ''}
-
-            <div class="tracking-box">
-                <div class="tracking-label">Votre numéro de suivi</div>
-                <div class="tracking-id">{demande.tracking_id}</div>
-            </div>
-
-            <div style="text-align: center; margin: 30px 0; padding: 25px;">
-                <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-                    Nous vous encourageons à postuler à nouveau pour de futures opportunités.
-                </p>
-            </div>
-        """
-        
-        subject = f"Décision concernant votre candidature - {demande.tracking_id}"
-        greeting = f"Cher(e) {demande.etudiant_nom} {demande.etudiant_prenom},"
+        subject = f"Acceptation - Candidature n°{demande.tracking_id}"
         
         return {
             'subject': subject,
@@ -534,63 +676,47 @@ class EmailContentService:
         """Génère le contenu pour un email de mise en traitement"""
         
         content = f"""
-            <div class="content-box">
-                <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-                    Votre demande est en cours de traitement
-                </div>
-                <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-                    Votre demande de stage a été prise en compte et est actuellement en cours 
-                    d'examen par notre équipe.
-                </p>
-            </div>
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous vous informons que votre demande de stage a été prise en compte 
+            et est désormais en cours d'examen par nos services compétents.
+        </p>
+    </div>
 
-            <div class="content-box">
-                <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-                    Détails de votre demande
-                </div>
-                <table class="data-table">
-                    <tr>
-                        <th style="width: 140px;">Référence</th>
-                        <td><strong>{demande.tracking_id}</strong></td>
-                    </tr>
-                    <tr>
-                        <th>Date de soumission</th>
-                        <td>{demande.date_soumission.strftime('%d/%m/%Y')}</td>
-                    </tr>
-                    <tr>
-                        <th>Type de stage</th>
-                        <td>{demande.type_stage}</td>
-                    </tr>
-                    <tr>
-                        <th>Spécialité</th>
-                        <td>{demande.etudiant_specialite}</td>
-                    </tr>
-                    <tr>
-                        <th>Niveau d'étude</th>
-                        <td>{demande.etudiant_niveau}</td>
-                    </tr>
-                </table>
-            </div>
+    <!-- Référence -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 25px; border-radius: 6px; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+            Référence administrative
+        </p>
+        <p style="color: #333; font-size: 20px; margin: 0; font-family: monospace; font-weight: bold;">
+            {demande.tracking_id}
+        </p>
+    </div>
 
-            <div class="content-box">
-                <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-                    Prochaines étapes
-                </div>
-                <ul style="color: #383838; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-                    <li style="margin-bottom: 8px;">Notre équipe étudie actuellement votre profil</li>
-                    <li style="margin-bottom: 8px;">Vous serez informé(e) par email de l'avancement</li>
-                    <li style="margin-bottom: 8px;">La réponse définitive vous parviendra sous peu</li>
-                </ul>
-            </div>
+    <!-- Information sur le traitement -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Information sur le traitement
+        </h3>
+        
+        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+            Votre dossier suivra la procédure d'instruction établie. 
+            Vous serez informé(e) des évolutions dans les délais impartis.
+        </p>
+    </div>
 
-            <div style="text-align: center; margin: 30px 0; padding: 25px;">
-                <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6; font-style: italic;">
-                    Pensez à vérifier régulièrement votre boîte email.
-                </p>
-            </div>
+    <!-- Message patiente -->
+    <div style="text-align: center; background-color: #fff8f8; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Merci de bien vouloir patienter pendant la durée du traitement administratif
+        </p>
+    </div>
+</div>
         """
         
-        subject = f"Votre demande de stage est en cours de traitement - {demande.tracking_id}"
+        subject = f"Mise en traitement - Demande n°{demande.tracking_id}"
         greeting = f"Cher(e) {demande.etudiant_prenom},"
         
         return {
@@ -604,58 +730,128 @@ class EmailContentService:
         """Génère le contenu pour une demande d'information complémentaire"""
         
         content = f"""
-        <div class="content-box">
-            <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 16px;">
-                Information complémentaire nécessaire
-            </div>
-            <p style="color: #383838; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-                Dans le cadre de l'étude de votre candidature, nous avons besoin 
-                d'informations complémentaires.
-            </p>
-        </div>
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Dans le cadre de l'instruction de votre dossier, il nous est nécessaire 
+            de solliciter des informations ou documents supplémentaires.
+        </p>
+    </div>
 
-        <div class="content-box">
-            <div style="color: #0D652D; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
-                Information demandée
-            </div>
-            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #E8EAED;">
-                {message}
-            </div>
+    <!-- Élément(s) sollicité(s) -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #0D652D; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Élément(s) sollicité(s)
+        </h3>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #E8EAED;">
+            {message}
         </div>
+    </div>
 
-        <div class="tracking-box">
-            <div class="tracking-label">Numéro de suivi</div>
-            <div class="tracking-id">{demande.tracking_id}</div>
-        </div>
+    <!-- Référence -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 25px; border-radius: 6px; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+            Référence de dossier
+        </p>
+        <p style="color: #333; font-size: 20px; margin: 0; font-family: monospace; font-weight: bold;">
+            {demande.tracking_id}
+        </p>
+    </div>
 
-        <div class="content-box" style="border-left: 4px solid #17a2b8;">
-            <div style="color: #0D652D; font-weight: bold; margin-bottom: 10px; font-size: 15px;">
-                Délai de réponse
-            </div>
-            <p style="color: #383838; margin: 0; line-height: 1.6;">
-                Merci de nous répondre dans les meilleurs délais afin de ne pas 
-                retarder le traitement de votre candidature.
-            </p>
-        </div>
+    <!-- Délai de réponse -->
+    <div style="background-color: #e3f2fd; border: 1px solid #bbdefb; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #1565c0; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Délai de réponse
+        </h3>
+        
+        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.6;">
+            Nous vous prions de bien vouloir nous transmettre ces éléments dans les meilleurs délais 
+            afin de ne pas interrompre le traitement de votre dossier.
+        </p>
+    </div>
 
-        <div style="text-align: center; margin: 30px 0; padding: 25px;">
-            <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6;">
-                Vous pouvez accéder à votre espace de suivi à l'adresse suivante :<br>
-                <a href="{suivi_url}" style="color: #0D652D; text-decoration: none;">
-                    {suivi_url}
-                </a>
-            </p>
-        </div>
+    <!-- Lien de suivi -->
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
+        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.6;">
+            Vous pouvez accéder à votre espace de suivi à l'adresse suivante :<br>
+            <a href="{suivi_url}" style="color: #0D652D; text-decoration: none;">
+                {suivi_url}
+            </a>
+        </p>
+    </div>
+</div>
         """
         
-        subject = f"Demande d'information complémentaire - {demande.tracking_id}"
-        greeting = f"Bonjour {demande.etudiant_prenom},"
+        subject = f"Demande d'élément complémentaire - Réf: {demande.tracking_id}"
+        greeting = f"Cher(e) {demande.etudiant_prenom},"
         
         return {
             'subject': subject,
             'html': EmailTemplateService.build_email(greeting, content),
             'text': EmailContentService._generate_text_version(subject, greeting, content)
         }
+    
+    @staticmethod
+    def demande_refusee(demande) -> Dict[str, str]:
+        """Génère le contenu pour un email de refus"""
+        greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
+        
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #383838; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+            Nous vous remercions de l'intérêt que vous avez porté à la Communauté Électrique du Bénin.
+        </p>
+    </div>
+    
+    <!-- Décision -->
+    <div style="margin-bottom: 30px;">
+        <h3 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Décision
+        </h3>
+        
+        <p style="color: #383838; font-size: 14px; margin-bottom: 15px; line-height: 1.6;">
+            Après un examen attentif de votre dossier, nous regrettons de vous informer que votre candidature n'a pas été retenue pour cette session.
+        </p>
+        
+        <div style="background-color: #ffebee; padding: 15px; border-radius: 6px; margin: 15px 0;">
+            <p style="color: #c62828; font-size: 14px; margin: 0; line-height: 1.6;">
+                <strong>Motif :</strong> {demande.raison_refus or "Le nombre de places disponibles est limité."}
+            </p>
+        </div>
+    </div>
+    
+    <!-- Référence -->
+    <div style="text-align: center; background-color: #f0f7f0; padding: 25px; border-radius: 6px; margin: 30px 0;">
+        <p style="color: #0D652D; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+            Référence administrative
+        </p>
+        <p style="color: #333; font-size: 20px; margin: 0; font-family: monospace; font-weight: bold;">
+            {demande.tracking_id}
+        </p>
+    </div>
+    
+    <!-- Message de fin -->
+    <div style="text-align: center; background-color: #fff8f8; padding: 20px; border-radius: 6px; margin-top: 20px;">
+        <p style="color: #0D652D; font-size: 15px; margin: 0; font-weight: bold;">
+            Nous vous remercions encore pour votre candidature et vous souhaitons plein succès dans vos recherches futures
+        </p>
+    </div>
+</div>
+        """
+        
+        subject = f"Réponse à votre candidature de stage - {demande.tracking_id}"
+        
+        return {
+            'subject': subject,
+            'html': EmailTemplateService.build_email(greeting, content),
+            'text': EmailContentService._generate_text_version(subject, greeting, content)
+        }
+    
+    
     
     @staticmethod
     def _generate_text_version(subject: str, greeting: str, html_content: str) -> str:
@@ -669,19 +865,21 @@ class EmailContentService:
         # Nettoyer
         text = text.strip()
         
+        current_year = datetime.now().year
+        
         return f"""
-        {subject}
+{subject}
 
-        {greeting}
+{greeting}
 
-        {text}
+{text}
 
-        ---
-        Service des Stages - CEB
-        Email: stages@ceb.bj
-        Téléphone: +229 21 30 05 06
+---
+Service des Stages - CEB
+Email: stages@ceb.bj
+Téléphone: +229 21 30 05 06
 
-        © {datetime.now().year} Communauté Électrique du Bénin
+© {current_year} Communauté Électrique du Bénin
         """
 
 
@@ -696,22 +894,15 @@ class EmailSenderService:
         text_content: str,
         async_send: bool = True,
         reply_to: Optional[List[str]] = None,
-        cc: Optional[List[str]] = None 
+        cc: Optional[List[str]] = None,
+        attachments: Optional[List[Dict]] = None  # ✅ AJOUT
     ) -> bool:
         """
         Envoie un email avec gestion asynchrone optionnelle
         
         Args:
-            to_email: Email du destinataire
-            subject: Sujet de l'email
-            html_content: Contenu HTML
-            text_content: Contenu texte
-            async_send: Si True, envoi en arrière-plan
-            reply_to: Adresses de réponse
-            cc: Adresses en copie
-        
-        Returns:
-            True si l'envoi a été initié avec succès
+            attachments: Liste de dict avec 'filename', 'content', 'mimetype'
+                        Ex: [{'filename': 'convention.pdf', 'content': file_content, 'mimetype': 'application/pdf'}]
         """
         
         if reply_to is None:
@@ -729,6 +920,17 @@ class EmailSenderService:
                 )
                 
                 email.attach_alternative(html_content, "text/html")
+                
+                # ✅ AJOUT : Gestion des pièces jointes
+                if attachments:
+                    for attachment in attachments:
+                        email.attach(
+                            attachment['filename'],
+                            attachment['content'],
+                            attachment['mimetype']
+                        )
+                        logger.info(f"📎 Pièce jointe ajoutée : {attachment['filename']}")
+                
                 result = email.send(fail_silently=False)
                 
                 logger.info(f"✅ Email envoyé à {to_email} - Sujet: {subject[:50]}...")
@@ -736,22 +938,7 @@ class EmailSenderService:
                 
             except Exception as e:
                 logger.error(f"❌ Erreur envoi email à {to_email}: {e}")
-                
-                # Tentative de fallback en texte simple
-                try:
-                    from django.core.mail import send_mail
-                    send_mail(
-                        subject,
-                        text_content,
-                        getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@ceb.bj'),
-                        [to_email],
-                        fail_silently=False,
-                    )
-                    logger.info(f"✅ Email texte envoyé en fallback à {to_email}")
-                    return True
-                except Exception as fallback_error:
-                    logger.error(f"❌ Erreur fallback: {fallback_error}")
-                    return False
+                return False
         
         if async_send:
             thread = threading.Thread(target=send_task, name=f"email-{to_email[:20]}")
@@ -760,6 +947,66 @@ class EmailSenderService:
             return True
         else:
             return send_task()
+    
+    @classmethod
+    def send_demande_attestation_stagiaire(cls, stagiaire, demande_attestation, async_send: bool = True) -> bool:
+        """
+        Envoie l'email de confirmation de demande d'attestation au stagiaire
+        
+        Args:
+            stagiaire: Instance du stagiaire
+            demande_attestation: Instance de la demande d'attestation
+            async_send: Envoi asynchrone ou non
+            
+        Returns:
+            True si l'envoi a été initié avec succès
+        """
+        email_data = EmailContentService.demande_attestation_confirmee(stagiaire, demande_attestation)
+        return cls.send_email(
+            to_email=stagiaire.email,
+            subject=email_data['subject'],
+            html_content=email_data['html'],
+            text_content=email_data['text'],
+            async_send=async_send,
+            reply_to=['stages@ceb.bj']
+        )
+
+    @classmethod
+    def send_nouvelle_demande_attestation_admins(
+        cls,
+        stagiaire,
+        demande_attestation,
+        admin_emails: list,
+        async_send: bool = True
+    ) -> bool:
+        """
+        Envoie une notification aux administrateurs pour une nouvelle demande d'attestation
+        
+        Args:
+            stagiaire: Instance du stagiaire
+            demande_attestation: Instance de la demande d'attestation
+            admin_emails: Liste des emails des administrateurs
+            async_send: Envoi asynchrone ou non
+            
+        Returns:
+            True si l'envoi a été initié avec succès
+        """
+        if not admin_emails:
+            logger.warning("⚠️ Aucun email d'administrateur fourni pour notification attestation")
+            return False
+        
+        email_data = EmailContentService.nouvelle_demande_attestation_admin(stagiaire, demande_attestation)
+        
+        # Envoi groupé à tous les admins
+        return cls.send_email(
+            to_email=admin_emails[0],  # Premier admin en destinataire principal
+            subject=email_data['subject'],
+            html_content=email_data['html'],
+            text_content=email_data['text'],
+            async_send=async_send,
+            reply_to=[stagiaire.email],  # Répondre directement au stagiaire
+            cc=admin_emails[1:] if len(admin_emails) > 1 else None  # Autres admins en copie
+        )
     
     @classmethod
     def send_confirmation_demande(cls, demande, async_send: bool = True) -> bool:
@@ -774,21 +1021,60 @@ class EmailSenderService:
         )
     
     @classmethod
-    def send_acceptation(cls, stagiaire, demande, async_send: bool = True) -> bool:
-        """Envoie l'email d'acceptation
-
+    def send_acceptation(
+        cls, 
+        stagiaire, 
+        demande, 
+        async_send: bool = True,
+        convention_pdf_path: Optional[str] = None,  # ✅ AJOUT
+        convention_pdf_object = None  # ✅ AJOUT
+    ) -> bool:
+        """
+        Envoie l'email d'acceptation avec la convention signée en pièce jointe
+        
         Args:
             stagiaire: Instance du stagiaire
-            demande: Instance de la demande liée à l'acceptation
+            demande: Instance de la demande
             async_send: Envoi asynchrone ou non
+            convention_pdf_path: Chemin fichier système de la convention PDF
+            convention_pdf_object: Objet FieldFile Django de la convention
         """
-        email_data = EmailContentService.demande_acceptee(stagiaire, demande)
+        email_data = EmailContentService.demande_acceptee(stagiaire, demande, convention_pdf_path)
+        
+        # ✅ AJOUT : Préparation de la pièce jointe
+        attachments = []
+        if convention_pdf_path or convention_pdf_object:
+            try:
+                # Récupérer le contenu du fichier
+                if convention_pdf_object and hasattr(convention_pdf_object, 'read'):
+                    convention_pdf_object.open('rb')
+                    file_content = convention_pdf_object.read()
+                    convention_pdf_object.close()
+                    filename = convention_pdf_object.name.split('/')[-1]
+                elif convention_pdf_path:
+                    with open(convention_pdf_path, 'rb') as f:
+                        file_content = f.read()
+                    filename = convention_pdf_path.split('/')[-1]
+                else:
+                    file_content = None
+                    
+                if file_content:
+                    attachments.append({
+                        'filename': filename,
+                        'content': file_content,
+                        'mimetype': 'application/pdf'
+                    })
+                    logger.info(f"📎 Convention PDF préparée pour envoi : {filename}")
+            except Exception as e:
+                logger.error(f"❌ Erreur lecture convention PDF : {e}")
+        
         return cls.send_email(
             to_email=stagiaire.email,
             subject=email_data['subject'],
             html_content=email_data['html'],
             text_content=email_data['text'],
-            async_send=async_send
+            async_send=async_send,
+            attachments=attachments  # ✅ AJOUT
         )
     
     @classmethod
@@ -945,7 +1231,6 @@ class EmailSenderService:
             html_content=email_data['html'],
             text_content=email_data['text'],
             async_send=async_send,
-            reply_to=['stages@ceb.bj']
         )
 
     @classmethod
@@ -984,3 +1269,105 @@ class EmailSenderService:
             reply_to=[demande.etudiant_email],  # Répondre directement au candidat
             cc=admin_emails[1:] if len(admin_emails) > 1 else None  # Autres admins en copie
         )
+    
+    @classmethod
+    def send_demande_attestation_approuvee(
+        cls,
+        stagiaire,
+        demande_attestation,
+        async_send: bool = True
+    ) -> bool:
+        """
+        Envoie l'email de confirmation d'approbation d'attestation au stagiaire
+        """
+        from services.email_templates_extended import AttestationEmailTemplates
+        
+        email_data = AttestationEmailTemplates.attestation_approuvee(stagiaire, demande_attestation)
+        return cls.send_email(
+            to_email=stagiaire.email,
+            subject=email_data['subject'],
+            html_content=email_data['html'],
+            text_content=email_data['text'],
+            async_send=async_send
+        )
+    
+    @classmethod
+    def send_demande_attestation_refusee(
+        cls,
+        stagiaire,
+        demande_attestation,
+        async_send: bool = True
+    ) -> bool:
+        """
+        Envoie l'email de notification de refus d'attestation au stagiaire
+        """
+        from services.email_templates_extended import AttestationEmailTemplates
+        
+        email_data = AttestationEmailTemplates.attestation_refusee(stagiaire, demande_attestation)
+        return cls.send_email(
+            to_email=stagiaire.email,
+            subject=email_data['subject'],
+            html_content=email_data['html'],
+            text_content=email_data['text'],
+            async_send=async_send
+        )
+    
+    
+    @classmethod
+    def send_attestation_signee(
+        cls,
+        stagiaire,
+        demande_attestation,
+        attestation_path: str,
+        async_send: bool = True
+    ) -> bool:
+        """
+        Envoie l'attestation signée au stagiaire
+        
+        Args:
+            stagiaire: Instance du stagiaire
+            demande_attestation: Instance de la demande d'attestation
+            attestation_path: Chemin vers le fichier PDF de l'attestation signée
+            async_send: Envoi asynchrone ou non
+            
+        Returns:
+            True si l'envoi a été initié avec succès
+        """
+        try:
+            # Générer le contenu de l'email
+            email_data = EmailContentService.attestation_signee(
+                stagiaire, 
+                demande_attestation, 
+                attestation_path
+            )
+            
+            # Préparer la pièce jointe
+            attachments = []
+            try:
+                with open(attestation_path, 'rb') as f:
+                    file_content = f.read()
+                
+                attachments.append({
+                    'filename': f'attestation_stage_{stagiaire.nom}_{stagiaire.prenom}.pdf',
+                    'content': file_content,
+                    'mimetype': 'application/pdf'
+                })
+                logger.info(f"📎 Attestation PDF préparée pour envoi : {attestation_path}")
+            except Exception as e:
+                logger.error(f"❌ Erreur lecture fichier attestation: {e}")
+                # On continue sans pièce jointe mais on log l'erreur
+            
+            # Envoyer l'email
+            return cls.send_email(
+                to_email=stagiaire.email,
+                subject=email_data['subject'],
+                html_content=email_data['html'],
+                text_content=email_data['text'],
+                async_send=async_send,
+                attachments=attachments,
+                reply_to=['attestations@ceb.bj']
+            )
+            
+        except Exception as e:
+            logger.error(f"❌ Erreur envoi email attestation signée: {e}", exc_info=True)
+            return False

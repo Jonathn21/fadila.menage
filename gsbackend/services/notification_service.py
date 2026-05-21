@@ -11,29 +11,7 @@ class NotificationService:
     """Service centralisé pour gérer les notifications"""
     
     TYPE_MAPPING = {
-        'nouveau_entretien': {
-            'type': 'alert',
-            'icone': 'CalendarIcon',
-            'titre_template': 'Nouvel entretien programmé'
-        },
-
-        'entretien_modifie': {
-            'type': 'message',
-            'icone': 'EditIcon',
-            'titre_template': 'Entretien modifié'
-        },
-
-        'entretien_annule': {
-            'type': 'alert',
-            'icone': 'XCircleIcon',
-            'titre_template': 'Entretien annulé'
-        },
-
-        'entretien_termine': {
-            'type': 'success',
-            'icone': 'CheckCircleIcon',
-            'titre_template': 'Entretien terminé'
-        },
+        
         'demande_pre_acceptee': {
             'type': 'success',
             'icone': 'DocumentCheckIcon',
@@ -43,24 +21,6 @@ class NotificationService:
             'type': 'warning',
             'icone': 'XCircleIcon',
             'titre_template': 'Pré-acceptation annulée'
-        },
-
-        'entretien_supprime': {
-            'type': 'alert',
-            'icone': 'XCircleIcon',
-            'titre_template': 'Entretien supprimé'
-        },
-
-        'entretien_deplace': {
-            'type': 'message',
-            'icone': 'ArrowPathIcon',
-            'titre_template': 'Entretien déplacé'
-        },
-
-        'rappel_entretien': {
-            'type': 'alert',
-            'icone': 'BellIcon',
-            'titre_template': 'Rappel d\'entretien'
         },
 
         'validation_requise': {
@@ -195,6 +155,18 @@ class NotificationService:
             'icone': 'CogIcon',  # Mieux pour "traitement"
             'titre_template': 'Demande en traitement'
         },
+
+        'attestation': {
+            'type': 'success',
+            'icone': 'DocumentCheckIcon',
+            'titre_template': 'Attestation générée'
+        },
+
+        'demande_attestation': {
+            'type': 'info',
+            'icone': 'DocumentTextIcon',
+            'titre_template': 'Demande d\'attestation'
+        },
     }
 
     @classmethod
@@ -324,220 +296,6 @@ class NotificationService:
     # =========================================================================
     # MÉTHODES SPÉCIFIQUES POUR LES ENTRETIENS
     # =========================================================================
-
-    @classmethod
-    def notifier_creation_entretien(cls, entretien, user):
-        """Notification pour la création d'un nouvel entretien"""
-        message = (
-            f"Un entretien a été programmé avec {entretien.demandeur.etudiant_prenom} {entretien.demandeur.etudiant_nom} "
-            f"pour le {entretien.date.strftime('%d/%m/%Y')} à {entretien.heure_debut.strftime('%H:%M')}."
-        )
-        
-        return cls.envoyer_notification(
-            user=user,
-            titre="Nouvel entretien programmé",
-            message=message,
-            type_notif='nouveau_entretien',
-            entretien=entretien
-        )
-
-    @classmethod
-    def broadcast_creation_entretien(cls, entretien, createur):
-        """Diffuser la création d'un entretien à tous les utilisateurs"""
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        
-        utilisateurs = User.objects.filter(is_active=True)
-        for user in utilisateurs:
-            if user != createur:
-                cls.notifier_creation_entretien(entretien, user)
-        
-        logger.info(f"📢 Broadcast création entretien envoyé à {utilisateurs.count()} utilisateurs")
-
-    @classmethod
-    def notifier_modification_entretien(cls, entretien, user, modifications):
-        """Notification pour une modification d'entretien"""
-        modifs_str = ", ".join(modifications)
-        message = (
-            f"L'entretien avec {entretien.demandeur.etudiant_prenom} {entretien.demandeur.etudiant_nom} "
-            f"a été modifié ({modifs_str}). "
-            f"Nouvelle date : {entretien.date.strftime('%d/%m/%Y')} à {entretien.heure_debut.strftime('%H:%M')}."
-        )
-        
-        return cls.envoyer_notification(
-            user=user,
-            titre="Entretien modifié",
-            message=message,
-            type_notif='entretien_modifie',
-            entretien=entretien
-        )
-
-    @classmethod
-    def broadcast_modification_entretien(cls, entretien, utilisateur_courant, modifications):
-        """Diffuser la modification d'entretien"""
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        
-        utilisateurs = User.objects.filter(is_active=True)
-        for user in utilisateurs:
-            if user != utilisateur_courant:
-                cls.notifier_modification_entretien(entretien, user, modifications)
-        
-        logger.info(f"📢 Broadcast modification entretien envoyé à {utilisateurs.count()} utilisateurs")
-
-    @classmethod
-    def notifier_annulation_entretien(cls, entretien, user, raison=None):
-        """Notification pour l'annulation d'un entretien (temporaire, peut être reprogrammé)"""
-        message = (
-            f"L'entretien avec {entretien.demandeur.etudiant_prenom} {entretien.demandeur.etudiant_nom} "
-            f"prévu le {entretien.date.strftime('%d/%m/%Y')} à {entretien.heure_debut.strftime('%H:%M')} "
-            f"a été annulé."
-        )
-        if raison:
-            message += f" Motif : {raison}"
-        
-        return cls.envoyer_notification(
-            user=user,
-            titre="Entretien annulé",
-            message=message,
-            type_notif='entretien_annule',
-            entretien=entretien
-        )
-
-    @classmethod
-    def broadcast_annulation_entretien(cls, entretien, utilisateur_courant, raison=None):
-        """Diffuser l'annulation d'entretien"""
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        
-        utilisateurs = User.objects.filter(is_active=True)
-        for user in utilisateurs:
-            if user != utilisateur_courant:
-                cls.notifier_annulation_entretien(entretien, user, raison)
-        
-        logger.info(f"📢 Broadcast annulation entretien envoyé à {utilisateurs.count()} utilisateurs")
-
-    @classmethod
-    def notifier_terminaison_entretien(cls, entretien, user):
-        """Notification pour la terminaison d'un entretien (action définitive)"""
-        message = (
-            f"L'entretien avec {entretien.demandeur.etudiant_prenom} {entretien.demandeur.etudiant_nom} "
-            f"prévu le {entretien.date.strftime('%d/%m/%Y')} a été marqué comme terminé. "
-            f"Le processus de recrutement est maintenant clos pour ce candidat."
-        )
-        
-        return cls.envoyer_notification(
-            user=user,
-            titre="Entretien terminé",
-            message=message,
-            type_notif='entretien_termine',
-            entretien=entretien
-        )
-
-    @classmethod
-    def broadcast_terminaison_entretien(cls, entretien, utilisateur_courant):
-        """Diffuser la terminaison d'entretien"""
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        
-        utilisateurs = User.objects.filter(is_active=True)
-        for user in utilisateurs:
-            if user != utilisateur_courant:
-                cls.notifier_terminaison_entretien(entretien, user)
-        
-        logger.info(f"📢 Broadcast terminaison entretien envoyé à {utilisateurs.count()} utilisateurs")
-
-    @classmethod
-    def notifier_suppression_entretien(cls, titre_entretien, demandeur_nom, user):
-        """Notification pour la suppression définitive d'un entretien (action irréversible)"""
-        message = (
-            f"L'entretien '{titre_entretien}' avec {demandeur_nom} "
-            f"a été supprimé définitivement du système."
-        )
-        
-        return cls.envoyer_notification(
-            user=user,
-            titre="Entretien supprimé définitivement",
-            message=message,
-            type_notif='entretien_supprime',
-            url='/entretiens'
-        )
-
-    @classmethod
-    def broadcast_suppression_entretien(cls, titre_entretien, demandeur_nom, utilisateur_courant):
-        """Diffuser la suppression d'entretien"""
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        
-        utilisateurs = User.objects.filter(is_active=True)
-        for user in utilisateurs:
-            if user != utilisateur_courant:
-                cls.notifier_suppression_entretien(titre_entretien, demandeur_nom, user)
-        
-        logger.info(f"📢 Broadcast suppression entretien envoyé à {utilisateurs.count()} utilisateurs")
-
-    @classmethod
-    def notifier_deplacement_entretien(cls, entretien, user, ancienne_date, ancienne_heure, nouvelle_date, nouvelle_heure, motif):
-        """Notification pour le déplacement d'un entretien"""
-        message = (
-            f"L'entretien avec {entretien.demandeur.etudiant_prenom} {entretien.demandeur.etudiant_nom} "
-            f"a été déplacé de {ancienne_date} {ancienne_heure} à {nouvelle_date} {nouvelle_heure}. "
-            f"Motif : {motif}"
-        )
-        
-        return cls.envoyer_notification(
-            user=user,
-            titre="Entretien déplacé",
-            message=message,
-            type_notif='entretien_deplace',
-            entretien=entretien
-        )
-
-    @classmethod
-    def broadcast_deplacement_entretien(cls, entretien, utilisateur_courant, ancienne_date, ancienne_heure, nouvelle_date, nouvelle_heure, motif):
-        """Diffuser le déplacement d'entretien"""
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        
-        utilisateurs = User.objects.filter(is_active=True)
-        for user in utilisateurs:
-            if user != utilisateur_courant:
-                cls.notifier_deplacement_entretien(entretien, user, ancienne_date, ancienne_heure, nouvelle_date, nouvelle_heure, motif)
-        
-        logger.info(f"📢 Broadcast déplacement entretien envoyé à {utilisateurs.count()} utilisateurs")
-
-    @classmethod
-    def notifier_rappel_entretien(cls, user, entretien, delai="24h"):
-        """Notification de rappel avant un entretien"""
-        message = (
-            f"Rappel : Votre entretien avec {entretien.demandeur.etudiant_prenom} {entretien.demandeur.etudiant_nom} "
-            f"aura lieu le {entretien.date.strftime('%d/%m/%Y')} à {entretien.heure_debut.strftime('%H:%M')} "
-            f"(dans {delai})."
-        )
-        
-        return cls.envoyer_notification(
-            user=user,
-            titre="Rappel d'entretien",
-            message=message,
-            type_notif='rappel_entretien',
-            entretien=entretien
-        )
-
-    @classmethod
-    def notifier_validation_requise(cls, user, entretien):
-        """Notification pour une validation requise"""
-        message = (
-            f"Le compte-rendu de l'entretien avec {entretien.demandeur.etudiant_prenom} {entretien.demandeur.etudiant_nom} "
-            f"est en attente de validation."
-        )
-        
-        return cls.envoyer_notification(
-            user=user,
-            titre="Validation en attente",
-            message=message,
-            type_notif='validation_requise',
-            entretien=entretien
-        )
 
     # =========================================================================
     # MÉTHODES SPÉCIFIQUES POUR LES DEMANDES
@@ -1431,7 +1189,6 @@ class NotificationService:
         
         logger.info(f"📢 Broadcast création stage envoyé à {utilisateurs.count()} utilisateurs")
 
-   
     @classmethod
     def notifier_demande_information(cls, demande, utilisateur, message):
         """Notification pour l'envoi d'une demande d'information complémentaire à un étudiant"""
@@ -1573,8 +1330,6 @@ class NotificationService:
         
         logger.info(f"📢 Broadcast modification documents envoyé à {tous_utilisateurs.count()} utilisateurs pour demande #{demande.tracking_id}")
 
-        # Ajoutez ces méthodes à votre classe NotificationService
-
     @classmethod
     def notifier_pre_acceptation_demande(cls, demande, user, donnees_pre_acceptation):
         """Notification pour la pré-acceptation d'une demande de stage"""
@@ -1678,4 +1433,197 @@ class NotificationService:
         
         logger.info(f"📢 Broadcast annulation pré-acceptation envoyé à {utilisateurs.count()} utilisateurs")
 
+    @classmethod
+    def notifier_nouvelle_demande_attestation(cls, stagiaire, demande_attestation):
+        """
+        Notification pour une nouvelle demande d'attestation
+        Notifie TOUS les utilisateurs actifs
+        """
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        # ✅ Récupérer TOUS les utilisateurs actifs
+        utilisateurs_actifs = User.objects.filter(is_active=True)
+        
+        if not utilisateurs_actifs.exists():
+            logger.error("❌ Aucun utilisateur actif dans le système")
+            return None
+        
+        message = (
+            f"Nouvelle demande d'attestation reçue de {stagiaire.prenom} {stagiaire.nom}. "
+            f"Stage effectué du {stagiaire.date_debut.strftime('%d/%m/%Y')} "
+            f"au {stagiaire.date_fin.strftime('%d/%m/%Y')} "
+            f"({stagiaire.duree_jours} jours) dans le service {stagiaire.service}."
+        )
+        
+        # ✅ Créer pour le premier utilisateur (pour le retour)
+        notification_principale = cls.envoyer_notification(
+            user=utilisateurs_actifs.first(),
+            titre="Nouvelle demande d'attestation",
+            message=message,
+            type_notif='attestation',
+            url=f"/demandes-attestations/{demande_attestation.id}",
+            son='bell'
+        )
+        
+        logger.info(
+            f"✅ Notification créée : ID={notification_principale.id if notification_principale else 'None'} "
+            f"pour {utilisateurs_actifs.count()} utilisateur(s)"
+        )
+        
+        return notification_principale
+
+    @classmethod
+    def broadcast_nouvelle_demande_attestation(cls, stagiaire, demande_attestation):
+        """
+        Diffuser la nouvelle demande d'attestation à TOUS les utilisateurs actifs
+        """
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        # ✅ TOUS les utilisateurs actifs
+        utilisateurs_actifs = User.objects.filter(is_active=True)
+        
+        if not utilisateurs_actifs.exists():
+            logger.warning("⚠️ Aucun utilisateur actif pour diffuser la notification")
+            return
+        
+        message = (
+            f"Nouvelle demande d'attestation reçue de {stagiaire.prenom} {stagiaire.nom}. "
+            f"Stage : {stagiaire.type_stage} - {stagiaire.service} "
+            f"({stagiaire.date_debut.strftime('%d/%m/%Y')} - {stagiaire.date_fin.strftime('%d/%m/%Y')}). "
+            f"Documents soumis : Rapport de stage + Demande manuscrite."
+        )
+        
+        compteur = 0
+        for utilisateur in utilisateurs_actifs:
+            notification = cls.envoyer_notification(
+                user=utilisateur,
+                titre="Nouvelle demande d'attestation",
+                message=message,
+                type_notif='attestation',
+                url=f"/demandes-attestations/{demande_attestation.id}",
+                son='bell'
+            )
+            if notification:
+                compteur += 1
+                logger.info(f"✅ Notification créée pour {utilisateur.email}: ID={notification.id}")
+            else:
+                logger.error(f"❌ Échec notification pour {utilisateur.email}")
+        
+        logger.info(
+            f"📢 Broadcast demande attestation #{demande_attestation.id} "
+            f"diffusée à {compteur}/{utilisateurs_actifs.count()} utilisateurs"
+    )
+    @staticmethod
+    def notifier_attestation_approuvee(stagiaire, demande_attestation, user):
+        """Notifie qu'une attestation a été approuvée"""
+        try:
+            # Notification à l'utilisateur qui a effectué l'action
+            Notification.objects.create(
+                user=user,
+                titre="Attestation approuvée",
+                message=f"La demande d'attestation de {stagiaire.prenom} {stagiaire.nom} a été approuvée.",
+                type="success",
+                icone="check-circle",
+                son="success",
+                url=f"/demandes-attestation/"
+            )
+            
+            logger.info(f"✅ Notification attestation approuvée créée pour {stagiaire.nom}")
+            return True
+        except Exception as e:
+            logger.error(f"❌ Erreur création notification attestation approuvée: {e}")
+            return False
     
+    @staticmethod
+    def notifier_attestation_refusee(stagiaire, demande_attestation, user, motif):
+        """Notifie qu'une attestation a été refusée"""
+        try:
+            # Notification à l'utilisateur qui a effectué l'action
+            Notification.objects.create(
+                user=user,
+                titre="Attestation refusée",
+                message=f"La demande d'attestation de {stagiaire.prenom} {stagiaire.nom} a été refusée. Motif: {motif}",
+                type="warning",
+                icone="x-circle",
+                son="warning",
+                url=f"/demandes-attestation/"
+            )
+            
+            logger.info(f"Notification attestation refusée créée pour {stagiaire.nom}")
+            return True
+        except Exception as e:
+            logger.error(f"❌ Erreur création notification attestation refusée: {e}")
+            return False
+        
+    @staticmethod
+    def notifier_attestation_signee_upload(stagiaire, demande_attestation, user):
+        """
+        Crée une notification pour l'upload de l'attestation signée
+        """
+        try:
+            titre = "Attestation signée uploadée"
+            message = f"L'attestation signée de {stagiaire.nom} {stagiaire.prenom} a été uploadée et envoyée au stagiaire."
+            
+            # Créer la notification pour l'utilisateur courant
+            notification = Notification.objects.create(
+                user=user,
+                titre=titre,
+                message=message,
+                type='success',
+                son='success'
+            )
+            
+            # Diffuser aux administrateurs
+            NotificationService.broadcast_attestation_signee_upload(stagiaire, demande_attestation)
+            
+            return notification
+            
+        except Exception as e:
+            logger.error(f"❌ Erreur création notification attestation signée: {e}")
+            return None
+    
+    @classmethod
+    def broadcast_attestation_signee_upload(cls, stagiaire, demande_attestation):
+        """
+        Diffuse la notification d'upload d'attestation signée à tous les utilisateurs actifs
+        
+        Args:
+            stagiaire: Instance du stagiaire
+            demande_attestation: Instance de la demande d'attestation
+        """
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        utilisateurs_actifs = User.objects.filter(is_active=True)
+        
+        if not utilisateurs_actifs.exists():
+            logger.warning("⚠️ Aucun utilisateur actif pour diffuser la notification")
+            return
+        
+        message = (
+            f"L'attestation signée de {stagiaire.prenom} {stagiaire.nom} "
+            f"a été uploadée et envoyée au stagiaire. "
+        )
+        
+        compteur = 0
+        for utilisateur in utilisateurs_actifs:
+            notification = cls.envoyer_notification(
+                user=utilisateur,
+                titre="Attestation signée uploadée",
+                message=message,
+                type_notif='attestation',
+                url=f"/demandes-attestations/{demande_attestation.id}",
+                son='success'
+            )
+            if notification:
+                compteur += 1
+                logger.info(f"✅ Notification créée pour {utilisateur.email}: ID={notification.id}")
+            else:
+                logger.error(f"❌ Échec notification pour {utilisateur.email}")
+        
+        logger.info(
+            f"📢 Broadcast attestation signée #{demande_attestation.id} "
+            f"diffusée à {compteur}/{utilisateurs_actifs.count()} utilisateurs"
+        )
