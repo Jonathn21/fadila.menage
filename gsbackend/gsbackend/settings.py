@@ -246,12 +246,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # EMAIL
 # ======================
 EMAIL_BACKEND     = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST        = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT        = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS     = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
-EMAIL_HOST_USER   = os.environ.get('EMAIL_HOST_USER', 'jonathantchangani876@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'vqyn gqcf kjfk ttix')
-DEFAULT_FROM_EMAIL  = os.environ.get('DEFAULT_FROM_EMAIL', 'stages@ceb.bj')
+EMAIL_HOST        = os.environ.get('EMAIL_HOST')
+EMAIL_PORT        = int(os.environ.get('EMAIL_PORT'))
+EMAIL_USE_TLS     = os.environ.get('EMAIL_USE_TLS').lower() == 'true'
+EMAIL_HOST_USER   = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL  = os.environ.get('DEFAULT_FROM_EMAIL')
 
 # ======================
 # FRONTEND
@@ -278,7 +278,7 @@ CSRF_COOKIE_HTTPONLY = True
 # ======================
 # GEMINI
 # ======================
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyC7m6r02cRHq5yx_bdIrEyWJZvvIgCpGeA")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 GEMINI_AVAILABLE_MODELS = [
     "models/gemini-2.0-flash",
     "models/gemini-2.0-flash-001",
@@ -318,3 +318,6 @@ LOGGING = {
 # WEBSOCKET
 # ======================
 ASGI_THREADS = 4
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024   
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024

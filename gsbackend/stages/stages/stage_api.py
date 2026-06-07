@@ -279,6 +279,26 @@ class ModifierPeriodeStagiaireAPIView(APIView):
 class StagiaireDetailAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser]
+    
+    def delete(self, request, stagiaire_id):
+        stagiaire = Stagiaire.objects.filter(id=stagiaire_id).first()
+        if not stagiaire:
+            return Response(
+                {"success": False, "message": "Stagiaire introuvable."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        try:
+            nom = f"{getattr(stagiaire, 'nom', '')} {getattr(stagiaire, 'prenom', '')}".strip()
+            stagiaire.delete()
+            return Response(
+                {"success": True, "message": f"Stagiaire {nom} supprimé avec succès."},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"success": False, "message": f"Erreur lors de la suppression : {e}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     @method_decorator(ratelimit(key='user', rate='30/m', method='GET'))
     def get(self, request, stagiaire_id):

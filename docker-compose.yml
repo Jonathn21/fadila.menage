@@ -1,86 +1,186 @@
-﻿version: '3.8'
+version: '3.8'
+
 
 services:
+
+  # ======================
+
+  # DATABASE (MariaDB)
+
+  # ======================
+
   db:
-    image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
+
+    image: mariadb:10.11
+
     volumes:
+
       - mysql_data:/var/lib/mysql
+
     environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+
+      MARIADB_DATABASE: ${DB_NAME}
+
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+
     ports:
-      - "3307:3306"
+
+      - "3307:3306"   # ⚠️ à fermer via firewall en prod
+
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 30s
+
+  # ======================
+
+  # REDIS
+
+  # ======================
 
   redis:
+
     image: redis:7-alpine
+
     ports:
-      - "6379:6379"
+
+      - "6379:6379"   # ⚠️ à fermer via firewall en prod
+
     healthcheck:
+
       test: ["CMD", "redis-cli", "ping"]
+
       interval: 5s
+
       timeout: 3s
+
       retries: 5
 
+
+  # ======================
+
+  # FRONTEND
+
+  # ======================
+
   frontend:
+
     build: ./frontend
+
     volumes:
+
       - ./frontend:/app
+
       - /app/node_modules
+
     ports:
+
       - "8080:8080"
+
     environment:
-      - VITE_API_URL=http://localhost:8000/api/
-      - VITE_WS_URL=ws://localhost:8000/ws/
-      - REACT_APP_API_URL=http://localhost:8000/api/
+
+      - VITE_API_URL=http://185.158.5.60:8000/api/
+
+      - VITE_WS_URL=ws://185.158.5.60:8000/ws/
+
+      - REACT_APP_API_URL=http://185.158.5.60:8000/api/
+
       - CHOKIDAR_USEPOLLING=true
+
     stdin_open: true
+
     tty: true
 
+
+  # ======================
+
+  # BACKEND (Django)
+
+  # ======================
+
   backend:
+
     build: ./gsbackend
+
     command: >
+
       sh -c "
+
       python manage.py migrate &&
+
       daphne -b 0.0.0.0 -p 8000 gsbackend.asgi:application
+
       "
+
     volumes:
+
       - ./gsbackend:/app
-      - media_volume:/app/media
-      - static_volume:/app/staticfiles
+
+      - /home/serverAdmin/apps/gestion-des-stages-productions/gsbackend/media:/app/media
+
+      - /home/serverAdmin/apps/gestion-des-stages-productions/gsbackend/staticfiles:/app/staticfiles
+
     ports:
+
       - "8000:8000"
+
     environment:
-    - DOCKERIZED=true
-    - DB_HOST=db
-    - DB_PORT=3306
-    - DB_USER=root
-    - DB_PASSWORD=${DB_PASSWORD}
-    - DB_NAME=${DB_NAME}
-    - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-    - DJANGO_DEBUG=${DJANGO_DEBUG}
-    - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0,backend,gestion-stageemploi.pages.dev
-    - CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://localhost:8080,http://127.0.0.1:8000,http://127.0.0.1:8080,https://gestion-stageemploi.pages.dev
-    - CORS_ALLOWED_ORIGINS=http://localhost:8080,http://localhost:8000,http://127.0.0.1:8080,http://127.0.0.1:8000,https://gestion-stageemploi.pages.dev
-    - FRONTEND_URL=http://localhost:8080
-    - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-    - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
-    - USE_X_FORWARDED_HOST=True
-    - SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,https
+
+      DOCKERIZED: "true"
+
+      DB_HOST: db
+
+      DB_PORT: 3306
+
+      DB_USER: root
+
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      DB_NAME: ${DB_NAME}
+
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+
+      DJANGO_DEBUG: ${DJANGO_DEBUG}
+
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,0.0.0.0,backend,185.158.5.60,api.cebnet.org
+      CSRF_TRUSTED_ORIGINS: https://api.cebnet.org,https://stageemploi.cebnet.org
+      CORS_ALLOWED_ORIGINS: https://stageemploi.cebnet.org,https://api.cebnet.org
+      FRONTEND_URL: https://stageemploi.cebnet.org
+
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+
+      USE_X_FORWARDED_HOST: "True"
+
+      SECURE_PROXY_SSL_HEADER: HTTP_X_FORWARDED_PROTO,https
+
 
     depends_on:
+
       db:
+
         condition: service_healthy
+
       redis:
+
         condition: service_healthy
+
     restart: unless-stopped
 
+
+# ======================
+
+# VOLUMES
+
+# ======================
+
 volumes:
+
   mysql_data:
-  media_volume:
-  static_volume:
+
+
+
+

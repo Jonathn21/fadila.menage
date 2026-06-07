@@ -318,6 +318,9 @@ urlpatterns = [
      path('demandes/<int:demande_id>/regenerer-convention/', RegenererConventionAPIView.as_view()),
     path('stagiaires/<int:stagiaire_id>/regenerer-convention-renouvellement/', RegenererConventionRenouvellementAPIView.as_view()),
 path('export-rapport/', views.ExportRapportAPIView.as_view(), name='export_rapport'),
+path('stagiaires/<int:stagiaire_id>/supprimer/',
+          StagiaireDetailAPI.as_view(),
+          name='supprimer_stagiaire'),
 ]
 
 urlpatterns += router.urls
