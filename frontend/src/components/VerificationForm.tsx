@@ -110,7 +110,7 @@ const VerificationForm = () => {
 
         // ✅ Attendre un peu avant la redirection
         setTimeout(() => {
-          navigate("/dashboard", { replace: true });
+          navigate("/accueil", { replace: true });
         }, 1500);
 
       } else {
@@ -185,111 +185,111 @@ const VerificationForm = () => {
   };
 
   return (
-    <div className="W-full">
-        <PublicHeader />
-      <div className="container mx-auto px-4 py-8 max-w-md">
-        <Card>
-        <CardHeader className="space-y-4 pb-6">
-          <div className="flex justify-center">
-            <Logo />
-          </div>
-          <div className="text-center">
-            
-            <CardTitle className="text-2xl font-bold text-foreground">
-              Vérification en deux étapes
-            </CardTitle>
-            <CardDescription className="mt-2">
-              Entrez le code de vérification envoyé à
-            </CardDescription>
-            <div className="flex items-center justify-center gap-2 mt-2 bg-muted/50 rounded-lg p-3">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium text-foreground">{email}</span>
-            </div>
-          </div>
-        </CardHeader>
+    <div className="min-h-screen flex flex-col">
+      
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Card className="w-full">
+            <CardHeader className="space-y-4 pb-6">
+              <div className="flex justify-center">
+                <Logo />
+              </div>
+              <div className="text-center">
+                <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+                  Vérification en deux étapes
+                </CardTitle>
+                <CardDescription className="mt-2">
+                  Entrez le code de vérification envoyé à
+                </CardDescription>
+                <div className="flex items-center justify-center gap-2 mt-2 bg-muted/50 rounded-lg p-3">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium text-foreground">{email}</span>
+                </div>
+              </div>
+            </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex justify-center">
-              <div className="space-y-3 w-full max-w-xs">
-                <Input
-                  ref={inputRef}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={value}
-                  onChange={handleInputChange}
-                  onPaste={handlePaste}
-                  placeholder="000000"
-                  className="w-full h-14 text-center text-2xl font-mono tracking-widest "
-                  maxLength={6}
-                  disabled={loading}
-                  autoComplete="one-time-code"
-                />
-                <p className="text-sm text-muted-foreground text-center">
-                  {value.length}/6 chiffres - La vérification se fera automatiquement
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
+                <div className="flex justify-center">
+                  <div className="space-y-3 w-full max-w-xs">
+                    <Input
+                      ref={inputRef}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={value}
+                      onChange={handleInputChange}
+                      onPaste={handlePaste}
+                      placeholder="000000"
+                      className="w-full h-14 text-center text-2xl font-mono tracking-widest"
+                      maxLength={6}
+                      disabled={loading}
+                      autoComplete="one-time-code"
+                    />
+                    <p className="text-sm text-muted-foreground text-center">
+                      {value.length}/6 chiffres - La vérification se fera automatiquement
+                    </p>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 bg-primary hover:bg-primary/90 transition-colors"
+                  disabled={loading || value.length !== 6}
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Vérification en cours...
+                    </div>
+                  ) : (
+                    "Vérifier le code"
+                  )}
+                </Button>
+
+                <div className="text-center space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Vous n'avez pas reçu de code ?
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={handleResend}
+                    variant="outline"
+                    disabled={resending || timer > 0}
+                    className="gap-2"
+                  >
+                    {resending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <RotateCcw className="h-4 w-4" />
+                    )}
+                    {timer > 0 ? `Renvoyer (${timer}s)` : "Renvoyer le code"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+
+            <CardFooter className="flex flex-col space-y-3 border-t pt-6">
+              <Button 
+                onClick={handleBackToLogin}
+                variant="ghost" 
+                className="w-full gap-2"
+                disabled={loading}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour à la connexion
+              </Button>
+              
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">
+                  Copyright © 2025 - CEB. Tous droits réservés.
                 </p>
               </div>
-            </div>
-
-            <Button 
-              type="submit" 
-              className="w-full h-11 bg-primary hover:bg-primary/90 transition-colors"
-              disabled={loading || value.length !== 6}
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Vérification en cours...
-                </div>
-              ) : (
-                "Vérifier le code"
-              )}
-            </Button>
-
-            <div className="text-center space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Vous n'avez pas reçu de code ?
-              </p>
-              <Button
-                type="button"
-                onClick={handleResend}
-                variant="outline"
-                disabled={resending || timer > 0}
-                className="gap-2"
-              >
-                {resending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <RotateCcw className="h-4 w-4" />
-                )}
-                {timer > 0 ? `Renvoyer (${timer}s)` : "Renvoyer le code"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-
-        <CardFooter className="flex flex-col space-y-3 border-t pt-6">
-          <Button 
-            onClick={handleBackToLogin}
-            variant="ghost" 
-            className="w-full gap-2"
-            disabled={loading}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour à la connexion
-          </Button>
-          
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">
-              Copyright © 2025 - CEB. Tous droits réservés.
-            </p>
-          </div>
-        </CardFooter>
-      </Card>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
-      <PublicFooter />
-
+      
     </div>
   );
 };

@@ -79,7 +79,7 @@ export const useProcessInternshipForm = () => {
         montant: data.isPaid ? data.remunerationAmount?.toString() : null,
       };
 
-      const response = await axios.post(`http://127.0.0.1:8000/api/demandes/${id}/accepter/`, payload);
+      const response = await axios.post(`https://localhost:8000/api/demandes/${id}/accepter/`, payload);
 
       if (response.data.success) {
         toast({

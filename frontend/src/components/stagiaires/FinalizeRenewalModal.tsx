@@ -257,21 +257,21 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                 <Separator className="my-4" />
 
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                     <span className="text-muted-foreground">Type:</span>
                     <span className="font-medium">{nouveauStage?.type_stage}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                     <span className="text-muted-foreground">Direction/Service:</span>
                     <span className="font-medium">{nouveauStage?.direction} / {nouveauStage?.service}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                     <span className="text-muted-foreground">Période:</span>
                     <span className="font-medium">
                       {nouveauStage?.date_debut} - {nouveauStage?.date_fin}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                     <span className="text-muted-foreground">Statut:</span>
                     <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">
                       {nouveauStage?.statut}
@@ -349,7 +349,7 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
           </div>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4 md:space-y-6">
           {/* Étape 1: Téléchargement */}
           {conventionTemporaireUrl && (
             <Card className="bg-green-50 border-green-200">
@@ -433,7 +433,7 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                     Fichier signé (PDF uniquement)
                   </Label>
                   
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer bg-muted/10">
+                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-3 sm:p-4 md:p-6 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer bg-muted/10">
                     <input
                       id="file-upload"
                       type="file"
@@ -456,7 +456,7 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                   </div>
                   
                   {file && (
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 border border-green-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg bg-green-50 border border-green-200 gap-2 sm:gap-0">
                       <div className="flex items-center gap-3">
                         <FileText className="h-5 w-5 text-green-600" />
                         <div>

@@ -292,7 +292,7 @@ const PendingInternships: React.FC = () => {
     {
       key: "actions",
       label: "Actions",
-      render: (_: any, item: Internship) => (
+      render: (_: unknown, item: Internship) => (
         <div className="flex space-x-2">
           <Button 
             variant="outline" 
@@ -318,12 +318,12 @@ const PendingInternships: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-4 md:space-y-6">
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Users className="h-8 w-8 text-primary" />
-              <CardTitle className="text-3xl">Demandes en attente</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl">Demandes en attente</CardTitle>
             </div>
             <CardDescription>
               Gérez et suivez l'ensemble des demandes de stage en attente de validation
@@ -399,7 +399,7 @@ const PendingInternships: React.FC = () => {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 sm:gap-0">
                   <h3 className="font-semibold">
                     {internships.length} demande{internships.length !== 1 ? 's' : ''} en attente
                   </h3>

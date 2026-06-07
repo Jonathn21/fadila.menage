@@ -26,8 +26,8 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
     return (
       <div className={cn("grid gap-4 md:grid-cols-2 lg:grid-cols-4", className)}>
         {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="rounded-xl border bg-card p-6 shadow-sm">
-            <div className="flex items-center justify-between">
+          <div key={index} className="rounded-xl border bg-card p-3 sm:p-4 md:p-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-4 w-4 rounded-full" />
             </div>

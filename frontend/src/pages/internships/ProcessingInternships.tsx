@@ -579,12 +579,12 @@ const PendingInternships: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-4 md:space-y-6">
         {/* En-tête de la page */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-col gap-2">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Demandes en cours de traitement</h1>
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">Demandes en cours de traitement</h1>
               <CardDescription className="text-muted-foreground">
                 Gérez et suivez l'ensemble des demandes de stage en cours de traitement
               </CardDescription>
@@ -673,7 +673,7 @@ const PendingInternships: React.FC = () => {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 sm:gap-0">
                   <h3 className="font-semibold">
                     {filteredInternships.length} demande{filteredInternships.length !== 1 ? 's' : ''} en cours de traitement
                   </h3>
@@ -695,7 +695,7 @@ const PendingInternships: React.FC = () => {
                       <tbody>
                         {filteredInternships.length === 0 ? (
                           <tr>
-                            <td colSpan={columns.length} className="p-8 text-center">
+                            <td colSpan={columns.length} className="p-4 sm:p-6 md:p-8 text-center">
                               <div className="text-center py-12">
                                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                                 <h3 className="font-medium text-lg mb-1">Aucune demande en cours de traitement</h3>
@@ -746,7 +746,7 @@ const PendingInternships: React.FC = () => {
                           <CardContent className="p-4">
                             <div className="space-y-4">
                               {/* En-tête avec nom et indicateur de délai */}
-                              <div className="flex justify-between items-start">
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-0">
                                 <div className="flex-1">
                                   <h4 className="font-semibold text-lg">
                                     {internship.etudiant_nom} {internship.etudiant_prenom}
@@ -797,7 +797,7 @@ const PendingInternships: React.FC = () => {
                                   ? 'bg-yellow-50 text-yellow-800 border border-yellow-200'
                                   : 'bg-blue-50 text-blue-800 border border-blue-200'
                               }`}>
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                                   <span className="font-medium">
                                     {daysInProcess > 30 ? 'Retard critique' : 
                                      daysInProcess > 15 ? 'Attention nécessaire' : 'En cours de traitement'}

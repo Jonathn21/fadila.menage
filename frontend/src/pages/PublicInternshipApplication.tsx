@@ -151,14 +151,14 @@ const PublicInternshipApplication = () => {
           }}
         >
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">CARRIÈRES</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">CARRIÈRES</h1>
             <p className="text-base sm:text-lg opacity-90 max-w-3xl mx-auto px-4">
               Vous souhaitez rejoindre l'équipe de la CEB ? Envoyez-nous vos
               informations et documents, et nous vous contacterons au besoin.
             </p>
           </div>
         </div>
-        <div className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
+        <div className="flex-1 container mx-auto px-4 py-4 sm:py-6 md:py-8 max-w-4xl">
           <ConfirmationDialog
             trackingCode={trackingCode}
             email={applicationData.email}
@@ -184,7 +184,7 @@ const PublicInternshipApplication = () => {
         }}
       >
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">CARRIÈRES</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">CARRIÈRES</h1>
           <p className="text-base sm:text-lg opacity-90 max-w-3xl mx-auto px-4">
             Vous souhaitez rejoindre l'équipe de la CEB ? Envoyez-nous vos
             informations et documents, et nous vous contacterons au besoin.

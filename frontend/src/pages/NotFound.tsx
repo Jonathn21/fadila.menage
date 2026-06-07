@@ -17,19 +17,19 @@ const NotFound = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <Card className="w-full max-w-md mx-auto shadow-lg border-0">
-        <CardContent className="p-8 text-center">
+        <CardContent className="p-4 sm:p-6 md:p-8 text-center">
           <div className="flex justify-center mb-6">
             <div className="relative">
               <div className="w-24 h-24 bg-destructive/20 rounded-full flex items-center justify-center">
                 <AlertTriangle className="h-12 w-12 text-destructive" />
               </div>
               <div className="absolute -top-2 -right-2 bg-background rounded-full p-1 shadow-md">
-                <span className="text-2xl font-bold text-destructive">404</span>
+                <span className="text-lg sm:text-xl md:text-2xl font-bold text-destructive">404</span>
               </div>
             </div>
           </div>
           
-          <h1 className="text-3xl font-bold text-foreground mb-2">Page non trouvée</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2">Page non trouvée</h1>
           
           <p className="text-muted-foreground mb-6">
             Oups ! La page que vous recherchez semble introuvable.

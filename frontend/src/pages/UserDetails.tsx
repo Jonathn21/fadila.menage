@@ -1,16 +1,52 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {User,ArrowLeft,Save,Edit,Shield,History,Trash2,Mail,Calendar,LogIn,UserCog,CheckCircle,XCircle,Loader2,ChevronLeft,ChevronRight} from "lucide-react";
+import {
+  User,
+  ArrowLeft,
+  Save,
+  Edit,
+  Shield,
+  History,
+  Trash2,
+  Mail,
+  Calendar,
+  LogIn,
+  UserCog,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue,} from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import DeleteConfirmDialog from "@/components/DeleteConfirmDialog";
 import { usePermissions } from "@/hooks/usePermissions";
-import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,} from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,10 +61,11 @@ const UserDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("info");
 
   const [user, setUser] = useState(null);
   const [actionHistory, setActionHistory] = useState([]);
-  
+
   // États pour la pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -41,9 +78,9 @@ const UserDetails = () => {
       try {
         const [userResponse, historyResponse] = await Promise.all([
           apiClient.get(`/utilisateurs/${userId}/`),
-          apiClient.get(`/utilisateurs/${userId}/actions/`)
+          apiClient.get(`/utilisateurs/${userId}/actions/`),
         ]);
-        
+
         setUser(userResponse.data);
         setActionHistory(historyResponse.data);
         setTotalPages(Math.ceil(historyResponse.data.length / itemsPerPage));
@@ -103,7 +140,7 @@ const UserDetails = () => {
         title: "Utilisateur supprimé",
         description: "L'utilisateur a été supprimé avec succès.",
       });
-      navigate("/users");
+      navigate("/utilisateurs");
     } catch (error) {
       toast({
         title: "Erreur",
@@ -117,12 +154,13 @@ const UserDetails = () => {
     // Recharger les données pour annuler les modifications
     setIsEditing(false);
     setLoading(true);
-    apiClient.get(`/utilisateurs/${userId}/`)
-      .then(response => {
+    apiClient
+      .get(`/utilisateurs/${userId}/`)
+      .then((response) => {
         setUser(response.data);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         toast({
           title: "Erreur",
           description: "Impossible de recharger les données",
@@ -135,48 +173,48 @@ const UserDetails = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
           <Button
             variant="outline"
-            className="gap-2 mb-4"
+            className="gap-2 mb-4 text-xs sm:text-sm hover:bg-gray-50 text-gray-700 hover:text-gray-800 hover:border-gray-300"
             onClick={() => navigate("/users")}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
             Retour à la liste
           </Button>
-          
-          <div className="flex items-center gap-4 mb-6">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-3 w-[200px]" />
+
+          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-100" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <Skeleton className="h-3.5 sm:h-4 w-40 sm:w-64 bg-gray-100" />
+              <Skeleton className="h-2.5 sm:h-3 w-32 sm:w-48 bg-gray-100" />
             </div>
           </div>
-          
-          <Tabs defaultValue="info" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-6">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </TabsList>
-            
-            <TabsContent value="info" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <Skeleton className="h-6 w-1/4" />
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i}>
-                        <Skeleton className="h-4 w-1/3 mb-2" />
-                        <Skeleton className="h-10 w-full" />
-                      </div>
-                    ))}
+
+          <Card className="border border-gray-200">
+            <CardContent className="p-4 sm:p-6">
+              <Tabs defaultValue="info" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 bg-gray-50 mb-4 sm:mb-6 border border-gray-200">
+                  <Skeleton className="h-8 sm:h-10 w-full bg-gray-100" />
+                  <Skeleton className="h-8 sm:h-10 w-full bg-gray-100" />
+                </TabsList>
+
+                <TabsContent value="info" className="space-y-3 sm:space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
+                    <Skeleton className="h-4 sm:h-6 w-1/4 bg-gray-100" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i}>
+                          <Skeleton className="h-3 sm:h-4 w-1/3 mb-1.5 sm:mb-2 bg-gray-100" />
+                          <Skeleton className="h-8 sm:h-10 w-full bg-gray-100" />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
       </DashboardLayout>
     );
@@ -185,22 +223,25 @@ const UserDetails = () => {
   if (!user) {
     return (
       <DashboardLayout>
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
           <Button
             variant="outline"
-            className="gap-2"
-            onClick={() => navigate("/users")}
+            className="gap-2 text-xs sm:text-sm hover:bg-gray-50 text-gray-700 hover:text-gray-800 hover:border-gray-300"
+            onClick={() => navigate("/utilisateurs")}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
             Retour à la liste
           </Button>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-10">
-                <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">Utilisateur non trouvé</h3>
-                <p className="text-muted-foreground">
-                  L'utilisateur que vous recherchez n'existe pas ou a été supprimé.
+          <Card className="border border-gray-200">
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="text-center py-4 sm:py-6 md:py-8 sm:py-10">
+                <User className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-gray-400 mb-3 sm:mb-4" />
+                <h3 className="text-sm sm:text-base font-medium mb-1 sm:mb-2 text-gray-900">
+                  Utilisateur non trouvé
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  L'utilisateur que vous recherchez n'existe pas ou a été
+                  supprimé.
                 </p>
               </div>
             </CardContent>
@@ -212,44 +253,50 @@ const UserDetails = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* Header avec boutons d'action */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate("/users")}
-              className="hidden sm:flex"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="gap-2 sm:hidden"
-              onClick={() => navigate("/users")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Retour
-            </Button>
-            
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                {user.first_name} {user.last_name}
-              </h1>
-              <p className="text-muted-foreground">{user.email}</p>
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex flex-col gap-1 sm:gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">
+              Détails de l'utilisateur            
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Visualisez et modifiez les informations de l'utilisateur
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1 sm:gap-2 text-xs sm:text-sm sm:hidden hover:bg-gray-50 text-gray-700 hover:text-gray-800 hover:border-gray-300"
+              onClick={() => navigate("/utilisateurs")}
+            >
+              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+              Retour
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate("/utilisateurs")}
+              className="hidden sm:flex hover:bg-gray-50 text-gray-700 hover:text-gray-800 hover:border-gray-300"
+              title="Retour à la liste"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+
             {hasPermission("users.delete") && (
               <DeleteConfirmDialog
                 title="Supprimer l'utilisateur"
                 description="Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible."
                 onConfirm={handleDelete}
                 trigger={
-                  <Button variant="destructive" className="gap-2">
-                    <Trash2 className="h-4 w-4" />
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="gap-1 sm:gap-2 text-xs sm:text-sm bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span className="hidden sm:inline">Supprimer</span>
                   </Button>
                 }
@@ -258,20 +305,34 @@ const UserDetails = () => {
 
             {hasPermission("users.edit") &&
               (!isEditing ? (
-                <Button className="gap-2" onClick={() => setIsEditing(true)}>
-                  <Edit className="h-4 w-4" />
+                <Button
+                  size="sm"
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm bg-primary hover:bg-primary/90 text-white"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Modifier</span>
                 </Button>
               ) : (
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={handleCancelEdit}>
+                <div className="flex gap-1 sm:gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCancelEdit}
+                    className="text-xs sm:text-sm hover:bg-gray-50 text-gray-700 hover:text-gray-800 hover:border-gray-300"
+                  >
                     Annuler
                   </Button>
-                  <Button className="gap-2" onClick={handleSave} disabled={saving}>
+                  <Button
+                    size="sm"
+                    className="gap-1 sm:gap-2 text-xs sm:text-sm bg-primary hover:bg-primary/90 text-white"
+                    onClick={handleSave}
+                    disabled={saving}
+                  >
                     {saving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                     ) : (
-                      <Save className="h-4 w-4" />
+                      <Save className="h-3 w-3 sm:h-4 sm:w-4" />
                     )}
                     <span className="hidden sm:inline">Enregistrer</span>
                   </Button>
@@ -281,320 +342,383 @@ const UserDetails = () => {
         </div>
 
         {/* En-tête utilisateur */}
-        <div className="flex items-center gap-4 p-4 border rounded-lg bg-card">
-          <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10">
-            <User className="h-8 w-8 text-primary" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold">
-              {user.first_name} {user.last_name}
-            </h2>
-            <div className="flex flex-wrap items-center gap-2 mt-1">
-              <Badge variant={user.is_active ? "default" : "secondary"} className="gap-1">
-                {user.is_active ? (
-                  <CheckCircle className="h-3 w-3" />
-                ) : (
-                  <XCircle className="h-3 w-3" />
-                )}
-                {user.is_active ? "Actif" : "Inactif"}
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <UserCog className="h-3 w-3" />
-                {user.role}
-              </Badge>
+        <Card className="border border-gray-200">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+              <div className="flex items-center justify-center h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-primary/10">
+                <User className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+                  {user.last_name} {user.first_name}
+                </h2>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
+                  <Badge
+                    variant={user.is_active ? "default" : "secondary"}
+                    className="gap-0.5 sm:gap-1 text-[10px] sm:text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                  >
+                    {user.is_active ? (
+                      <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    ) : (
+                      <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    )}
+                    {user.is_active ? "Actif" : "Inactif"}
+                  </Badge>
+                  <Badge
+                    variant="outline"
+                    className="gap-0.5 sm:gap-1 text-[10px] sm:text-xs text-gray-700 border-gray-300"
+                  >
+                    <UserCog className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    {user.role}
+                  </Badge>
+                </div>
+              </div>
+              <div className="text-right mt-2 sm:mt-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600">
+                  Dernière connexion
+                </p>
+                <p className="text-sm sm:text-base text-gray-900">
+                  {user.last_login
+                    ? new Date(user.last_login).toLocaleDateString("fr-FR")
+                    : "Jamais"}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-2 mb-6">
-            <TabsTrigger value="info" className="gap-2">
-              <User className="h-4 w-4" />
-              Informations
-            </TabsTrigger>
-            <TabsTrigger value="history" className="gap-2">
-              <History className="h-4 w-4" />
-              Historique
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="info" className="space-y-4">
-            {/* ------------------ INFOS UTILISATEUR ------------------ */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Détails de l'utilisateur</CardTitle>
-                <CardDescription>
-                  Informations personnelles et compte de l'utilisateur
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="first_name">Prénom</Label>
-                    {isEditing ? (
-                      <Input
-                        id="first_name"
-                        value={user.first_name || ""}
-                        onChange={(e) =>
-                          setUser({ ...user, first_name: e.target.value })
-                        }
-                      />
-                    ) : (
-                      <div className="p-3 border rounded-md bg-muted/50">
-                        {user.first_name || "Non renseigné"}
-                      </div>
-                    )}
-                  </div>
+        {/* Onglets et contenu */}
+        <Card className="border border-gray-200">
+          <CardContent className="p-4 sm:p-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-gray-50/50 border border-gray-200">
+                <TabsTrigger
+                  value="info"
+                  className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
+                >
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Informations
+                </TabsTrigger>
+                <TabsTrigger
+                  value="history"
+                  className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
+                >
+                  <History className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Historique ({actionHistory.length})
+                </TabsTrigger>
+              </TabsList>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="last_name">Nom</Label>
-                    {isEditing ? (
-                      <Input
-                        id="last_name"
-                        value={user.last_name || ""}
-                        onChange={(e) =>
-                          setUser({ ...user, last_name: e.target.value })
-                        }
-                      />
-                    ) : (
-                      <div className="p-3 border rounded-md bg-muted/50">
-                        {user.last_name || "Non renseigné"}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-1">
-                      <Mail className="h-4 w-4" />
-                      Email
-                    </Label>
-                    {isEditing ? (
-                      <Input
-                        id="email"
-                        type="email"
-                        value={user.email}
-                        onChange={(e) =>
-                          setUser({ ...user, email: e.target.value })
-                        }
-                      />
-                    ) : (
-                      <div className="p-3 border rounded-md bg-muted/50">
-                        {user.email}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="role" className="flex items-center gap-1">
-                      <Shield className="h-4 w-4" />
-                      Rôle
-                    </Label>
-                    {isEditing ? (
-                      <Select
-                        value={user.role}
-                        onValueChange={(value) => setUser({ ...user, role: value })}
-                      >
-                        <SelectTrigger id="role">
-                          <SelectValue placeholder="Sélectionner un rôle" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Admin">Administrateur</SelectItem>
-                          <SelectItem value="Utilisateur">Utilisateur</SelectItem>
-                          <SelectItem value="Editeur">Éditeur</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div className="p-3 border rounded-md bg-muted/50">
-                        {user.role}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Statut</Label>
-                    {isEditing ? (
-                      <Select
-                        value={user.is_active ? "Actif" : "Inactif"}
-                        onValueChange={(value) =>
-                          setUser({ ...user, is_active: value === "Actif" })
-                        }
-                      >
-                        <SelectTrigger id="status">
-                          <SelectValue placeholder="Sélectionner un statut" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Actif">Actif</SelectItem>
-                          <SelectItem value="Inactif">Inactif</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div className="p-3 border rounded-md bg-muted/50 flex items-center gap-2">
-                        {user.is_active ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-red-500" />
-                        )}
-                        {user.is_active ? "Actif" : "Inactif"}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-1">
-                      <LogIn className="h-4 w-4" />
-                      Dernière connexion
-                    </Label>
-                    <div className="p-3 border rounded-md bg-muted/50">
-                      {user.last_login
-                      ? new Date(user.last_login).toLocaleString("fr-FR", {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : "Jamais"}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      Date de création
-                    </Label>
-                    <div className="p-3 border rounded-md bg-muted/50">
-                      {new Date(user.date_joined).toLocaleDateString("fr-FR", {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="history">
-            {/* ------------------ HISTORIQUE ------------------ */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Historique des actions</CardTitle>
-                    <CardDescription>
-                      Historique des activités de cet utilisateur
+              <TabsContent value="info" className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
+                <Card className="border border-gray-200">
+                  <CardHeader>
+                    <CardTitle className="text-sm sm:text-base text-gray-900">
+                      Détails de l'utilisateur
+                    </CardTitle>
+                    <CardDescription className="text-xs sm:text-sm text-gray-600">
+                      Informations personnelles et compte de l'utilisateur
                     </CardDescription>
-                  </div>
-                  {actionHistory.length > 0 && (
-                    <div className="text-sm text-muted-foreground">
-                      Total : {actionHistory.length} action{actionHistory.length > 1 ? 's' : ''}
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                {actionHistory.length === 0 ? (
-                  <div className="text-center py-10">
-                    <History className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Aucun historique</h3>
-                    <p className="text-muted-foreground">
-                      Aucune action n'a été enregistrée pour cet utilisateur.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Date et heure</TableHead>
-                            <TableHead>Action</TableHead>
-                            <TableHead>Utilisateur</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {getCurrentPageActions().map((action, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium">
-                                {new Date(action.timestamp).toLocaleString("fr-FR")}
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className="text-xs">
-                                  {action.action}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-muted-foreground">
-                                {action.performed_by_name}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-muted-foreground">
-                          Page {currentPage} sur {totalPages}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                            Précédent
-                          </Button>
-                          
-                          <div className="flex items-center gap-1">
-                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                              .filter(page => {
-                                // Afficher la première page, la dernière, la page actuelle et les pages adjacentes
-                                return (
-                                  page === 1 ||
-                                  page === totalPages ||
-                                  Math.abs(page - currentPage) <= 1
-                                );
-                              })
-                              .map((page, index, array) => (
-                                <React.Fragment key={page}>
-                                  {index > 0 && array[index - 1] !== page - 1 && (
-                                    <span className="px-2 text-muted-foreground">...</span>
-                                  )}
-                                  <Button
-                                    variant={currentPage === page ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => handlePageChange(page)}
-                                    className="w-10"
-                                  >
-                                    {page}
-                                  </Button>
-                                </React.Fragment>
-                              ))}
+                  </CardHeader>
+                  <CardContent className="space-y-3 sm:space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                      <div className="space-y-1 sm:space-y-2">
+                        <Label htmlFor="first_name" className="text-xs sm:text-sm font-medium text-gray-800">
+                          Prénom
+                        </Label>
+                        {isEditing ? (
+                          <Input
+                            id="first_name"
+                            value={user.first_name || ""}
+                            onChange={(e) =>
+                              setUser({ ...user, first_name: e.target.value })
+                            }
+                            className="text-xs sm:text-sm focus:border-primary focus:ring-primary text-gray-900"
+                          />
+                        ) : (
+                          <div className="p-2.5 sm:p-3 border border-gray-300 rounded-md bg-gray-50/30 text-xs sm:text-sm text-gray-900">
+                            {user.first_name || "Non renseigné"}
                           </div>
+                        )}
+                      </div>
 
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
+                      <div className="space-y-1 sm:space-y-2">
+                        <Label htmlFor="last_name" className="text-xs sm:text-sm font-medium text-gray-800">
+                          Nom
+                        </Label>
+                        {isEditing ? (
+                          <Input
+                            id="last_name"
+                            value={user.last_name || ""}
+                            onChange={(e) =>
+                              setUser({ ...user, last_name: e.target.value })
+                            }
+                            className="text-xs sm:text-sm focus:border-primary focus:ring-primary text-gray-900"
+                          />
+                        ) : (
+                          <div className="p-2.5 sm:p-3 border border-gray-300 rounded-md bg-gray-50/30 text-xs sm:text-sm text-gray-900">
+                            {user.last_name || "Non renseigné"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-1 sm:space-y-2">
+                        <Label
+                          htmlFor="email"
+                          className="flex items-center gap-1 text-xs sm:text-sm font-medium text-gray-800"
+                        >
+                          <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+                          Email
+                        </Label>
+                        {isEditing ? (
+                          <Input
+                            id="email"
+                            type="email"
+                            value={user.email}
+                            onChange={(e) =>
+                              setUser({ ...user, email: e.target.value })
+                            }
+                            className="text-xs sm:text-sm focus:border-primary focus:ring-primary text-gray-900"
+                          />
+                        ) : (
+                          <div className="p-2.5 sm:p-3 border border-gray-300 rounded-md bg-gray-50/30 text-xs sm:text-sm text-gray-900">
+                            {user.email}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-1 sm:space-y-2">
+                        <Label
+                          htmlFor="role"
+                          className="flex items-center gap-1 text-xs sm:text-sm font-medium text-gray-800"
+                        >
+                          <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
+                          Rôle
+                        </Label>
+                        {isEditing ? (
+                          <Select
+                            value={user.role}
+                            onValueChange={(value) =>
+                              setUser({ ...user, role: value })
+                            }
                           >
-                            Suivant
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
+                            <SelectTrigger
+                              id="role"
+                              className="text-xs sm:text-sm focus:border-primary focus:ring-primary text-gray-900"
+                            >
+                              <SelectValue placeholder="Sélectionner un rôle" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Admin" className="text-xs sm:text-sm">Administrateur</SelectItem>
+                              <SelectItem value="Utilisateur" className="text-xs sm:text-sm">Utilisateur</SelectItem>
+                              <SelectItem value="Editeur" className="text-xs sm:text-sm">Éditeur</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className="p-2.5 sm:p-3 border border-gray-300 rounded-md bg-gray-50/30 text-xs sm:text-sm text-gray-900">
+                            {user.role}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-1 sm:space-y-2">
+                        <Label htmlFor="status" className="text-xs sm:text-sm font-medium text-gray-800">
+                          Statut
+                        </Label>
+                        {isEditing ? (
+                          <Select
+                            value={user.is_active ? "Actif" : "Inactif"}
+                            onValueChange={(value) =>
+                              setUser({ ...user, is_active: value === "Actif" })
+                            }
+                          >
+                            <SelectTrigger
+                              id="status"
+                              className="text-xs sm:text-sm focus:border-primary focus:ring-primary text-gray-900"
+                            >
+                              <SelectValue placeholder="Sélectionner un statut" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Actif" className="text-xs sm:text-sm">Actif</SelectItem>
+                              <SelectItem value="Inactif" className="text-xs sm:text-sm">Inactif</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className="p-2.5 sm:p-3 border border-gray-300 rounded-md bg-gray-50/30 text-xs sm:text-sm text-gray-900 flex items-center gap-1.5">
+                            {user.is_active ? (
+                              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+                            ) : (
+                              <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
+                            )}
+                            {user.is_active ? "Actif" : "Inactif"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-1 sm:space-y-2">
+                        <Label
+                          className="flex items-center gap-1 text-xs sm:text-sm font-medium text-gray-800"
+                        >
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                          Date de création
+                        </Label>
+                        <div className="p-2.5 sm:p-3 border border-gray-300 rounded-md bg-gray-50/30 text-xs sm:text-sm text-gray-900">
+                          {new Date(user.date_joined).toLocaleDateString("fr-FR", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
                         </div>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="history" className="mt-4 sm:mt-6">
+                <Card className="border border-gray-200">
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+                      <div>
+                        <CardTitle className="text-sm sm:text-base text-gray-900">
+                          Historique des actions
+                        </CardTitle>
+                        <CardDescription className="text-xs sm:text-sm text-gray-600">
+                          Historique des activités de cet utilisateur
+                        </CardDescription>
+                      </div>
+                      {actionHistory.length > 0 && (
+                        <div className="text-xs sm:text-sm text-gray-600">
+                          Total : {actionHistory.length} action
+                          {actionHistory.length > 1 ? "s" : ""}
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {actionHistory.length === 0 ? (
+                      <div className="text-center py-6 sm:py-8">
+                        <History className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-gray-400 mb-3 sm:mb-4" />
+                        <h3 className="text-sm sm:text-base font-medium mb-1 sm:mb-2 text-gray-900">
+                          Aucun historique
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-600">
+                          Aucune action n'a été enregistrée pour cet utilisateur.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="border border-gray-300 rounded-lg overflow-hidden">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="bg-gray-50/30">
+                                <TableHead className="text-xs sm:text-sm text-gray-900">
+                                  Date et heure
+                                </TableHead>
+                                <TableHead className="text-xs sm:text-sm text-gray-900">
+                                  Action
+                                </TableHead>
+                                <TableHead className="text-xs sm:text-sm text-gray-900">
+                                  Utilisateur
+                                </TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {getCurrentPageActions().map((action, index) => (
+                                <TableRow key={index} className="hover:bg-gray-50/30">
+                                  <TableCell className="font-medium text-xs sm:text-sm text-gray-900">
+                                    {new Date(action.timestamp).toLocaleString(
+                                      "fr-FR"
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge
+                                      variant="outline"
+                                      className="text-[10px] sm:text-xs text-gray-700 border-gray-300"
+                                    >
+                                      {action.action}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-xs sm:text-sm text-gray-600">
+                                    {action.performed_by_name}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                            <div className="text-xs sm:text-sm text-gray-600">
+                              Page {currentPage} sur {totalPages}
+                            </div>
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="gap-1 text-xs sm:text-sm hover:bg-gray-50 text-gray-700 hover:text-gray-800 hover:border-gray-300"
+                              >
+                                <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="hidden sm:inline">Précédent</span>
+                              </Button>
+
+                              <div className="flex items-center gap-0.5 sm:gap-1">
+                                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                  .filter((page) => {
+                                    return (
+                                      page === 1 ||
+                                      page === totalPages ||
+                                      Math.abs(page - currentPage) <= 1
+                                    );
+                                  })
+                                  .map((page, index, array) => (
+                                    <React.Fragment key={page}>
+                                      {index > 0 && array[index - 1] !== page - 1 && (
+                                        <span className="px-1 sm:px-2 text-xs text-gray-600">
+                                          ...
+                                        </span>
+                                      )}
+                                      <Button
+                                        variant={
+                                          currentPage === page ? "default" : "outline"
+                                        }
+                                        size="sm"
+                                        onClick={() => handlePageChange(page)}
+                                        className={`w-7 h-7 sm:w-8 sm:h-8 p-0 text-xs ${
+                                          currentPage === page
+                                            ? "bg-primary hover:bg-primary/90 text-white"
+                                            : "hover:bg-gray-50 text-gray-700 hover:text-gray-800 hover:border-gray-300"
+                                        }`}
+                                      >
+                                        {page}
+                                      </Button>
+                                    </React.Fragment>
+                                  ))}
+                              </div>
+
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="gap-1 text-xs sm:text-sm hover:bg-gray-50 text-gray-700 hover:text-gray-800 hover:border-gray-300"
+                              >
+                                <span className="hidden sm:inline">Suivant</span>
+                                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import apiClient from "@/lib/apiClient";
-import PublicHeader from "@/components/PublicHeader";
+import PublicHeader from "@/components/PublicHeader1";
 import PublicFooter from "@/components/PublicFooter";
 import Logo from "./Logo";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import PublicHeader1 from "./PublicHeader1";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -180,138 +181,121 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="W-full">
-      <PublicHeader />
+    <div className="min-h-screen flex flex-col">
+      
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Card className="w-full">
+            <CardHeader className="space-y-4 pb-6">
+              <div className="flex justify-center">
+                <Logo />
+              </div>
+              <div className="text-center">
+                <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+                  Connexion à votre compte
+                </CardTitle>
+                <CardDescription className="mt-2">
+                  Entrez vos identifiants pour accéder à votre espace
+                </CardDescription>
+              </div>
+            </CardHeader>
 
-      <div 
-        className="relative text-white py-16"
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(5, 150, 105, 0.8), rgba(4, 120, 87, 0.8)), url('https://images.unsplash.com/photo-1636955816868-fcb881e57954?q=80&w=2070&auto=format&fit=crop')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">CONNEXION</h1>
-          <p className="text-lg opacity-90">
-            Accédez à votre espace personnel sécurisé
-          </p>
+            <CardContent className="space-y-3 sm:space-y-4 md:space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-3">
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Adresse email
+                  </Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10 h-11"
+                      placeholder="utilisateur"
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                    <Label htmlFor="password" className="text-sm font-medium">
+                      Mot de passe
+                    </Label>
+                    <Link
+                      to="/forgot-password"
+                      className="text-xs text-primary hover:underline transition-colors"
+                    >
+                      Mot de passe oublié ?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10 h-11"
+                      placeholder="••••••••"                  
+                      disabled={isLoading}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={toggleShowPassword}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      disabled={isLoading}
+                      aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                      aria-pressed={showPassword}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 bg-primary hover:bg-primary/90 transition-all duration-200 shadow-md hover:shadow-lg"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      Connexion en cours...
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      Se connecter
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+
+            <CardFooter className="flex flex-col items-center border-t bg-muted/20 py-4">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <KeyRound className="h-3 w-3" />
+                <span>Système sécurisé avec authentification à double facteur</span>
+              </div>
+            </CardFooter>
+          </Card>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-md ">
-        <Card>
-          <CardHeader className="space-y-4 pb-6">
-            <div className="flex justify-center">
-              <Logo />
-            </div>
-            <div className="text-center">
-              <CardTitle className="text-2xl font-bold text-foreground">
-                Connexion à votre compte
-              </CardTitle>
-              <CardDescription className="mt-2">
-                Entrez vos identifiants pour accéder à votre espace
-              </CardDescription>
-            </div>
-          </CardHeader>
-
-          <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-3">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Adresse email
-                </Label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11"
-                    placeholder="utilisateur"
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    Mot de passe
-                  </Label>
-                  <Link
-                    to="/forgot-password"
-                    className="text-xs text-primary hover:underline transition-colors"
-                  >
-                    Mot de passe oublié ?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-11"
-                    placeholder="••••••••"                  
-                    disabled={isLoading}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={toggleShowPassword}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    disabled={isLoading}
-                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                    aria-pressed={showPassword}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full h-11 bg-primary hover:bg-primary/90 transition-all duration-200 shadow-md hover:shadow-lg"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                    Connexion en cours...
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    Se connecter
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-
-          <CardFooter className="flex flex-col items-center border-t bg-muted/20 py-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <KeyRound className="h-3 w-3" />
-              <span>Système sécurisé avec authentification à double facteur</span>
-            </div>
-          </CardFooter>
-        </Card>
-      </div>
-
-      <PublicFooter className="mt-auto" />
     </div>
   );
 };

@@ -122,7 +122,7 @@ const ResetPasswordForm = () => {
       <div className="W-full">
         <PublicHeader />
 
-        <div className="container mx-auto px-4 py-8 max-w-md">
+        <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8 max-w-md">
           <Card>
             <CardHeader className="space-y-4 pb-6">
               <div className="flex justify-center">
@@ -134,7 +134,7 @@ const ResetPasswordForm = () => {
                     <CheckCircle className="h-8 w-8 text-green-600" />
                   </div>
                 </div>
-                <CardTitle className="text-2xl font-bold text-foreground">
+                <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
                   Mot de passe réinitialisé !
                 </CardTitle>
                 <CardDescription className="mt-2">
@@ -144,7 +144,7 @@ const ResetPasswordForm = () => {
             </CardHeader>
 
             <CardContent>
-              <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+              <div className="bg-green-50 rounded-lg p-4 border ">
                 <p className="text-sm text-green-700 text-center">
                   <strong>Conseil de sécurité :</strong> Utilisez ce mot de passe uniquement pour ce service et ne le partagez avec personne.
                 </p>
@@ -171,7 +171,7 @@ const ResetPasswordForm = () => {
       <div className="W-full">
         <PublicHeader />
 
-        <div className="container mx-auto px-4 py-8 max-w-md">
+        <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8 max-w-md">
         <Card>
         <CardHeader className="space-y-4 pb-6">
           <div className="flex justify-center">
@@ -179,7 +179,7 @@ const ResetPasswordForm = () => {
           </div>
           <div className="text-center">
            
-            <CardTitle className="text-2xl font-bold text-foreground">
+            <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
               Nouveau mot de passe
             </CardTitle>
             <CardDescription className="mt-2">
@@ -224,7 +224,7 @@ const ResetPasswordForm = () => {
               {password.length > 0 && (
                 <div className="space-y-2">
                   <Progress value={passwordStrength} className="h-2" />
-                  <div className="flex justify-between text-xs text-muted-foreground">
+                  <div className="flex flex-col sm:flex-row sm:justify-between text-xs text-muted-foreground gap-2 sm:gap-0">
                     <span>Force du mot de passe</span>
                     <span className={passwordStrength >= 75 ? "text-green-600" : "text-amber-600"}>
                       {passwordStrength >= 75 ? "Fort" : passwordStrength >= 50 ? "Moyen" : "Faible"}

@@ -70,7 +70,7 @@ const DocumentUploadStep: React.FC<DocumentUploadStepProps> = ({
   };
 
   const isFormValid = () => {
-    return data.documents.cv && data.documents.lettreMotivation;
+    return true; // Documents optionnels
   };
 
   const FileUploadCard = ({ 
@@ -87,7 +87,7 @@ const DocumentUploadStep: React.FC<DocumentUploadStepProps> = ({
     required?: boolean;
   }) => (
     <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors">
-      <CardContent className="p-6">
+      <CardContent className="p-3 sm:p-4 md:p-6">
         <div className="text-center space-y-4">
           <div className="mx-auto w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
             <Upload className="h-6 w-6 text-muted-foreground" />
@@ -95,7 +95,6 @@ const DocumentUploadStep: React.FC<DocumentUploadStepProps> = ({
           <div>
             <h3 className="font-medium mb-2">
               {title}
-              {required && <span className="text-red-500 ml-1">*</span>}
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
               Cliquez ou déplacez un fichier dans cette zone pour le téléverser
@@ -119,7 +118,7 @@ const DocumentUploadStep: React.FC<DocumentUploadStepProps> = ({
           
           {/* Show uploaded files */}
           {type !== 'diplomes' && file && (
-            <div className="p-3 bg-muted rounded-lg flex items-center justify-between">
+            <div className="p-3 bg-muted rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
               <div className="flex items-center">
                 <FileText className="h-4 w-4 mr-2 text-primary" />
                 <span className="text-sm font-medium">{(file as File).name}</span>
@@ -137,7 +136,7 @@ const DocumentUploadStep: React.FC<DocumentUploadStepProps> = ({
           {type === 'diplomes' && Array.isArray(file) && file.length > 0 && (
             <div className="mt-4 space-y-2">
               {file.map((f, index) => (
-                <div key={index} className="p-3 bg-muted rounded-lg flex items-center justify-between">
+                <div key={index} className="p-3 bg-muted rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-2 text-primary" />
                     <span className="text-sm font-medium">{f.name}</span>
@@ -159,20 +158,20 @@ const DocumentUploadStep: React.FC<DocumentUploadStepProps> = ({
   );
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         <FileUploadCard
-          title="CV (Curriculum Vitae) *"
+          title="CV (Curriculum Vitae)"
           type="cv"
           file={data.documents.cv}
-          required={true}
+          required={false}
         />
         
         <FileUploadCard
-          title="Lettre de motivation *"
+          title="Lettre de motivation"
           type="lettreMotivation"
           file={data.documents.lettreMotivation}
-          required={true}
+          required={false}
         />
         
         <FileUploadCard
@@ -188,7 +187,7 @@ const DocumentUploadStep: React.FC<DocumentUploadStepProps> = ({
           <div className="text-sm text-blue-800">
             <strong>Informations importantes :</strong>
             <ul className="mt-2 space-y-1 list-disc list-inside">
-              <li>Tous les documents marqués d'un * sont obligatoires</li>
+              <li>Tous les documents sont optionnels</li>
               <li>Formats acceptés : PDF, DOC, DOCX</li>
               <li>Taille maximale par fichier : 5MB</li>
               <li>La photo passeport a déjà été ajoutée à l'étape précédente</li>
@@ -197,7 +196,7 @@ const DocumentUploadStep: React.FC<DocumentUploadStepProps> = ({
         </CardContent>
       </Card>
 
-      <div className="flex justify-between">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
         <Button 
           variant="outline" 
           onClick={onPrevious}

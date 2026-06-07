@@ -496,7 +496,7 @@ const OngoingInternships: React.FC = () => {
         const endDate = new Date(value);
         const statusInfo = calculateInternshipStatus(item.date_debut, value);
         
-        let variant: "default" | "destructive" | "secondary" = "default";
+        const variant: "default" | "destructive" | "secondary" = "default";
         
         
         return (
@@ -562,11 +562,11 @@ const OngoingInternships: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-4 md:space-y-6">
         {/* En-tête */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Stages terminés</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">Stages terminés</h1>
             <CardDescription className="text-muted-foreground">
               Gérez et suivez l'ensemble des stages terminés
             </CardDescription>
@@ -660,7 +660,7 @@ const OngoingInternships: React.FC = () => {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 sm:gap-0">
                   <h3 className="font-semibold">
                     {filteredStagiaires.length} stage{filteredStagiaires.length !== 1 ? 's' : ''} terminés
                   </h3>
@@ -716,7 +716,7 @@ const OngoingInternships: React.FC = () => {
                         <CardContent className="p-4">
                           <div className="space-y-3">
                             {/* En-tête */}
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-0">
                               <div>
                                 <h4 className="font-semibold">{stagiaire.nom} {stagiaire.prenom}</h4>
                                 <p className="text-sm text-muted-foreground">{stagiaire.specialite}</p>

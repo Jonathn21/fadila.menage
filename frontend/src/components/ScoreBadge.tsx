@@ -62,7 +62,7 @@ const ScoreBadge: React.FC<ScoreBadgeProps> = ({
         icon: <Award className="h-3 w-3 fill-current" />,
         gradient: "from-green-500 to-emerald-600",
         bgColor: "bg-gradient-to-r from-green-500 to-emerald-600",
-        borderColor: "border-green-200",
+        borderColor: "",
         textColor: "text-white",
         description: "Candidat excellent, fortement recommandé",
         emoji: "⭐"
@@ -171,7 +171,7 @@ const ScoreBadge: React.FC<ScoreBadgeProps> = ({
     const config = {
       high: { label: "Élevée", color: "bg-red-100 text-red-800 border-red-200" },
       medium: { label: "Moyenne", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-      low: { label: "Faible", color: "bg-green-100 text-green-800 border-green-200" }
+      low: { label: "Faible", color: "bg-green-100 text-green-800 " }
     };
     
     return config[priority as keyof typeof config] || config.medium;
@@ -228,7 +228,7 @@ const ScoreBadge: React.FC<ScoreBadgeProps> = ({
       {showTrend && trend && (
         <div className={cn(
           "p-1 rounded-full border",
-          trend === "up" ? "bg-green-50 border-green-200" :
+          trend === "up" ? "bg-green-50 " :
           trend === "down" ? "bg-red-50 border-red-200" :
           "bg-blue-50 border-blue-200"
         )}>

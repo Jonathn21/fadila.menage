@@ -101,7 +101,7 @@ const EventDialog: React.FC<EventDialogProps> = ({
         
         <div className="space-y-4 py-4">
           {/* Titre et Statut */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
             <h3 className="font-semibold text-lg">{event.titre}</h3>
             {badge}
           </div>

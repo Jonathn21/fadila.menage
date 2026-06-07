@@ -163,8 +163,8 @@ const ProgressIndicator: React.FC<{
   steps: { label: string; description: string }[];
 }> = ({ currentStep, steps }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-start relative">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start relative gap-2 sm:gap-0">
         {steps.map((step, index) => (
           <div key={step.label} className="flex flex-col items-center flex-1 z-10">
             <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
@@ -338,7 +338,7 @@ const RemunerationSection: React.FC<{
         control={form.control}
         name="isPaid"
         render={({ field }: any) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/20">
+          <FormItem className="flex flex-col sm:flex-row flex-row sm:items-center sm:justify-between rounded-lg border p-4 bg-muted/20 gap-2 sm:gap-0">
             <div className="space-y-0.5">
               <FormLabel className="text-base flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
@@ -412,7 +412,7 @@ const StepNavigation: React.FC<{
   isSubmitting = false 
 }) => {
   return (
-    <div className="flex justify-between pt-6">
+    <div className="flex flex-col sm:flex-row sm:justify-between pt-6 gap-2 sm:gap-0">
       <Button 
         type="button" 
         variant="outline" 
@@ -476,7 +476,7 @@ const SummaryPreview: React.FC<{
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
       {/* Nouveau stage */}
       <Card className="bg-muted/20 border-muted">
         <CardHeader className="pb-3">
@@ -487,43 +487,43 @@ const SummaryPreview: React.FC<{
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           {values.internshipType && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
               <span className="text-muted-foreground">Type:</span>
               <span className="font-medium">{values.internshipType}</span>
             </div>
           )}
           {values.location && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
               <span className="text-muted-foreground">Lieu:</span>
               <span className="font-medium">{values.location}</span>
             </div>
           )}
           {values.department && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
               <span className="text-muted-foreground">Direction:</span>
               <span className="font-medium">{values.department}</span>
             </div>
           )}
           {values.service && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
               <span className="text-muted-foreground">Service:</span>
               <span className="font-medium">{values.service}</span>
             </div>
           )}
           {values.startDate && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
               <span className="text-muted-foreground">Début:</span>
               <span className="font-medium">{formatDate(values.startDate)}</span>
             </div>
           )}
           {values.endDate && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
               <span className="text-muted-foreground">Fin:</span>
               <span className="font-medium">{formatDate(values.endDate)}</span>
             </div>
           )}
           {values.isPaid && values.amount && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
               <span className="text-muted-foreground">Rémunération:</span>
               <span className="font-medium text-green-600">{values.amount?.toLocaleString()} FCFA</span>
             </div>
@@ -540,17 +540,17 @@ const SummaryPreview: React.FC<{
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Période:</span>
             <span className="font-medium">
               {format(new Date(previousStage.date_debut), "dd/MM/yyyy")} - {format(new Date(previousStage.date_fin), "dd/MM/yyyy")}
             </span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Direction/Service:</span>
             <span className="font-medium">{previousStage.direction} / {previousStage.service}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Rémunération:</span>
             <span className="font-medium">
               {previousStage.remunere 
@@ -894,11 +894,12 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
         return !!(values.internshipType?.trim() && values.location?.trim());
       case 1:
         return !!(values.department?.trim() && values.service?.trim());
-      case 2:
+      case 2: {
         const hasValidDates = values.startDate && values.endDate;
         const noDateError = hasValidDates && !dateValidationError;
         const hasValidAmount = !values.isPaid || (values.isPaid && values.amount && values.amount > 0);
         return !!(hasValidDates && noDateError && hasValidAmount);
+      }
       default:
         return false;
     }
@@ -933,7 +934,7 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
               <RefreshCw className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <DialogTitle className="text-2xl font-bold tracking-tight">
+              <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
                 {generatedPdf ? "Étape 1 : Convention générée" : "Étape 1 : Pré-renouvellement"}
               </DialogTitle>
               <DialogDescription className="text-base">
@@ -945,7 +946,7 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
           </div>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4 md:space-y-6">
           {/* Progress Indicator */}
           <Card className="bg-gradient-to-r from-muted/50 to-muted/30">
             <CardContent className="pt-6">
@@ -1005,7 +1006,7 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
 
           {/* Formulaire (uniquement si pas de PDF généré) */}
           {!generatedPdf && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
               {/* Main Form */}
               <div className="lg:col-span-2">
                 <Card>
@@ -1025,10 +1026,10 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
                   
                   <CardContent>
                     <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 md:space-y-6">
                         {/* Étape 1: Informations générales */}
                         {currentStep === 0 && (
-                          <div className="space-y-6">
+                          <div className="space-y-3 sm:space-y-4 md:space-y-6">
                             <EnhancedSelect
                               form={form}
                               name="internshipType"
@@ -1057,7 +1058,7 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
 
                         {/* Étape 2: Affectation */}
                         {currentStep === 1 && (
-                          <div className="space-y-6">
+                          <div className="space-y-3 sm:space-y-4 md:space-y-6">
                             <EnhancedSelect
                               form={form}
                               name="department"
@@ -1098,7 +1099,7 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
 
                         {/* Étape 3: Finalisation */}
                         {currentStep === 2 && (
-                          <div className="space-y-6">
+                          <div className="space-y-3 sm:space-y-4 md:space-y-6">
                             <EnhancedSelect
                               form={form}
                               name="supervisor"
@@ -1120,7 +1121,7 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
                               </div>
                             )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                               <DatePickerField
                                 form={form}
                                 name="startDate"
@@ -1230,7 +1231,7 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
               </div>
 
               {/* Sidebar */}
-              <div className="space-y-6">
+              <div className="space-y-3 sm:space-y-4 md:space-y-6">
                 <SummaryPreview form={form} previousStage={previousStage} />
                 
                 {/* Quick Stats */}
@@ -1241,17 +1242,17 @@ const PreRenewInternshipModal: React.FC<PreRenewInternshipModalProps> = ({
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                       <span className="text-muted-foreground">Étape actuelle:</span>
                       <span className="font-medium">{currentStep + 1}/{steps.length}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                       <span className="text-muted-foreground">Statut:</span>
                       <Badge variant={currentStep === 2 ? "default" : "secondary"}>
                         {currentStep === 2 ? "Finalisation" : "En cours"}
                       </Badge>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                       <span className="text-muted-foreground">Validation:</span>
                       <Badge variant={form.formState.isValid ? "default" : "secondary"}>
                         {form.formState.isValid ? "Valide" : "En attente"}

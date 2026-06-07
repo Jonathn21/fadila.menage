@@ -13,6 +13,7 @@ const PhotoDialog: React.FC<PhotoDialogProps> = ({ open, onOpenChange, photoUrl,
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      
       <DialogContent className="max-w-md p-0 overflow-hidden bg-transparent border-none">
         <img 
           src={photoUrl} 

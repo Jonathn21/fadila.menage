@@ -23,7 +23,7 @@ const AppearanceSettings = () => {
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4 md:space-y-6">
           <div>
             <h2 className="text-lg font-medium mb-4">Thème</h2>
             <RadioGroup 

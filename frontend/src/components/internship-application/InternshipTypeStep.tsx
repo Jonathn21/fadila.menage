@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Upload, Image, X } from "lucide-react";
+import { ArrowRight, Upload, Image, X, Check, AlertCircle } from "lucide-react";
 import { ApplicationData } from "@/pages/PublicInternshipApplication";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +54,7 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
   const [selectedCountry, setSelectedCountry] = useState<CountryData>(
     COUNTRIES.find(country => country.phoneCode === data.telephone?.substring(0, 4)) || COUNTRIES[0]
   );
+  const [photoError, setPhotoError] = useState<string>("");
 
   const handleInputChange = (field: keyof ApplicationData, value: string) => {
     onDataUpdate({ [field]: value });
@@ -63,6 +64,22 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
     if (!files || files.length === 0) return;
     
     const file = files[0];
+    
+    // Validation du fichier
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (!validTypes.includes(file.type)) {
+      setPhotoError("Format de fichier invalide. Utilisez JPG, JPEG, PNG ou WEBP.");
+      return;
+    }
+    
+    if (file.size > maxSize) {
+      setPhotoError("Le fichier est trop volumineux. Taille maximale: 5MB.");
+      return;
+    }
+    
+    setPhotoError("");
     onDataUpdate({
       documents: {
         ...data.documents,
@@ -72,6 +89,7 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
   };
 
   const removePhoto = () => {
+    setPhotoError("");
     onDataUpdate({
       documents: {
         ...data.documents,
@@ -149,15 +167,15 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
   }, [selectedCountry]);
 
   const isFormValid = () => {
-    const requiredFields = ['nom', 'prenom', 'genre', 'paysResidence', 'telephone', 'email', 'domaine', 'niveauEtude', 'typeStage', 'adresse'];
-    return requiredFields.every(field => data[field as keyof ApplicationData]) && data.documents.photoPasseport;
+    const requiredFields = ['nom', 'prenom', 'genre', 'paysResidence', 'telephone', 'email', 'domaine', 'niveauEtude'];
+    return requiredFields.every(field => data[field as keyof ApplicationData]) && data.documents.photoPasseport && !photoError;
   };
 
   const isAcademicInternship = data.typeStage === "Académique";
   const isSchoolInfoValid = !isAcademicInternship || (data.nomEcole && data.adresseEcole && data.telephoneEcole && data.emailEcole);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="nom">Nom *</Label>
@@ -266,7 +284,7 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="adresse">Adresse *</Label>
+          <Label htmlFor="adresse">Adresse</Label>
           <Input
             id="adresse"
             value={data.adresse || ""}
@@ -343,16 +361,20 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
           <CardTitle className="text-lg">Photo Passeport *</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-6 items-start">
-            {/* Zone de téléversement */}
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 items-start">
+            {/* Zone de téléversement - Agrandie */}
             <div className="flex-1">
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                <div className="mx-auto w-12 h-12 bg-muted rounded-lg flex items-center justify-center mb-4">
-                  <Image className="h-6 w-6 text-muted-foreground" />
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 sm:p-6 md:p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                <div 
+                  className="mx-auto w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-6 hover:bg-primary/20 transition-colors"
+                  onClick={() => document.getElementById('photo-passeport')?.click()}
+                >
+                  <Image className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-medium mb-2">Ajouter votre photo passeport</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Format accepté : JPG, PNG, JPEG. Photo récente avec visage bien visible.
+                <h3 className="font-medium text-lg mb-3">Ajouter votre photo passeport</h3>
+                <p className="text-sm text-muted-foreground mb-6 max-w-lg mx-auto">
+                  Format accepté : JPG, PNG, JPEG, WEBP. Photo récente avec visage bien visible.
+                  Taille maximale : 5MB
                 </p>
                 <input
                   type="file"
@@ -363,47 +385,91 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
                 />
                 <label
                   htmlFor="photo-passeport"
-                  className="inline-flex items-center px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-md cursor-pointer transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md cursor-pointer transition-colors text-sm font-medium"
                 >
-                  <Upload className="mr-2 h-4 w-4" />
+                  <Upload className="mr-2 h-5 w-5" />
                   Choisir une photo
                 </label>
+                
+                {/* Liste des spécifications */}
+                
               </div>
+              
+              {/* Message d'erreur */}
+              {photoError && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-red-600">
+                    <AlertCircle className="h-4 w-4" />
+                    <span className="text-sm">{photoError}</span>
+                  </div>
+                </div>
+              )}
             </div>
 
+            {/* Aperçu - Agrandi */}
             <div className="flex-1">
               <div className="text-center">
-                <h4 className="font-medium mb-4">Aperçu de votre photo</h4>
+                <h4 className="font-medium text-lg mb-6">Aperçu de votre photo</h4>
                 {data.documents.photoPasseport ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="flex justify-center">
-                      <div className="relative w-40 h-40 border-2 border-primary rounded-lg overflow-hidden bg-muted">
+                      {/* Cadre agrandi pour la photo */}
+                      <div className="relative w-64 h-80 border-4 border-primary/30 rounded-2xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/30 shadow-lg">
                         <img 
                           src={URL.createObjectURL(data.documents.photoPasseport)} 
                           alt="Photo passeport" 
                           className="w-full h-full object-cover"
                         />
+                        {/* Overlay avec effet passeport */}
+                        <div className="absolute inset-0 border-2 border-white/20 rounded-2xl pointer-events-none"></div>
                       </div>
                     </div>
-                    <div className="p-3 bg-muted rounded-lg flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Image className="h-4 w-4 mr-2 text-primary" />
-                        <span className="text-sm font-medium">{data.documents.photoPasseport.name}</span>
+                    <div className="p-4 bg-muted/50 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <Image className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="text-left">
+                          <span className="text-sm font-medium block">{data.documents.photoPasseport.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {(data.documents.photoPasseport.size / 1024 / 1024).toFixed(2)} MB
+                          </span>
+                        </div>
                       </div>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={removePhoto}
+                        className="hover:bg-red-50 hover:text-red-600"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-5 w-5" />
                       </Button>
+                    </div>
+                    
+                    {/* Indicateur de validation */}
+                    <div className="p-3 bg-green-50 border  rounded-lg">
+                      <div className="flex items-center justify-center gap-2 text-green-600">
+                        <Check className="h-4 w-4" />
+                        <span className="text-sm font-medium">Photo valide</span>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="w-40 h-40 border-2 border-dashed border-muted-foreground/25 rounded-lg flex items-center justify-center mx-auto">
-                    <p className="text-sm text-muted-foreground text-center px-4">
-                      Aucune photo sélectionnée
-                    </p>
+                  <div className="space-y-4">
+                    <div className="w-64 h-80 border-4 border-dashed border-muted-foreground/25 rounded-2xl flex flex-col items-center justify-center mx-auto p-3 sm:p-4 md:p-6 bg-gradient-to-br from-muted/30 to-muted/10">
+                      <Image className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                      <p className="text-sm text-muted-foreground text-center">
+                        Aucune photo sélectionnée
+                      </p>
+                      <p className="text-xs text-muted-foreground/75 mt-2 text-center">
+                        Cliquez sur "Choisir une photo" pour ajouter votre photo
+                      </p>
+                    </div>
+                    <div className="p-4 bg-muted/30 rounded-xl">
+                      <p className="text-sm text-muted-foreground text-center">
+                        L'aperçu de votre photo s'affichera ici
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -510,10 +576,10 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
         <Button 
           onClick={onNext}
           disabled={!isFormValid() || !isSchoolInfoValid}
-          className="bg-primary hover:bg-primary/90"
+          className="bg-primary hover:bg-primary/90 px-4 sm:px-6 md:px-8 py-3 h-auto"
         >
-          Suivant
-          <ArrowRight className="ml-2 h-4 w-4" />
+          <span className="font-medium">Suivant</span>
+          <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
       </div>
     </div>

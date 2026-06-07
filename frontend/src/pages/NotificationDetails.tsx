@@ -216,7 +216,7 @@ const NotificationDetails = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={goBack}>
               <ArrowLeft className="h-4 w-4" />
@@ -238,7 +238,7 @@ const NotificationDetails = () => {
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-2/3" />
             </CardContent>
-            <CardFooter className="flex justify-between pt-6">
+            <CardFooter className="flex flex-col sm:flex-row sm:justify-between pt-6 gap-2 sm:gap-0">
               <Skeleton className="h-10 w-32" />
               <Skeleton className="h-10 w-40" />
             </CardFooter>
@@ -251,12 +251,12 @@ const NotificationDetails = () => {
   if (!notification) {
     return (
       <DashboardLayout>
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={goBack}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-2xl font-bold">Détails de la notification</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Détails de la notification</h1>
           </div>
           
           <Card>
@@ -282,14 +282,14 @@ const NotificationDetails = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" onClick={goBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Détails de la notification</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">Détails de la notification</h1>
             <p className="text-muted-foreground">Informations complètes sur cette notification</p>
           </div>
         </div>

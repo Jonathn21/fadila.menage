@@ -25,7 +25,7 @@ const DocumentsList = ({
   return (
     <div className="space-y-4">
       {documents.map((doc, index) => (
-        <div key={index} className="flex justify-between items-center p-3 border rounded-md">
+        <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 border rounded-md gap-2 sm:gap-0">
           <div className="flex items-center gap-3">
             <FileText className="h-5 w-5 text-primary" />
             <div>

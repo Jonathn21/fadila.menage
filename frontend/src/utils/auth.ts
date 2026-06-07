@@ -17,7 +17,7 @@ export async function refreshAccessToken(): Promise<string | null> {
   if (!refresh) return null;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+    const res = await fetch("https://localhost:8000/api/token/refresh/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh }),
@@ -27,7 +27,7 @@ export async function refreshAccessToken(): Promise<string | null> {
       // Refresh invalide → nettoyage + redirection
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
-      window.location.href = "/"; // 🔹 Redirection login
+      window.location.href = "/connexion"; // 🔹 Redirection login
       return null;
     }
 

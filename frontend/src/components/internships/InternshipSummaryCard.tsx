@@ -46,7 +46,7 @@ const InternshipSummaryCard = ({
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-0">
           <div>
             <CardTitle className="text-xl">Resumé du profil</CardTitle>
           </div>

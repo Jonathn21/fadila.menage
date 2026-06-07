@@ -29,18 +29,18 @@ const ActivityTab: React.FC<ActivityTabProps> = ({ activityData }) => {
             valueFormatter={(value) => `${value} demandes`}
           />
         </div>
-        <div className="flex justify-between mt-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between mt-6 gap-2 sm:gap-0">
           <div className="text-center">
             <h4 className="text-sm font-medium text-muted-foreground">Cette semaine</h4>
-            <p className="text-2xl font-bold">70</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold">70</p>
           </div>
           <div className="text-center">
             <h4 className="text-sm font-medium text-muted-foreground">Moyenne</h4>
-            <p className="text-2xl font-bold">65</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold">65</p>
           </div>
           <div className="text-center">
             <h4 className="text-sm font-medium text-muted-foreground">Variation</h4>
-            <p className="text-2xl font-bold text-green-500">+7%</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-500">+7%</p>
           </div>
         </div>
         <div className="mt-6 pt-6 border-t border-border">

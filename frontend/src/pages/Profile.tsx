@@ -6,7 +6,7 @@ import ProfileForm from "@/components/ProfileForm";
 const Profile = () => {
   return (
     <DashboardLayout>
-      <div className="max-w-2xl mx-auto">
+      <div className="w-full max-w-2xl mx-auto px-1 sm:px-0">
         <ProfileForm />
       </div>
     </DashboardLayout>

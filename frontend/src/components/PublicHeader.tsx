@@ -8,8 +8,7 @@ const PublicHeader = () => {
   const location = useLocation();
 
   const menuItems = [
-    { label: "Accueil", path: "/" },
-    { label: "Soumettre une demande", path: "/soumettre-demande" },
+    { label: "Soumettre une demande", path: "/" },
     { label: "Suivre ma demande", path: "/suivi-demande" },
   ];
 
@@ -30,7 +29,7 @@ const PublicHeader = () => {
 
       {/* Mobile Header with Logo */}
       <div className="md:hidden w-full bg-white shadow-sm">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="container mx-auto px-4 h-16 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
           <img
             src="/images/ceb-logo.png"
             alt="CEB Logo"
@@ -51,7 +50,7 @@ const PublicHeader = () => {
       </div>
 
       {/* Navigation - Desktop */}
-      <nav className="hidden md:block w-full bg-white border-b shadow-sm"> {/* w-full ajouté */}
+      <nav className="hidden md:block w-full bg-white border-b shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center h-20">
             <div className="flex items-center justify-center space-x-8">

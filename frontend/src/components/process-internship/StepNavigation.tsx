@@ -26,7 +26,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
   submitButtonText = "Valider le stage",
 }) => {
   return (
-    <div className="flex justify-between mt-6">
+    <div className="flex flex-col sm:flex-row sm:justify-between mt-6 gap-2 sm:gap-0">
       {!isFirstStep && onPrevious && (
         <Button type="button" variant="outline" onClick={onPrevious}>
           <ArrowLeft className="mr-2 h-4 w-4" />

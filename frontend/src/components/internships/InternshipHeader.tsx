@@ -20,7 +20,7 @@ const InternshipHeader = ({
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <div>
-        <h1 className="text-2xl font-bold">{title} {id}</h1>
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold">{title} {id}</h1>
         <p className="text-muted-foreground">
           {subtitle}
         </p>

@@ -447,7 +447,7 @@ const Calendar = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4 md:space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <Skeleton className="h-9 w-64" />
             <div className="flex gap-2">
@@ -469,7 +469,7 @@ const Calendar = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-4 md:space-y-6">
         {/* En-tête amélioré avec navigation et actions */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
@@ -477,7 +477,7 @@ const Calendar = () => {
               <CalendarIcon className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Calendrier des entretiens</h1>
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Calendrier des entretiens</h1>
               <p className="text-muted-foreground">Gérez et planifiez vos entretiens de stage</p>
             </div>
           </div>
@@ -551,7 +551,7 @@ const Calendar = () => {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4 md:space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Grid className="h-4 w-4" />
@@ -590,7 +590,7 @@ const Calendar = () => {
           <TabsContent value="upcoming">
             <Card>
               <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
                   <CardTitle>Entretiens à venir</CardTitle>
                   <Badge variant="outline" className="text-sm">
                     {getUpcomingEvents().length} entretien{getUpcomingEvents().length !== 1 ? 's' : ''}
@@ -605,7 +605,7 @@ const Calendar = () => {
                   {getUpcomingEvents().map((event) => (
                     <div
                       key={event.id}
-                      className="flex justify-between items-start p-4 border rounded-lg hover:bg-muted/30 transition-colors cursor-pointer group"
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-start p-4 border rounded-lg hover:bg-muted/30 transition-colors cursor-pointer group gap-2 sm:gap-0"
                       onClick={() => handleViewEvent(event)}
                     >
                       <div className="flex-1 space-y-2">

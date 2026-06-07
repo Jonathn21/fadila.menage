@@ -738,7 +738,7 @@ const OngoingInternshipDetails: React.FC = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
@@ -750,8 +750,8 @@ const OngoingInternshipDetails: React.FC = () => {
             <Skeleton className="h-8 w-64" />
           </div>
           
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 space-y-6">
+          <div className="grid gap-3 sm:gap-4 md:gap-6 md:grid-cols-3">
+            <div className="md:col-span-2 space-y-3 sm:space-y-4 md:space-y-6">
               <Card>
                 <CardHeader>
                   <Skeleton className="h-6 w-40" />
@@ -770,7 +770,7 @@ const OngoingInternshipDetails: React.FC = () => {
                 <CardHeader>
                   <Skeleton className="h-6 w-48" />
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                   {Array.from({ length: 6 }).map((_, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <Skeleton className="h-5 w-5 rounded-full" />
@@ -795,7 +795,7 @@ const OngoingInternshipDetails: React.FC = () => {
               </Card>
             </div>
             
-            <div className="space-y-6">
+            <div className="space-y-3 sm:space-y-4 md:space-y-6">
               {Array.from({ length: 3 }).map((_, i) => (
                 <Card key={i}>
                   <CardHeader>
@@ -822,7 +822,7 @@ const OngoingInternshipDetails: React.FC = () => {
   if (error) {
     return (
       <DashboardLayout>
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
@@ -831,7 +831,7 @@ const OngoingInternshipDetails: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-2xl font-bold">Détails du stagiaire</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Détails du stagiaire</h1>
           </div>
           
           <Card>
@@ -856,7 +856,7 @@ const OngoingInternshipDetails: React.FC = () => {
   if (!stagiaire || !student) {
     return (
       <DashboardLayout>
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
@@ -865,7 +865,7 @@ const OngoingInternshipDetails: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-2xl font-bold">Détails du stagiaire</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Détails du stagiaire</h1>
           </div>
           
           <Card>
@@ -886,7 +886,7 @@ const OngoingInternshipDetails: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6">
         {/* Header avec bouton retour */}
         <div className="flex items-center gap-4">
           <Button
@@ -899,19 +899,19 @@ const OngoingInternshipDetails: React.FC = () => {
           </Button>
           
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Détails du stagiaire</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">Détails du stagiaire</h1>
             <p className="text-muted-foreground">
               Informations complètes sur {student.name} et son stage
             </p>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="md:col-span-2 space-y-6">
+        <div className="grid gap-3 sm:gap-4 md:gap-6 md:grid-cols-3">
+          <div className="md:col-span-2 space-y-3 sm:space-y-4 md:space-y-6">
             {/* En-tête avec statut et progression */}
             <Card>
               <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-0">
                   <div>
                     <CardTitle className="text-xl flex items-center gap-2">
                       {student.name}
@@ -942,12 +942,12 @@ const OngoingInternshipDetails: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                     <span>Progression du stage</span>
                     <span>{calculateProgress()}%</span>
                   </div>
                   <Progress value={calculateProgress()} className="h-2" />
-                  <div className="flex justify-between text-xs text-muted-foreground">
+                  <div className="flex flex-col sm:flex-row sm:justify-between text-xs text-muted-foreground gap-2 sm:gap-0">
                     <span>{new Date(student.startDate).toLocaleDateString("fr-FR")}</span>
                     <span>{new Date(student.endDate).toLocaleDateString("fr-FR")}</span>
                   </div>
@@ -1006,7 +1006,7 @@ const OngoingInternshipDetails: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 text-sm">
                   {/* Colonne gauche */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
@@ -1113,7 +1113,7 @@ const OngoingInternshipDetails: React.FC = () => {
                     student.documents.map((doc, index) => (
                       <div
                         key={`${doc.nom}-${index}`}
-                        className="flex justify-between items-center p-3 border rounded-lg hover:bg-muted/30 transition-colors"
+                        className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 border rounded-lg hover:bg-muted/30 transition-colors gap-2 sm:gap-0"
                       >
                         <div className="flex items-center gap-3">
                           <div className="p-2 rounded-md bg-primary/10">
@@ -1150,7 +1150,7 @@ const OngoingInternshipDetails: React.FC = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-8 border rounded-lg bg-muted/20">
+                    <div className="text-center py-4 sm:py-6 md:py-8 border rounded-lg bg-muted/20">
                       <FileText className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                       <p className="text-muted-foreground">Aucun document disponible</p>
                     </div>
@@ -1161,7 +1161,7 @@ const OngoingInternshipDetails: React.FC = () => {
           </div>
 
           {/* Colonne droite : Stagiaire + Établissement + Superviseur + Actions */}
-          <div className="space-y-6">
+          <div className="space-y-3 sm:space-y-4 md:space-y-6">
             {/* Stagiaire */}
             <Card>
               <CardHeader>
@@ -1174,7 +1174,7 @@ const OngoingInternshipDetails: React.FC = () => {
                 <div className="flex flex-col items-center text-center">
                   <Avatar className="h-24 w-24 mb-4 cursor-pointer" onClick={() => setIsPhotoDialogOpen(true)}>
                     <AvatarImage src={student.photo} className="object-cover" />
-                    <AvatarFallback className="text-2xl font-bold">{student.avatar}</AvatarFallback>
+                    <AvatarFallback className="text-lg sm:text-xl md:text-2xl font-bold">{student.avatar}</AvatarFallback>
                   </Avatar>
                   <h3 className="font-semibold text-lg">{student.name}</h3>
                   <p className="text-sm text-muted-foreground mb-4">{student.program}, {student.year}</p>
@@ -1302,7 +1302,7 @@ const OngoingInternshipDetails: React.FC = () => {
             {/* Actions */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+                <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                   Actions
                   
                 </CardTitle>
@@ -1483,7 +1483,7 @@ const OngoingInternshipDetails: React.FC = () => {
 
               {newStartDate && newEndDate && (
                 <div className="bg-muted/50 rounded-lg p-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                     <span className="text-sm font-medium">Durée du stage :</span>
                     <Badge variant="outline">
                       {differenceInDays(newEndDate, newStartDate) + 1} jours

@@ -65,7 +65,7 @@ export function RefuseDialog({
           </Alert>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
               <Label htmlFor="motif-refus" className="text-sm font-medium">
                 Motif de refus *
               </Label>
@@ -85,7 +85,7 @@ export function RefuseDialog({
               disabled={loading}
               maxLength={500}
             />
-            <div className="flex justify-between items-center text-xs text-muted-foreground">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs text-muted-foreground gap-2 sm:gap-0">
               <span>
                 Minimum 10 caractères recommandés
                 {!isMotifValid && motifRefus.length > 0 && (

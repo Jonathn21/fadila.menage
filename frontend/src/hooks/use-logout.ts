@@ -14,7 +14,7 @@ export const useLogout = () => {
     localStorage.removeItem("sessionKey");
 
     toast({ title: "Déconnecté", description: "Vous avez été déconnecté." });
-    navigate("/");
+    navigate("/connexion");
   } catch {
     toast({ title: "Erreur", description: "Impossible de se déconnecter.", variant: "destructive" });
   }

@@ -4,79 +4,105 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* Fond avec dégradé subtil */
+    --background: 0 0% 98%;
     --foreground: 222.2 84% 4.9%;
+    
+    /* Cards avec légère élévation */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
+    
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
+    
+    /* Couleur principale rouge conservée */
     --primary: 0 84% 48%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
+    
+    /* Dégradé de gris-bleu doux */
+    --secondary: 210 30% 94%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
+    
+    --muted: 210 25% 95%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+    
+    --accent: 210 35% 92%;
     --accent-foreground: 222.2 47.4% 11.2%;
+    
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    
+    /* Bordures plus douces */
+    --border: 214.3 25% 88%;
+    --input: 214.3 25% 93%;
     --ring: 0 84% 48%;
     --radius: 0.5rem;
-    --sidebar-hover: 0 84% 95%;
+    --sidebar-hover: 0 84% 96%;
 
-    /* Sidebar et topbar en mode clair */
-    --sidebar-background: 0 0% 100%;
+    /* Sidebar avec dégradé subtil */
+    --sidebar-background: 0 0% 99%;
     --sidebar-foreground: 222.2 84% 4.9%;
-    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-border: 214.3 20% 90%;
     --sidebar-primary: 0 84% 48%;
     --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent: 210 30% 95%;
     --sidebar-accent-foreground: 222.2 47.4% 11.2%;
     --sidebar-ring: 0 84% 48%;
 
-    /* Topbar en mode clair */
-    --topbar-background: 0 0% 100%;
-    --topbar-border: 214.3 31.8% 91.4%;
+    /* Topbar avec effet de profondeur */
+    --topbar-background: 0 0% 99.5%;
+    --topbar-border: 214.3 20% 92%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Fond sombre avec dégradé */
+    --background: 222.2 70% 6%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    
+    /* Cards légèrement plus claires */
+    --card: 222.2 65% 8%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    
+    --popover: 222.2 65% 8%;
     --popover-foreground: 210 40% 98%;
+    
+    /* Rouge primary conservé */
     --primary: 0 84% 48%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 217.2 32.6% 17.5%;
+    
+    /* Dégradé sombre élégant */
+    --secondary: 217.2 25% 20%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
+    
+    --muted: 217.2 25% 18%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    
+    --accent: 217.2 30% 22%;
     --accent-foreground: 210 40% 98%;
+    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    
+    /* Bordures plus subtiles */
+    --border: 217.2 25% 20%;
+    --input: 217.2 25% 16%;
     --ring: 0 84% 48%;
     --radius: 0.5rem;
-    --sidebar-hover: 0 84% 20%;
+    --sidebar-hover: 0 60% 18%;
 
-    /* Sidebar et topbar en mode sombre */
-    --sidebar-background: 222.2 84% 4.9%;
+    /* Sidebar sombre avec dégradé */
+    --sidebar-background: 222.2 70% 7%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-border: 217.2 25% 18%;
     --sidebar-primary: 0 84% 48%;
     --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent: 217.2 30% 20%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-ring: 0 84% 48%;
 
-    /* Topbar en mode sombre */
-    --topbar-background: 222.2 84% 4.9%;
-    --topbar-border: 217.2 32.6% 17.5%;
+    /* Topbar sombre élégant */
+    --topbar-background: 222.2 70% 7.5%;
+    --topbar-border: 217.2 25% 16%;
   }
 }
 

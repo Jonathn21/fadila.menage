@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Search, Clock, CheckCircle, XCircle, AlertTriangle, Calendar, User, Mail, Phone, FileText,Coins, Edit, Save, X, GraduationCap, Image, Download, Eye, BookOpen, File, Upload, XIcon, Plus, Building, MapPin, Briefcase, Users, DollarSign, CalendarDays, Clock as ClockIcon, FileCheck, Award } from "lucide-react";
+import { Search, Clock, CheckCircle, XCircle, AlertTriangle, Calendar, User, Mail, Phone, FileText, Coins, Edit, Save, X, GraduationCap, Image, Download, Eye, BookOpen, File, Upload, XIcon, Plus, Building, MapPin, Briefcase, Users, DollarSign, CalendarDays, Clock as ClockIcon, FileCheck, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PublicHeader from "@/components/PublicHeader";
 import PublicFooter from "@/components/PublicFooter";
@@ -14,7 +14,7 @@ import apiClient from "@/lib/apiClient";
 
 interface ApplicationStatus {
   tracking_id: string;
-  statut_stage: "En attente" | "En cours de traitement" | "Acceptée" | "Refusée" | "Information supplémentaire requise";
+  statut_stage: "En attente" | "En cours de traitement" | "Acceptée" | "Refusée" | "Pré-acceptée";
   date_soumission: string;
   date_maj: string;
   stagiaire: {
@@ -45,9 +45,9 @@ interface ApplicationStatus {
     type?: string;
     id?: string;
   }>;
+  
   photo_passeport?: string;
   
-  // Informations du stage
   stage?: {
     id: number;
     nom: string;
@@ -66,7 +66,7 @@ interface ApplicationStatus {
     date_accord?: string;
     date_debut: string;
     date_fin: string;
-    statut_actuel: "Actuel" | "Terminé" | "À venir";
+    statut_actuel: string;
     duree_jours?: number;
     duree_mois?: number;
     jours_restants?: number;
@@ -83,11 +83,6 @@ interface ApplicationStatus {
       date_generation?: string;
       fichier_url?: string;
     };
-    rapports?: Array<{
-      titre: string;
-      date_ajout?: string;
-      fichier_url?: string;
-    }>;
     documents?: Array<{
       nom: string;
       type: string;
@@ -100,10 +95,20 @@ interface ApplicationStatus {
       telephone?: string;
     };
     demande_attestation?: {
+      id?: number;
       date_demande: string;
       fichier_url?: string;
-      statut: 'en_attente' | 'en_traitement' | 'generee' | 'refusee';
+      fichiers?: {
+        rapport_stage?: string;
+        demande_manuscrite?: string;
+        attestation_signee?: string;
+        attestation_generee?: string;
+        [key: string]: string | undefined;
+      };
+      statut: 'en_attente' | 'refusee' | 'approuvee' | 'traitee';
       motif_refus?: string;
+      peut_retenter?: boolean;
+      date_refus?: string;
     };
   };
   statut_detaille?: string;
@@ -134,14 +139,27 @@ const TrackApplication = () => {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const diplomeInputRef = useRef<HTMLInputElement>(null);
   
-  // États pour l'ajout de rapport
-  const [isAddingRapport, setIsAddingRapport] = useState(false);
-  const [newRapportTitre, setNewRapportTitre] = useState("");
-  const [newRapportFile, setNewRapportFile] = useState<File | null>(null);
-  const [isSubmittingRapport, setIsSubmittingRapport] = useState(false);
-  const rapportInputRef = useRef<HTMLInputElement>(null);
+  const [rapportStage, setRapportStage] = useState<File | null>(null);
+  const [demandeManuscrite, setDemandeManuscrite] = useState<File | null>(null);
+  const [isSubmittingAttestation, setIsSubmittingAttestation] = useState(false);
+  const [isSubmittingNewRequest, setIsSubmittingNewRequest] = useState(false);
+  const [showNewRequestForm, setShowNewRequestForm] = useState(false);
   
+  const rapportInputRef = useRef<HTMLInputElement>(null);
+  const demandeInputRef = useRef<HTMLInputElement>(null);
+  
+  // États pour les modals
+  const [isAttestationModalOpen, setIsAttestationModalOpen] = useState(false);
+  const [isStageModalOpen, setIsStageModalOpen] = useState(false);
+
   const { toast } = useToast();
+
+  const getStatusForDisplay = (status: ApplicationStatus["statut_stage"]): string => {
+    if (status === "Pré-acceptée") {
+      return "En cours de traitement";
+    }
+    return status;
+  };
 
   const handleSearch = async () => {
     if (!trackingCode.trim()) {
@@ -160,9 +178,12 @@ const TrackApplication = () => {
     setNewDocuments([]);
     setNewPhoto(null);
     setDocumentsToDelete([]);
-    setIsAddingRapport(false);
-    setNewRapportTitre("");
-    setNewRapportFile(null);
+    setRapportStage(null);
+    setDemandeManuscrite(null);
+    setShowNewRequestForm(false);
+    setIsSubmittingNewRequest(false);
+    setIsAttestationModalOpen(false);
+    setIsStageModalOpen(false);
 
     try {
       const cleanTrackingCode = trackingCode.trim().toUpperCase();
@@ -171,6 +192,8 @@ const TrackApplication = () => {
       const data = response.data;
 
       if (data.success && data.demande) {
+        console.log("📊 Données reçues:", data.demande);
+        console.log("📊 Détails demande_attestation:", data.demande.stage?.demande_attestation);
         setApplication(data.demande);
         setNotFound(false);
         toast({
@@ -306,111 +329,6 @@ const TrackApplication = () => {
     }
   };
 
-  const handleAddRapport = async () => {
-    if (!application?.tracking_id || !application?.stage?.id) return;
-    
-    if (!newRapportTitre.trim() || !newRapportFile) {
-      toast({
-        title: "Champs requis",
-        description: "Veuillez saisir un titre et sélectionner un fichier",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validation du fichier
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    const allowedTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ];
-
-    if (newRapportFile.size > maxSize) {
-      toast({
-        title: "Fichier trop volumineux",
-        description: "Le fichier ne doit pas dépasser 10MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!allowedTypes.includes(newRapportFile.type)) {
-      toast({
-        title: "Format non supporté",
-        description: "Veuillez utiliser un fichier PDF, DOC ou DOCX",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmittingRapport(true);
-    try {
-      const formData = new FormData();
-      formData.append('titre', newRapportTitre);
-      formData.append('fichier', newRapportFile);
-      formData.append('tracking_id', application.tracking_id);
-
-      const response = await apiClient.post(
-        `suivi-demande/${application.tracking_id}/ajouter-rapport/`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      if (response.data.success) {
-        toast({
-          title: "Rapport ajouté",
-          description: "Votre rapport de stage a été ajouté avec succès",
-          variant: "default",
-        });
-        
-        // Mettre à jour UNIQUEMENT les rapports du stage
-        if (application.stage) {
-          const updatedApplication = { 
-            ...application,
-            stage: {
-              ...application.stage,
-              rapports: [
-                ...(application.stage.rapports || []),
-                response.data.rapport
-              ]
-            }
-          };
-          setApplication(updatedApplication);
-        }
-        
-        // Réinitialiser le formulaire
-        setNewRapportTitre("");
-        setNewRapportFile(null);
-        setIsAddingRapport(false);
-      } else {
-        throw new Error(response.data.message || "Erreur lors de l'ajout du rapport");
-      }
-    } catch (error: any) {
-      console.error("Erreur lors de l'ajout du rapport:", error);
-      
-      let errorMessage = "Une erreur est survenue lors de l'ajout du rapport";
-      
-      if (error.response?.status === 400) {
-        errorMessage = error.response.data.message || errorMessage;
-      } else if (error.response?.status === 413) {
-        errorMessage = "Fichier trop volumineux. Veuillez réduire la taille du fichier.";
-      }
-      
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmittingRapport(false);
-    }
-  };
-
   const handleViewDocument = (doc: { nom: string; url: string; type?: string }) => {
     setSelectedDocument(doc);
     setIsModalOpen(true);
@@ -451,20 +369,201 @@ const TrackApplication = () => {
     }
   };
 
-  const handleRapportFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('application/')) {
+  const handleSubmitAttestation = async () => {
+    if (!rapportStage || !demandeManuscrite || !application?.tracking_id) {
       toast({
-        title: "Format invalide",
-        description: "Veuillez sélectionner un fichier PDF, DOC ou DOCX",
+        title: "Champs requis",
+        description: "Veuillez sélectionner le rapport de stage ET la demande manuscrite",
         variant: "destructive",
       });
       return;
     }
 
-    setNewRapportFile(file);
+    if (!rapportStage.name.toLowerCase().endsWith('.pdf')) {
+      toast({
+        title: "Format invalide",
+        description: "Le rapport de stage doit être au format PDF",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png'];
+    const demandeExt = demandeManuscrite.name.toLowerCase().split('.').pop();
+    if (!allowedExtensions.includes(`.${demandeExt}`)) {
+      toast({
+        title: "Format invalide",
+        description: "La demande manuscrite doit être en PDF, JPG ou PNG",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("rapport_stage", rapportStage);
+    formData.append("demande_manuscrite", demandeManuscrite);
+    formData.append("is_new_attempt", "true");
+
+    setIsSubmittingAttestation(true);
+
+    try {
+      console.log("🚀 Envoi de la demande d'attestation...");
+      console.log("📁 Fichiers:", {
+        rapport: rapportStage.name,
+        demande: demandeManuscrite.name,
+        trackingId: application.tracking_id
+      });
+
+      const response = await apiClient.post(
+        `suivi-demande/${application.tracking_id}/demande-attestation/`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          timeout: 30000,
+        }
+      );
+
+      console.log("✅ Réponse reçue:", response.data);
+
+      toast({
+        title: "Succès !",
+        description: response.data.message || "Demande d'attestation envoyée avec succès",
+      });
+
+      setRapportStage(null);
+      setDemandeManuscrite(null);
+      
+      setTimeout(() => {
+        handleSearch();
+      }, 2000);
+
+    } catch (error) {
+      console.error("❌ Erreur lors de l'envoi:", error);
+      
+      let errorMessage = "Une erreur est survenue lors de l'envoi";
+      
+      if (error.response) {
+        console.error("📊 Détails de l'erreur:", error.response.data);
+        
+        if (error.response.status === 413) {
+          errorMessage = "Fichier trop volumineux. Taille maximum: 10MB";
+        } else if (error.response.status === 415) {
+          errorMessage = "Format de fichier non supporté";
+        } else if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data?.errors) {
+          errorMessage = "Erreur de validation: " + JSON.stringify(error.response.data.errors);
+        }
+      } else if (error.request) {
+        console.error("🌐 Pas de réponse du serveur");
+        errorMessage = "Impossible de contacter le serveur. Vérifiez votre connexion.";
+      } else {
+        console.error("⚙️ Erreur de configuration:", error.message);
+      }
+      
+      toast({
+        title: "Erreur",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingAttestation(false);
+    }
+  };
+
+  const handleSubmitNewAttestationRequest = async () => {
+    if (!rapportStage || !demandeManuscrite || !application?.tracking_id) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez sélectionner le rapport de stage ET la demande manuscrite",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!rapportStage.name.toLowerCase().endsWith('.pdf')) {
+      toast({
+        title: "Format invalide",
+        description: "Le rapport de stage doit être au format PDF",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png'];
+    const demandeExt = demandeManuscrite.name.toLowerCase().split('.').pop();
+    if (!allowedExtensions.includes(`.${demandeExt}`)) {
+      toast({
+        title: "Format invalide",
+        description: "La demande manuscrite doit être en PDF, JPG ou PNG",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("rapport_stage", rapportStage);
+    formData.append("demande_manuscrite", demandeManuscrite);
+    formData.append("is_new_attempt", "true");
+
+    setIsSubmittingNewRequest(true);
+
+    try {
+      console.log("🚀 Envoi d'une nouvelle demande d'attestation...");
+      
+      const response = await apiClient.post(
+        `suivi-demande/${application.tracking_id}/demande-attestation/`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          timeout: 30000,
+        }
+      );
+
+      console.log("✅ Réponse reçue:", response.data);
+
+      toast({
+        title: "Succès !",
+        description: response.data.message || "Nouvelle demande d'attestation envoyée avec succès",
+      });
+
+      setRapportStage(null);
+      setDemandeManuscrite(null);
+      setShowNewRequestForm(false);
+      
+      setTimeout(() => {
+        handleSearch();
+      }, 2000);
+
+    } catch (error: any) {
+      console.error("❌ Erreur lors de l'envoi:", error);
+      
+      let errorMessage = "Une erreur est survenue lors de l'envoi";
+      
+      if (error.response) {
+        if (error.response.status === 413) {
+          errorMessage = "Fichier trop volumineux. Taille maximum: 10MB";
+        } else if (error.response.status === 415) {
+          errorMessage = "Format de fichier non supporté";
+        } else if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+      } else if (error.request) {
+        errorMessage = "Impossible de contacter le serveur. Vérifiez votre connexion.";
+      }
+      
+      toast({
+        title: "Erreur",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingNewRequest(false);
+    }
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, documentType?: string, replacesExisting: boolean = false) => {
@@ -543,7 +642,8 @@ const TrackApplication = () => {
   };
 
   const getStatusIcon = (status: ApplicationStatus["statut_stage"]) => {
-    switch (status) {
+    const displayedStatus = getStatusForDisplay(status);
+    switch (displayedStatus) {
       case "En attente":
         return <Clock className="h-5 w-5 text-yellow-500" />;
       case "En cours de traitement":
@@ -552,25 +652,22 @@ const TrackApplication = () => {
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case "Refusée":
         return <XCircle className="h-5 w-5 text-red-500" />;
-      case "Information supplémentaire requise":
-        return <AlertTriangle className="h-5 w-5 text-orange-500" />;
       default:
         return <Clock className="h-5 w-5 text-gray-500" />;
     }
   };
 
   const getStatusVariant = (status: ApplicationStatus["statut_stage"]) => {
-    switch (status) {
+    const displayedStatus = getStatusForDisplay(status);
+    switch (displayedStatus) {
       case "En attente":
         return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100";
       case "En cours de traitement":
         return "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100";
       case "Acceptée":
-        return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100";
+        return "bg-green-100 text-green-800  hover:bg-green-100";
       case "Refusée":
         return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100";
-      case "Information supplémentaire requise":
-        return "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100";
     }
@@ -592,39 +689,14 @@ const TrackApplication = () => {
   const getStageStatusColor = (status: string) => {
     switch (status) {
       case "Actuel":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 text-green-800 ";
       case "Terminé":
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-red-100 text-red-800 border-red-200";
       case "À venir":
         return "bg-blue-100 text-blue-800 border-blue-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  };
-
-  const canAddRapport = (stage: ApplicationStatus["stage"]) => {
-    return stage && stage.statut_actuel && ["Actuel", "Terminé"].includes(stage.statut_actuel);
-  };
-
-  const canRequestAttestation = (stage: ApplicationStatus["stage"]) => {
-    if (!stage) return false;
-    
-    // Conditions pour pouvoir demander une attestation :
-    // 1. Le stage doit être terminé ou en cours
-    // 2. Au moins un rapport doit être ajouté
-    // 3. L'attestation n'est pas encore générée
-    // 4. Aucune demande d'attestation n'est déjà en cours
-    
-    const isStageCompletedOrCurrent = stage.statut_actuel && ["Actuel", "Terminé"].includes(stage.statut_actuel);
-    const hasRapports = stage.rapports && stage.rapports.length > 0;
-    const noAttestationYet = !stage.attestation || !stage.attestation.fichier_url;
-    
-    // Vérifier si une demande existe déjà
-    const hasExistingRequest = stage.demande_attestation && 
-                            stage.demande_attestation.statut !== 'refusee' &&
-                            stage.demande_attestation.statut !== 'generee';
-    
-    return isStageCompletedOrCurrent && hasRapports && noAttestationYet && !hasExistingRequest;
   };
 
   const renderNonEditableField = (
@@ -690,7 +762,7 @@ const TrackApplication = () => {
   const getDocumentBadgeColor = (documentType: string) => {
     switch (documentType) {
       case 'cv': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'lettre_motivation': return 'bg-green-100 text-green-800 border-green-200';
+      case 'lettre_motivation': return 'bg-green-100 text-green-800 ';
       case 'diplome': return 'bg-purple-100 text-purple-800 border-purple-200';
       case 'rapport': return 'bg-red-100 text-red-800 border-red-200';
       case 'demande_attestation': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
@@ -842,6 +914,90 @@ const TrackApplication = () => {
     );
   };
 
+  const FileUploadCard = ({ 
+    title, 
+    required = false,
+    accept,
+    file,
+    onFileSelect,
+    onFileRemove,
+    inputRef,
+    description
+  }: { 
+    title: string;
+    required?: boolean;
+    accept: string;
+    file: File | null;
+    onFileSelect: (files: FileList | null) => void;
+    onFileRemove: () => void;
+    inputRef: React.RefObject<HTMLInputElement>;
+    description?: string;
+  }) => {
+    return (
+      <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors">
+        <CardContent className="p-4 sm:p-6">
+          <div className="text-center space-y-3 sm:space-y-4">
+            <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-lg flex items-center justify-center">
+              <Upload className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground" />
+            </div>
+            
+            <div>
+              <h3 className="font-medium mb-1 sm:mb-2 text-sm sm:text-base">
+                {title}
+                {required && <span className="text-red-500 ml-1">*</span>}
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
+                {description || "Cliquez ou déplacez un fichier dans cette zone pour le téléverser"}
+              </p>
+              
+              <input
+                type="file"
+                accept={accept}
+                onChange={(e) => onFileSelect(e.target.files)}
+                className="hidden"
+                id={`file-${title.replace(/\s+/g, '-').toLowerCase()}`}
+                ref={inputRef}
+              />
+              
+              <label
+                htmlFor={`file-${title.replace(/\s+/g, '-').toLowerCase()}`}
+                className="inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm border border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-md cursor-pointer transition-colors"
+              >
+                <Upload className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                Choisir un fichier
+              </label>
+            </div>
+            
+            {/* Fichier sélectionné */}
+            {file && (
+              <div className="mt-2 p-2 sm:p-3 bg-green-50 border rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                <div className="flex items-center">
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-green-600" />
+                  <div className="text-left">
+                    <span className="text-xs sm:text-sm font-medium text-green-700 block truncate max-w-[150px] sm:max-w-xs">
+                      {file.name}
+                    </span>
+                    <span className="text-xs text-green-600">
+                      {(file.size / (1024 * 1024)).toFixed(2)} MB
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={onFileRemove}
+                  className="h-6 w-6 sm:h-7 sm:w-7 p-0"
+                >
+                  <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <PublicHeader />
@@ -856,7 +1012,7 @@ const TrackApplication = () => {
         }}
       >
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">SUIVI DE DEMANDE</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">SUIVI DE DEMANDE</h1>
           <p className="text-base sm:text-lg opacity-90 max-w-2xl mx-auto">
             Suivez l'état de votre demande de stage en temps réel
           </p>
@@ -864,6 +1020,7 @@ const TrackApplication = () => {
       </div>
 
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-6xl">
+        
         <Card className="mb-6 sm:mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
@@ -914,7 +1071,7 @@ const TrackApplication = () => {
         )}
 
         {application && (
-          <div className="space-y-4 sm:space-y-6">
+          <div className="py-4 sm:py-6 space-y-4 sm:space-y-6">
             {isEditing && (
               <Alert className="mb-3 sm:mb-4">
                 <AlertTriangle className="h-4 w-4" />
@@ -935,35 +1092,14 @@ const TrackApplication = () => {
                       <CardTitle className="text-lg sm:text-xl">État de votre demande</CardTitle>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         Code de suivi: {application.tracking_id}
-                        {application.statut_detaille && ` • ${application.statut_detaille}`}
+                        {application.statut_detaille && ` `}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge className={`text-xs sm:text-sm border ${getStatusVariant(application.statut_stage)}`}>
-                      {application.statut_stage}
+                      {getStatusForDisplay(application.statut_stage)}
                     </Badge>
-                    {/* {!isEditing && application.statut_stage === "En attente" ? (
-                      <Button variant="outline" size="sm" onClick={handleEdit} className="text-xs sm:text-sm h-8 sm:h-9">
-                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        <span>Modifier</span>
-                      </Button>
-                    ) : isEditing ? (
-                      <div className="flex gap-1 sm:gap-2">
-                        <Button variant="outline" size="sm" onClick={handleCancelEdit} className="text-xs sm:text-sm h-8 sm:h-9">
-                          <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                          <span className="hidden sm:inline">Annuler</span>
-                        </Button>
-                        <Button size="sm" onClick={handleSave} disabled={isSaving} className="text-xs sm:text-sm h-8 sm:h-9">
-                          <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                          {isSaving ? (
-                            <span>Sauvegarde...</span>
-                          ) : (
-                            <span className="hidden sm:inline">Sauvegarder</span>
-                          )}
-                        </Button>
-                      </div>
-                    ) : null}*/}
                   </div>
                 </div>
               </CardHeader>
@@ -975,12 +1111,7 @@ const TrackApplication = () => {
                       <strong>Soumise le:</strong> {formatDate(application.date_soumission)}
                     </span>
                   </div>
-                  {/* <div className="flex items-center gap-2 text-xs sm:text-sm">
-                    <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
-                    <span>
-                      <strong>Dernière mise à jour:</strong> {formatDate(application.date_maj)}
-                    </span>
-                  </div>*/}
+
                 </div>
 
                 {application.date_examen && (
@@ -1008,80 +1139,40 @@ const TrackApplication = () => {
                   {(newPhoto || application.photo_passeport) ? (
                     <div className="space-y-3 sm:space-y-4 w-full">
                       <div className="text-center">
-                <h4 className="font-medium mb-2 sm:mb-4 text-sm sm:text-base">
-                  Aperçu de votre photo
-                </h4>
+                        <h4 className="font-medium mb-2 sm:mb-4 text-sm sm:text-base">
+                          Aperçu de votre photo
+                        </h4>
 
-                <div
-                  className="
-                    relative
-                    w-48 h-48
-                    sm:w-44 sm:h-44
-                    md:w-50 md:h-50
-                    lg:w-66 lg:h-66
-                    border-2 border-primary rounded-lg
-                    overflow-hidden bg-muted mx-auto
-                    cursor-pointer hover:border-primary/70 transition-colors
-                  "
-                  onClick={() =>
-                    handleViewPhoto(
-                      newPhoto
-                        ? URL.createObjectURL(newPhoto)
-                        : application.photo_passeport!
-                    )
-                  }
-                >
-                  <img
-                    src={
-                      newPhoto
-                        ? URL.createObjectURL(newPhoto)
-                        : application.photo_passeport!
-                    }
-                    alt={`Photo de ${application.stagiaire.prenom} ${application.stagiaire.nom}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-
-
-                      {/* <div className="p-2 sm:p-3 bg-muted rounded-lg flex items-center justify-between">
-                        <div className="flex items-center truncate">
-                          <Image className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-primary flex-shrink-0" />
-                          <span className="text-xs sm:text-sm font-medium truncate">
-                            {newPhoto ? newPhoto.name : "Photo passeport"}
-                          </span>
+                        <div
+                          className="
+                            relative
+                            w-48 h-48
+                            sm:w-44 sm:h-44
+                            md:w-50 md:h-50
+                            lg:w-66 lg:h-66
+                            border-2 border-primary rounded-lg
+                            overflow-hidden bg-muted mx-auto
+                            cursor-pointer hover:border-primary/70 transition-colors
+                          "
+                          onClick={() =>
+                            handleViewPhoto(
+                              newPhoto
+                                ? URL.createObjectURL(newPhoto)
+                                : application.photo_passeport!
+                            )
+                          }
+                        >
+                          <img
+                            src={
+                              newPhoto
+                                ? URL.createObjectURL(newPhoto)
+                                : application.photo_passeport!
+                            }
+                            alt={`Photo de ${application.stagiaire.prenom} ${application.stagiaire.nom}`}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 w-7 sm:h-8 sm:w-8"
-                            onClick={() => handleViewPhoto(newPhoto ? URL.createObjectURL(newPhoto) : application.photo_passeport!)}
-                          >
-                            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 w-7 sm:h-8 sm:w-8"
-                            asChild
-                          >
-                            <a href={newPhoto ? URL.createObjectURL(newPhoto) : application.photo_passeport!} download>
-                              <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                            </a>
-                          </Button>
-                          {isEditing && newPhoto && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-7 w-7 sm:h-8 sm:w-8"
-                              onClick={removeNewPhoto}
-                            >
-                              <X className="h-3 w-3 sm:h-4 sm:w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>*/}
+                      </div>
                     </div>
                   ) : (
                     <div className="text-center w-full">
@@ -1127,7 +1218,7 @@ const TrackApplication = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4 sm:space-y-6">
+                <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
                   {/* Section 1: Étudiant */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     {renderNonEditableField("Spécialité", application.stagiaire.specialite || "")}
@@ -1189,7 +1280,6 @@ const TrackApplication = () => {
                       {(() => {
                         let total = 0;
                         if (application.documents) {
-                          // Filtrer les documents pour exclure les rapports, conventions et attestations
                           const filteredDocs = application.documents.filter(doc => 
                             doc.type !== 'rapport' && 
                             !doc.nom.toLowerCase().includes('rapport') &&
@@ -1202,7 +1292,6 @@ const TrackApplication = () => {
                         }
                       
                         if (application.stage?.documents) {
-                          // Filtrer les documents du stage pour exclure les conventions et attestations
                           const filteredStageDocs = application.stage.documents.filter(doc => 
                             doc.type !== 'convention' && 
                             doc.type !== 'attestation' &&
@@ -1316,264 +1405,83 @@ const TrackApplication = () => {
               </CardContent>
             </Card>
 
-             {/* Informations du Stage (si disponible) */}
+            {/* Bouton pour ouvrir le modal du stage */}
             {application.stage && (
               <Card>
-                <CardHeader className="pb-3 sm:pb-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-full">
+                        <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                      </div>
                       <div>
-                        <CardTitle className="text-lg sm:text-xl">Informations concernant votre stage</CardTitle>
+                        <h3 className="font-medium text-sm sm:text-base">Informations concernant votre stage</h3>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                          Détails de votre stage à la CEB
+                          {application.stage.statut_actuel === "Actuel" 
+                            ? "Stage en cours" 
+                            : application.stage.statut_actuel === "Terminé" 
+                            ? "Stage terminé" 
+                            : "Stage à venir"}
                         </p>
                       </div>
                     </div>
-                    <Badge 
-                      variant={getStageStatusVariant(application.stage.statut_actuel)} 
-                      className={`text-xs sm:text-sm ${getStageStatusColor(application.stage.statut_actuel)}`}
-                    >
-                      {application.stage.statut_actuel}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6">
-                  {/* Dates et Durée */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
-                        <CalendarDays className="h-4 w-4 text-primary" />
-                        Période du stage
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Début:</span>
-                          <span className="font-medium">{formatDate(application.stage.date_debut)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Fin:</span>
-                          <span className="font-medium">{formatDate(application.stage.date_fin)}</span>
-                        </div>
-                        {application.stage.date_accord && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Accordé le:</span>
-                            <span className="font-medium">{formatDate(application.stage.date_accord)}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
-                        <ClockIcon className="h-4 w-4 text-primary" />
-                        Durée
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">En jours:</span>
-                          <span className="font-medium">{application.stage.duree_jours} jours</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">En mois:</span>
-                          <span className="font-medium">{application.stage.duree_mois} mois</span>
-                        </div>
-                        {/* {application.stage.jours_restants !== undefined && application.stage.statut_actuel === "Actuel" && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Jours restants:</span>
-                            <span className={`font-medium ${application.stage.jours_restants <= 30 ? 'text-red-600' : 'text-green-600'}`}>
-                              {application.stage.jours_restants} jours
-                            </span>
-                          </div>
-                        )}*/}
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
-                        <Coins className="h-4 w-4 text-primary" />
-                        Rémunération
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Type:</span>
-                          <span className="font-medium">{application.stage.remunere ? "Payant" : "Non rémunéré"}</span>
-                        </div>
-                        {application.stage.remunere && application.stage.montant_remuneration && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Montant:</span>
-                            <span className="font-medium text-green-600">
-                              {application.stage.montant_remuneration.toLocaleString()} FCFA
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
-                        <Building className="h-4 w-4 text-primary" />
-                        Lieu de stage
-                      </h4>
-                      <div className="space-y-2">
-                        {renderStageField("Direction", application.stage.direction, <Briefcase className="h-3 w-3" />)}
-                        {renderStageField("Service", application.stage.service, <Users className="h-3 w-3" />)}
-                        {renderStageField("Lieu", application.stage.lieu_stage, <MapPin className="h-3 w-3" />)}
-                        {/*{renderStageField("Superviseur", application.stage.superviseur, <Users className="h-3 w-3" />)}*/}
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
-                        <GraduationCap className="h-4 w-4 text-primary" />
-                        Détails du stagiaire
-                      </h4>
-                      <div className="space-y-2">
-                        {renderStageField("Niveau d'études", application.stage.niveau_etude, <GraduationCap className="h-3 w-3" />)}
-                        {renderStageField("Spécialité", application.stage.specialite, <Briefcase className="h-3 w-3" />)}
-                        {renderStageField("Type de stage", application.stage.type_stage, <FileCheck className="h-3 w-3" />)}
-                      </div>
-                    </div>
-                  </div>
-                  {/* 🔥 SECTION CONVENTION DE STAGE */}
-                  {application.stage.convention && (
-                    <div className="border-t pt-4 sm:pt-6">
-                      <h4 className="font-medium text-sm sm:text-base flex items-center gap-2 mb-4">
-                        <FileCheck className="h-4 w-4 text-primary" />
-                        Convention de stage
-                      </h4>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <div>
-                            <p className="font-medium text-blue-800">
-                              N° {application.stage.convention.numero_convention}
-                            </p>
-                            <p className="text-sm text-blue-700">
-                              {application.stage.convention.est_temporaire ? 
-                                "Convention temporaire (à signer)" : 
-                                "Convention définitive"}
-                            </p>
-                            {application.stage.convention.date_creation && (
-                              <p className="text-xs text-blue-600">
-                                Créée le: {formatDate(application.stage.convention.date_creation)}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewDocument({
-                                nom: `Convention de stage ${application.stage.convention.numero_convention}`,
-                                url: application.stage.convention.fichier_url,
-                                type: 'convention'
-                              })}
-                            >
-                              <Eye className="h-3 w-3 mr-1" />
-                              Voir
-                            </Button>
-                            <Button
-                              size="sm"
-                              asChild
-                            >
-                              <a 
-                                href={application.stage.convention.fichier_url} 
-                                download
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Download className="h-3 w-3 mr-1" />
-                                Télécharger
-                              </a>
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                {/* Rapports de stage 
-                {application.stage.rapports && application.stage.rapports.length > 0 && (
-                  <div className="border-t pt-4 sm:pt-6">
-                    <h4 className="font-medium text-sm sm:text-base flex items-center gap-2 mb-4">
-                      <BookOpen className="h-4 w-4 text-primary" />
-                      Rapports de stage
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {application.stage.rapports.map((rapport, index) => (
-                      <Card key={index} className="border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors cursor-pointer group">
-                        <CardContent className="p-4" onClick={() => handleViewDocument({ nom: rapport.titre, url: rapport.fichier_url || '', type: 'rapport' })}>
-                            <div className="text-center space-y-3">
-                              <div className="mx-auto w-10 h-10 bg-muted rounded-lg flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                                <BookOpen className="h-4 w-4 text-primary" />
-                              </div>
-                              <div>
-                                <h5 className="font-medium text-sm mb-1 line-clamp-2">{rapport.titre}</h5>
-                                <p className="text-xs text-muted-foreground">
-                                  {rapport.date_ajout ? formatDate(rapport.date_ajout) : "Date non spécifiée"}
-                                </p>
-                              </div>
-                              <div className="flex gap-2 justify-center">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="text-xs"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleViewDocument({ nom: rapport.titre, url: rapport.fichier_url || '', type: 'rapport' });
-                                  }}
-                                >
-                                  <Eye className="h-3 w-3 mr-1" />
-                                  Voir
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="text-xs"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    window.open(rapport.fichier_url, '_blank');
-                                  }}
-                                >
-                                  <Download className="h-3 w-3 mr-1" />
-                                  Téléc.
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                )}*/}
-
-                {/* Bouton pour ajouter un rapport 
-                {canAddRapport(application.stage) && (
-                  <div className="border-t pt-4 sm:pt-6">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-sm sm:text-base">Ajouter un rapport de stage</h4>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setIsAddingRapport(true)}
+                    <div className="flex items-center gap-3">
+                      <Badge 
+                        variant={getStageStatusVariant(application.stage.statut_actuel)} 
+                        className={`text-xs sm:text-sm ${getStageStatusColor(application.stage.statut_actuel)}`}
                       >
-                        <Plus className="h-3 w-3 mr-2" />
-                        Ajouter un rapport
+                        {application.stage.statut_actuel}
+                      </Badge>
+                      <Button 
+                        onClick={() => setIsStageModalOpen(true)}
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Voir les détails
                       </Button>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Vous pouvez ajouter vos rapports de stage pour documenter votre parcours.
-                    </p>
                   </div>
-                )}*/}
                 </CardContent>
               </Card>
             )}
 
-            {/* Prochaines étapes */}
-            {application.prochaines_etapes && (
+            {/* Bouton pour ouvrir le modal d'attestation */}
+            {application?.stage?.statut_actuel === "Terminé" && (
+              <Card>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-full">
+                        <Award className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-sm sm:text-base">Attestation de stage</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          {application?.stage?.demande_attestation 
+                            ? `Statut: ${application.stage.demande_attestation.statut === 'en_attente' ? 'En attente' : 
+                               application.stage.demande_attestation.statut === 'approuvee' ? 'Approuvée' :
+                               application.stage.demande_attestation.statut === 'traitee' ? 'Traitée' : 'Refusée'}`
+                            : 'Documents requis pour obtenir votre attestation'}
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => setIsAttestationModalOpen(true)}
+                      className="w-full sm:w-auto"
+                      size="lg"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Voir les détails
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Prochaines étapes - Ne s'affiche pas si le stage est Actuel ou Terminé */}
+            {application.prochaines_etapes && 
+             (!application.stage || (application.stage.statut_actuel !== "Actuel" && application.stage.statut_actuel !== "Terminé")) && (
               <Card>
                 <CardHeader className="pb-3 sm:pb-6">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -1604,23 +1512,625 @@ const TrackApplication = () => {
           </div>
         )}
 
-        {/* Dialog pour la visualisation des documents */}
+        {/* Modal du stage */}
+        {application && (
+          <Dialog open={isStageModalOpen} onOpenChange={setIsStageModalOpen}>
+            <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                  Informations concernant votre stage
+                </DialogTitle>
+                <DialogDescription>
+                  Détails de votre stage à la CEB
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 sm:space-y-4 md:space-y-6 py-4">
+                {/* En-tête avec statut */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                  <Badge 
+                    variant={getStageStatusVariant(application.stage?.statut_actuel || '')} 
+                    className={`text-xs sm:text-sm ${getStageStatusColor(application.stage?.statut_actuel || '')}`}
+                  >
+                    {application.stage?.statut_actuel}
+                  </Badge>
+                </div>
+
+                {/* Dates et Durée */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-primary" />
+                      Période du stage
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
+                        <span className="text-muted-foreground">Début:</span>
+                        <span className="font-medium">{formatDate(application.stage?.date_debut)}</span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
+                        <span className="text-muted-foreground">Fin:</span>
+                        <span className="font-medium">{formatDate(application.stage?.date_fin)}</span>
+                      </div>
+                      {application.stage?.date_accord && (
+                        <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
+                          <span className="text-muted-foreground">Accordé le:</span>
+                          <span className="font-medium">{formatDate(application.stage.date_accord)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
+                      <ClockIcon className="h-4 w-4 text-primary" />
+                      Durée
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
+                        <span className="text-muted-foreground">En jours:</span>
+                        <span className="font-medium">{application.stage?.duree_jours} jours</span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
+                        <span className="text-muted-foreground">En mois:</span>
+                        <span className="font-medium">{application.stage?.duree_mois} mois</span>
+                      </div>
+                      {application.stage?.jours_restants && application.stage.statut_actuel === "Actuel" && (
+                        <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-green-600 font-medium gap-2 sm:gap-0">
+                          <span>Jours restants:</span>
+                          <span>{application.stage.jours_restants} jours</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
+                      <Coins className="h-4 w-4 text-primary" />
+                      Rémunération
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
+                        <span className="text-muted-foreground">Type:</span>
+                        <span className="font-medium">{application.stage?.remunere ? "Payant" : "Non rémunéré"}</span>
+                      </div>
+                      {application.stage?.remunere && application.stage?.montant_remuneration && (
+                        <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
+                          <span className="text-muted-foreground">Montant:</span>
+                          <span className="font-medium text-green-600">
+                            {application.stage.montant_remuneration.toLocaleString()} FCFA
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
+                      <Building className="h-4 w-4 text-primary" />
+                      Lieu de stage
+                    </h4>
+                    <div className="space-y-2">
+                      {renderStageField("Direction", application.stage?.direction, <Briefcase className="h-3 w-3" />)}
+                      {renderStageField("Service", application.stage?.service, <Users className="h-3 w-3" />)}
+                      {renderStageField("Lieu", application.stage?.lieu_stage, <MapPin className="h-3 w-3" />)}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4 text-primary" />
+                      Détails du stagiaire
+                    </h4>
+                    <div className="space-y-2">
+                      {renderStageField("Niveau d'études", application.stage?.niveau_etude, <GraduationCap className="h-3 w-3" />)}
+                      {renderStageField("Spécialité", application.stage?.specialite, <Briefcase className="h-3 w-3" />)}
+                      {renderStageField("Type de stage", application.stage?.type_stage, <FileCheck className="h-3 w-3" />)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Informations supplémentaires si disponibles */}
+                {application.stage?.superviseur && (
+                  <div className="border-t pt-4">
+                    <h4 className="font-medium text-sm sm:text-base flex items-center gap-2 mb-3">
+                      <Users className="h-4 w-4 text-primary" />
+                      Supervision
+                    </h4>
+                    <div className="bg-muted/30 rounded-lg p-3">
+                      <p className="text-sm">
+                        <span className="font-medium">Superviseur:</span> {application.stage.superviseur}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Renouvellement si applicable */}
+                {application.stage?.a_ete_renouvele && (
+                  <div className="border-t pt-4">
+                    <Alert className="bg-blue-50 border-blue-200">
+                      <AlertTriangle className="h-4 w-4 text-blue-600" />
+                      <AlertDescription className="text-sm text-blue-700">
+                        Ce stage a été renouvelé. {application.stage.stage_renouvele_id && 
+                          `Nouveau code de suivi: ${application.stage.stage_renouvele_id}`}
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                )}
+
+                {/* Lettre de stage */}
+                {application.stage?.convention && (
+                  <>
+                    <h4 className="font-medium text-sm sm:text-base flex items-center gap-2">
+                      <FileCheck className="h-4 w-4 text-primary" />
+                      Lettre de stage
+                    </h4>
+                    <Card className="border-2 border-dashed border-muted-foreground/25">
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="text-center space-y-3 sm:space-y-4">
+                          <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <FileCheck className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
+                              Lettre de stage
+                            </h3>                        
+                            {application.stage.convention.date_creation && (
+                              <p className="text-xs text-muted-foreground">
+                                Créée le {formatDate(application.stage.convention.date_creation)}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex gap-2 justify-center flex-wrap">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs sm:text-sm"
+                              onClick={() => handleViewDocument({
+                                nom: `Lettre de stage`,
+                                url: application.stage.convention.fichier_url,
+                                type: 'convention'
+                              })}
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              Voir
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs sm:text-sm"
+                              asChild
+                            >
+                              <a 
+                                href={application.stage.convention.fichier_url} 
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Download className="h-3 w-3 mr-1" />
+                                Télécharger
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
+              </div>
+
+              <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
+                <Button variant="outline" onClick={() => setIsStageModalOpen(false)}>
+                  Fermer
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Modal d'attestation 
+        {application && (
+          <Dialog open={isAttestationModalOpen} onOpenChange={setIsAttestationModalOpen}>
+            <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Award className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                  Attestation de stage
+                </DialogTitle>
+                <DialogDescription>
+                  Gérez votre demande d'attestation de stage
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 sm:space-y-4 md:space-y-6 py-4">
+                {application?.stage?.demande_attestation ? (
+                  // Afficher les documents soumis
+                  <>
+                    <div className="p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        {application.stage.demande_attestation.statut === 'refusee' ? 
+                          <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" /> :
+                          <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        }
+                        <div>
+                          <h4 className="font-medium mb-1 text-sm sm:text-base">
+                            {application.stage.demande_attestation.statut === 'refusee' ? 
+                              'Demande refusée' : 
+                              application.stage.demande_attestation.statut === 'approuvee' || application.stage.demande_attestation.statut === 'traitee' ?
+                              'Demande approuvée' :
+                              'Demande soumise avec succès'
+                            }
+                          </h4>
+                          <p className="text-xs sm:text-sm text-gray-700">
+                            Votre demande d'attestation a été {application.stage.demande_attestation.statut === 'refusee' ? 'refusée' : 
+                            application.stage.demande_attestation.statut === 'approuvee' || application.stage.demande_attestation.statut === 'traitee' ?
+                            'traitée' : 'soumise'} le {formatDate(application.stage.demande_attestation.date_demande)}
+                          </p>
+                          
+                          {application.stage.demande_attestation.statut === 'refusee' && application.stage.demande_attestation.motif_refus && (
+                            <Alert variant="destructive" className="mt-3">
+                              <AlertTriangle className="h-4 w-4" />
+                              <AlertDescription className="text-sm">
+                                <strong>Motif du refus:</strong> {application.stage.demande_attestation.motif_refus}
+                              </AlertDescription>
+                            </Alert>
+                          )}
+                          
+                          {application.stage.demande_attestation.statut === 'refusee' && (
+                            <div className="mt-4">
+                              <Button
+                                onClick={() => setShowNewRequestForm(true)}
+                                variant="outline"
+                                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Soumettre une nouvelle demande
+                              </Button>
+                            </div>
+                          )}
+                          
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                      {application.stage.demande_attestation.fichiers?.rapport_stage && (
+                        <Card className="border-2 border-dashed border-muted-foreground/25">
+                          <CardContent className="p-4 sm:p-6">
+                            <div className="text-center space-y-3 sm:space-y-4">
+                              <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
+                              </div>
+                              <div>
+                                <h3 className="font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
+                                  Rapport de stage
+                                </h3>
+                                <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
+                                  PDF • Document soumis
+                                </p>
+                              </div>
+                              <div className="flex gap-2 justify-center flex-wrap">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs sm:text-sm"
+                                  onClick={() => handleViewDocument({
+                                    nom: 'Rapport de stage',
+                                    url: application.stage.demande_attestation.fichiers.rapport_stage,
+                                    type: 'rapport'
+                                  })}
+                                >
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  Voir
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs sm:text-sm"
+                                  onClick={() => window.open(application.stage.demande_attestation.fichiers.rapport_stage, '_blank')}
+                                >
+                                  <Download className="h-3 w-3 mr-1" />
+                                  Télécharger
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {application.stage.demande_attestation.fichiers?.demande_manuscrite && (
+                        <Card className="border-2 border-dashed border-muted-foreground/25">
+                          <CardContent className="p-4 sm:p-6">
+                            <div className="text-center space-y-3 sm:space-y-4">
+                              <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600" />
+                              </div>
+                              <div>
+                                <h3 className="font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
+                                  Demande manuscrite
+                                </h3>
+                                <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
+                                  {getFileExtension(application.stage.demande_attestation.fichiers.demande_manuscrite)} • Document soumis
+                                </p>
+                              </div>
+                              <div className="flex gap-2 justify-center flex-wrap">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs sm:text-sm"
+                                  onClick={() => handleViewDocument({
+                                    nom: 'Demande manuscrite',
+                                    url: application.stage.demande_attestation.fichiers.demande_manuscrite,
+                                    type: 'demande_manuscrite'
+                                  })}
+                                >
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  Voir
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs sm:text-sm"
+                                  onClick={() => window.open(application.stage.demande_attestation.fichiers.demande_manuscrite, '_blank')}
+                                >
+                                  <Download className="h-3 w-3 mr-1" />
+                                  Télécharger
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
+
+                    {(application.stage.attestation || application.stage.demande_attestation?.fichiers?.attestation_signee) && (
+                      <div className="border-t pt-4 sm:pt-6">
+                        <h4 className="font-medium text-sm sm:text-base flex items-center gap-2 mb-4">
+                          <Award className="h-4 w-4 text-teal-600" />
+                          Attestation de stage signée
+                        </h4>
+                        <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                              <p className="font-medium text-teal-800 mb-1">Votre attestation de stage est disponible</p>
+                              <p className="text-sm text-teal-700">
+                                Vous pouvez télécharger votre attestation de stage signée
+                              </p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              className="border-teal-600 text-teal-600 hover:bg-teal-50"
+                              onClick={() => window.open(application.stage.attestation?.fichier_url || application.stage.demande_attestation?.fichiers?.attestation_signee, '_blank')}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Télécharger
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {application.stage.demande_attestation.statut === 'refusee' && !showNewRequestForm && (
+                      <div className="border-t pt-4">
+                        <Button
+                          onClick={() => {
+                            setShowNewRequestForm(true);
+                          }}
+                          variant="outline"
+                          className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Soumettre une nouvelle demande
+                        </Button>
+                      </div>
+                    )}
+
+                    {showNewRequestForm && (
+                      <>
+                        <div className="p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                          <h4 className="font-medium text-amber-800 mb-1 sm:mb-2 text-sm sm:text-base">Nouvelle demande d'attestation</h4>
+                          <ul className="text-xs sm:text-sm text-amber-700 space-y-1">
+                            <li>• Veuillez corriger les éléments mentionnés dans le motif de refus</li>
+                            <li>• Téléchargez à nouveau les documents requis</li>
+                            <li>• La première page de votre rapport de stage signée au format PDF</li>
+                            <li>• La demande manuscrite doit être signée et scannée</li>
+                          </ul>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                          <FileUploadCard
+                            title="Rapport de stage (signé)"
+                            required={true}
+                            accept=".pdf"
+                            file={rapportStage}
+                            onFileSelect={(files) => setRapportStage(files?.[0] || null)}
+                            onFileRemove={() => setRapportStage(null)}
+                            inputRef={rapportInputRef}
+                            description="Format accepté: PDF uniquement. Taille max: 10MB"
+                          />
+
+                          <FileUploadCard
+                            title="Demande manuscrite signée"
+                            required={true}
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            file={demandeManuscrite}
+                            onFileSelect={(files) => setDemandeManuscrite(files?.[0] || null)}
+                            onFileRemove={() => setDemandeManuscrite(null)}
+                            inputRef={demandeInputRef}
+                            description="Formats acceptés: PDF, JPG, PNG. Taille max: 5MB"
+                          />
+                        </div>
+
+                        <div className="border-t pt-4 sm:pt-6">
+                          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setShowNewRequestForm(false);
+                                setRapportStage(null);
+                                setDemandeManuscrite(null);
+                              }}
+                              className="w-full sm:w-auto"
+                            >
+                              Annuler
+                            </Button>
+                            
+                            <Button
+                              onClick={handleSubmitNewAttestationRequest}
+                              disabled={isSubmittingNewRequest || !rapportStage || !demandeManuscrite}
+                              className="w-full sm:w-auto"
+                              size="lg"
+                            >
+                              {isSubmittingNewRequest ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
+                                  <span>Soumission en cours...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                                  <span>Soumettre la nouvelle demande</span>
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {!showNewRequestForm && application.stage.attestation && (
+                      <div className="space-y-3 sm:space-y-4 md:space-y-6">
+                        <div className="mt-2">
+                          <Card className="border-2 border-dashed border-teal-200">
+                            <CardContent className="p-4 sm:p-6">
+                              <div className="text-center space-y-3 sm:space-y-4">
+                                <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-teal-100 rounded-lg flex items-center justify-center">
+                                  <Award className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600" />
+                                </div>
+                                <div>
+                                  <h3 className="font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
+                                    Attestation de stage
+                                  </h3>
+                                  <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
+                                    PDF • Attestation officielle
+                                  </p>
+                                </div>
+                                <div className="flex gap-2 justify-center flex-wrap">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs sm:text-sm"
+                                    onClick={() => handleViewDocument({
+                                      nom: 'Attestation de stage signée',
+                                      url: application.stage.attestation.fichier_url,
+                                      type: 'attestation_signee'
+                                    })}
+                                  >
+                                    <Eye className="h-3 w-3 mr-1" />
+                                    Voir
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs sm:text-sm"
+                                    onClick={() => window.open(application.stage.attestation.fichier_url, '_blank')}
+                                  >
+                                    <Download className="h-3 w-3 mr-1" />
+                                    Télécharger
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // Afficher le formulaire de soumission initial (pas de demande précédente)
+                  <>
+                    <div className="p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                      <h4 className="font-medium text-amber-800 mb-1 sm:mb-2 text-sm sm:text-base">Informations importantes</h4>
+                      <ul className="text-xs sm:text-sm text-amber-700 space-y-1">
+                        <li>• La première page de votre rapport de stage signée au format PDF</li>
+                        <li>• La demande manuscrite doit être signée et scannée</li>
+                        <li>• Vous recevrez un email de confirmation après soumission</li>
+                      </ul>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                      <FileUploadCard
+                        title="Rapport de stage"
+                        required={true}
+                        accept=".pdf"
+                        file={rapportStage}
+                        onFileSelect={(files) => setRapportStage(files?.[0] || null)}
+                        onFileRemove={() => setRapportStage(null)}
+                        inputRef={rapportInputRef}
+                        description="Format accepté: PDF uniquement. Taille max: 10MB"
+                      />
+
+                      <FileUploadCard
+                        title="Demande manuscrite signée"
+                        required={true}
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        file={demandeManuscrite}
+                        onFileSelect={(files) => setDemandeManuscrite(files?.[0] || null)}
+                        onFileRemove={() => setDemandeManuscrite(null)}
+                        inputRef={demandeInputRef}
+                        description="Formats acceptés: PDF, JPG, PNG. Taille max: 5MB"
+                      />
+                    </div>
+
+                    <div className="border-t pt-4 sm:pt-6">
+                      <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
+                        <Button
+                          onClick={handleSubmitAttestation}
+                          disabled={isSubmittingAttestation || !rapportStage || !demandeManuscrite}
+                          className="w-full sm:w-auto"
+                          size="lg"
+                        >
+                          {isSubmittingAttestation ? (
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
+                              <span>Soumission en cours...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                              <span>Soumettre la demande d'attestation</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
+                <Button variant="outline" onClick={() => setIsAttestationModalOpen(false)}>
+                  Fermer
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+
+      */}
+
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] p-0 sm:p-6">
             <DialogHeader className="px-4 pt-4 sm:px-0 sm:pt-0">
-              <DialogTitle className="flex items-center justify-between text-base sm:text-lg">
+              <DialogTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-base sm:text-lg gap-2 sm:gap-0">
                 <div className="flex items-center gap-2 truncate">
                   {selectedDocument && getDocumentIcon(selectedDocument.type || 'default')}
                   <span className="truncate">{selectedDocument?.nom}</span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsModalOpen(false)}
-                  className="h-8 w-8 sm:h-9 sm:w-9"
-                >
-                  <XIcon className="h-4 w-4" />
-                </Button>
+               
               </DialogTitle>
             </DialogHeader>
             
@@ -1652,7 +2162,7 @@ const TrackApplication = () => {
                       </p>
                       <Button asChild size="sm" className="text-sm">
                         <a href={selectedDocument.url} download>
-                          <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                          <Download className="h-3.5 w-3.5" />
                           Télécharger
                         </a>
                       </Button>
@@ -1675,13 +2185,13 @@ const TrackApplication = () => {
                 <div className="flex gap-2 w-full sm:w-auto">
                   <Button variant="outline" asChild size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
                     <a href={selectedDocument.url} target="_blank" rel="noopener noreferrer">
-                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <Eye className="h-3.5 w-3.5" />
                       <span className="hidden xs:inline">Ouvrir</span>
                     </a>
                   </Button>
                   <Button asChild size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
                     <a href={selectedDocument.url} download>
-                      <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <Download className="h-3.5 w-3.5" />
                       <span className="hidden xs:inline">Télécharger</span>
                     </a>
                   </Button>
@@ -1695,19 +2205,12 @@ const TrackApplication = () => {
         <Dialog open={isPhotoModalOpen} onOpenChange={setIsPhotoModalOpen}>
           <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] p-0 sm:p-6">
             <DialogHeader className="px-4 pt-4 sm:px-0 sm:pt-0">
-              <DialogTitle className="flex items-center justify-between text-base sm:text-lg">
+              <DialogTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-base sm:text-lg gap-2 sm:gap-0">
                 <div className="flex items-center gap-2 truncate">
                   <Image className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                   <span className="truncate">Photo d'identité - {application?.stagiaire.prenom} {application?.stagiaire.nom}</span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsPhotoModalOpen(false)}
-                  className="h-8 w-8 sm:h-9 sm:w-9"
-                >
-                  <XIcon className="h-4 w-4" />
-                </Button>
+              
               </DialogTitle>
             </DialogHeader>
             
@@ -1716,7 +2219,7 @@ const TrackApplication = () => {
                 <div className="flex flex-col items-center">
                   <img 
                     src={selectedPhoto} 
-                    alt={`Photo de ${application?.stagiaire.prenom} ${application?.stagiaire.nom}`}
+                    alt={`${application?.stagiaire.nom} - Photo de ${application?.stagiaire.prenom}`}
                     className="max-w-full max-h-[60vh] sm:max-h-[70vh] object-contain rounded-lg shadow-lg"
                   />
                 </div>
@@ -1736,13 +2239,13 @@ const TrackApplication = () => {
                 <div className="flex gap-2 w-full sm:w-auto">
                   <Button variant="outline" asChild size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
                     <a href={selectedPhoto} target="_blank" rel="noopener noreferrer">
-                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <Eye className="h-3.5 w-3.5" />
                       <span className="hidden xs:inline">Ouvrir</span>
                     </a>
                   </Button>
                   <Button asChild size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
                     <a href={selectedPhoto} download={`photo-${application?.stagiaire.prenom}-${application?.stagiaire.nom}.${getFileExtension(selectedPhoto).toLowerCase()}`}>
-                      <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <Download className="h-3.5 w-3.5" />
                       <span className="hidden xs:inline">Télécharger</span>
                     </a>
                   </Button>
@@ -1751,118 +2254,7 @@ const TrackApplication = () => {
             )}
           </DialogContent>
         </Dialog>
-
-        {/* Dialog pour l'ajout de rapport */}
-        <Dialog open={isAddingRapport} onOpenChange={setIsAddingRapport}>
-          <DialogContent className="max-w-[95vw] sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Ajouter un rapport de stage
-              </DialogTitle>
-              <DialogDescription>
-                Remplissez les informations pour ajouter votre rapport de stage
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="rapport-titre">Titre du rapport *</Label>
-                <Input
-                  id="rapport-titre"
-                  placeholder="Ex: Rapport de stage - Première partie"
-                  value={newRapportTitre}
-                  onChange={(e) => setNewRapportTitre(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Donnez un titre descriptif à votre rapport
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="rapport-file">Fichier du rapport *</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                  <input
-                    type="file"
-                    ref={rapportInputRef}
-                    onChange={handleRapportFileSelect}
-                    accept=".pdf,.doc,.docx"
-                    className="hidden"
-                    id="rapport-file"
-                  />
-                  <label
-                    htmlFor="rapport-file"
-                    className="cursor-pointer flex flex-col items-center"
-                  >
-                    <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                    <span className="text-sm font-medium">
-                      {newRapportFile ? newRapportFile.name : "Cliquez pour sélectionner un fichier"}
-                    </span>
-                    <span className="text-xs text-gray-500 mt-1">
-                      PDF, DOC ou DOCX (max 10MB)
-                    </span>
-                  </label>
-                </div>
-                
-                {newRapportFile && (
-                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-gray-600" />
-                      <span className="text-sm font-medium truncate">{newRapportFile.name}</span>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setNewRapportFile(null)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded p-3">
-                <h5 className="text-sm font-medium text-blue-800 mb-1">Instructions</h5>
-                <ul className="text-xs text-blue-700 space-y-1">
-                  <li>• Le fichier doit être en format PDF, DOC ou DOCX</li>
-                  <li>• Taille maximum : 10MB</li>
-                  <li>• Donnez un titre clair et descriptif</li>
-                  <li>• Vous pouvez ajouter plusieurs rapports</li>
-                </ul>
-              </div>
-            </div>
-            
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsAddingRapport(false);
-                  setNewRapportTitre("");
-                  setNewRapportFile(null);
-                }}
-                disabled={isSubmittingRapport}
-              >
-                Annuler
-              </Button>
-              <Button
-                onClick={handleAddRapport}
-                disabled={isSubmittingRapport || !newRapportTitre.trim() || !newRapportFile}
-              >
-                {isSubmittingRapport ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Ajout en cours...
-                  </>
-                ) : (
-                  "Ajouter le rapport"
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
       </div>
-
       <PublicFooter className="mt-auto" />
     </div>
   );

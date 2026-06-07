@@ -155,7 +155,7 @@ const RejectedInternshipDetails = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-4 md:space-y-6">
         <InternshipHeader
           id={params.id || internshipData.id}
           title="Demande rejetée"
@@ -163,8 +163,8 @@ const RejectedInternshipDetails = () => {
           backUrl="/internships/rejected"
         />
         
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="md:col-span-2 space-y-6">
+        <div className="grid gap-3 sm:gap-4 md:gap-6 md:grid-cols-3">
+          <div className="md:col-span-2 space-y-3 sm:space-y-4 md:space-y-6">
             <InternshipSummaryCard
               status={currentStatus}
               // resume={internshipData.resume}
@@ -214,7 +214,7 @@ const RejectedInternshipDetails = () => {
             </Tabs>
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-3 sm:space-y-4 md:space-y-6">
             <StudentProfileCard student={internshipData.student} />
             <SchoolCard school={internshipData.student.school} />
             <ActionsCard actions={actions} />

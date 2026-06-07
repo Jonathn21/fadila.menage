@@ -29,8 +29,6 @@ type Session = {
   is_pc?: boolean;
 };
 
-
-
 const SecuritySettings = () => {
   const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
   const [showPassword, setShowPassword] = useState({ current: false, new: false, confirm: false });
@@ -48,7 +46,6 @@ const SecuritySettings = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchSessions();
     fetchSecuritySettings();
   }, []);
 
@@ -87,122 +84,6 @@ const SecuritySettings = () => {
       hasSpecialChar
     };
   };
-
-const fetchSessions = async () => {
-  setLoading(prev => ({ ...prev, sessions: true }));
-  try {
-    const res = await apiClient.get("/security/sessions/");
-    console.log("Sessions reçues:", res.data); // Pour debug
-    setSessions(res.data.sessions || []);
-  } catch (error: any) {
-    console.error("Erreur chargement sessions:", error);
-    toast({ 
-      title: "Erreur", 
-      description: "Impossible de charger les sessions actives.", 
-      variant: "destructive" 
-    });
-    // Set empty array on error
-    setSessions([]);
-  } finally {
-    setLoading(prev => ({ ...prev, sessions: false }));
-  }
-};
-
-const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: boolean }) => {
-  const getDeviceIcon = () => {
-    if (session.is_mobile) return "📱";
-    if (session.is_tablet) return "📱";
-    if (session.is_pc) return "💻";
-    return "🖥️";
-  };
-
-  const formatIP = (ip: string) => {
-    if (!ip || ip === 'Inconnue') return 'IP masquée';
-    // Masquer les 2 derniers octets pour la confidentialité
-    const parts = ip.split('.');
-    if (parts.length === 4) {
-      return `${parts[0]}.${parts[1]}.*.*`;
-    }
-    return ip;
-  };
-
-  return (
-    <div className={`p-4 border rounded-lg ${isCurrent ? 'border-primary/30 bg-primary/5' : 'border-border'}`}>
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <div className="text-2xl mt-1">{getDeviceIcon()}</div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <h4 className="font-medium">
-                {session.device || 'Appareil inconnu'}
-              </h4>
-              {isCurrent && (
-                <Badge variant="default" className="bg-green-100 text-green-800">
-                  Actuelle
-                </Badge>
-              )}
-            </div>
-            
-            <div className="text-sm text-muted-foreground space-y-1">
-              <div className="flex items-center gap-2">
-                <Globe className="h-3 w-3" />
-                <span>IP: {formatIP(session.ip)}</span>
-              </div>
-              
-              {session.browser && (
-                <div className="flex items-center gap-2">
-                  <Chrome className="h-3 w-3" />
-                  <span>{session.browser}</span>
-                </div>
-              )}
-              
-              {session.os && (
-                <div className="flex items-center gap-2">
-                  <Cpu className="h-3 w-3" />
-                  <span>{session.os}</span>
-                </div>
-              )}
-              
-              <div className="flex items-center gap-2">
-                <Calendar className="h-3 w-3" />
-                <span>Connecté: {formatDate(session.connected_at)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {!isCurrent && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={async () => {
-              try {
-                await apiClient.post("/security/logout-session/", {
-                  session_key: session.session_key
-                });
-                toast({
-                  title: "Session déconnectée",
-                  description: "La session a été déconnectée avec succès.",
-                });
-                fetchSessions();
-              } catch {
-                toast({
-                  title: "Erreur",
-                  description: "Impossible de déconnecter cette session.",
-                  variant: "destructive",
-                });
-              }
-            }}
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="sr-only">Déconnecter</span>
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-};
 
   const fetchSecuritySettings = async () => {
     setLoading(prev => ({ ...prev, settings: true }));
@@ -336,51 +217,31 @@ const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: bool
     }
   };
 
-  const logoutOtherSessions = async () => {
-    setLoading(prev => ({ ...prev, logoutOthers: true }));
-    try {
-      await apiClient.post("/security/logout-others/");
-      toast({
-        title: "Succès",
-        description: "Toutes les autres sessions ont été déconnectées",
-      });
-      fetchSessions();
-    } catch (err: any) {
-      toast({
-        title: "Erreur",
-        description: err.response?.data?.detail || "Impossible de déconnecter les autres sessions",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(prev => ({ ...prev, logoutOthers: false }));
-    }
-  };
-
   const passwordValidation = validatePassword(passwords.new);
   const passwordsMatch = passwords.new === passwords.confirm && passwords.confirm.length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
       {/* Changer mot de passe */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Key className="h-5 w-5 text-primary" />
+      <Card className="border border-gray-200">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+              <Key className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
             <div>
-              <CardTitle>Changer le mot de passe</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-sm sm:text-base text-gray-900">Changer le mot de passe</CardTitle>
+              <CardDescription className="text-xs sm:text-sm text-gray-600">
                 Mettez à jour votre mot de passe pour renforcer la sécurité de votre compte
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+          <form onSubmit={handlePasswordSubmit} className="space-y-3 sm:space-y-4">
             {(["current", "new", "confirm"] as const).map(field => (
-              <div key={field} className="space-y-2">
-                <Label htmlFor={field} className="text-sm font-medium">
+              <div key={field} className="space-y-1 sm:space-y-2">
+                <Label htmlFor={field} className="text-xs sm:text-sm font-medium text-gray-800">
                   {field === "current" ? "Mot de passe actuel" : 
                    field === "new" ? "Nouveau mot de passe" : "Confirmer le mot de passe"}
                 </Label>
@@ -392,7 +253,7 @@ const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: bool
                     value={passwords[field]}
                     onChange={handlePasswordChange}
                     disabled={loading.password}
-                    className="pr-10"
+                    className="pr-8 text-xs sm:text-sm focus:border-primary focus:ring-primary"
                     placeholder={
                       field === "current" ? "Entrez votre mot de passe actuel" :
                       field === "new" ? "Créez un nouveau mot de passe sécurisé" :
@@ -406,9 +267,9 @@ const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: bool
                     disabled={loading.password}
                   >
                     {showPassword[field] ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      <EyeOff className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                     ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                     )}
                   </button>
                 </div>
@@ -416,31 +277,37 @@ const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: bool
             ))}
 
             {passwords.new && (
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Force du mot de passe</span>
-                  <span className="text-xs text-muted-foreground">
+              <div className="space-y-1 sm:space-y-2">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
+                  <span className="text-xs sm:text-sm text-gray-700">Force du mot de passe</span>
+                  <span className="text-[10px] sm:text-xs font-medium text-gray-700">
                     {passwordValidation.strength >= 80 ? "Fort" : 
                      passwordValidation.strength >= 60 ? "Moyen" : "Faible"}
                   </span>
                 </div>
-                <Progress value={passwordValidation.strength} className="h-2" />
-                <div className="text-xs text-muted-foreground space-y-1">
+                <div className="h-1.5 sm:h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full transition-all ${passwordValidation.strength >= 80 ? "bg-green-600" : 
+                                     passwordValidation.strength >= 60 ? "bg-yellow-500" : "bg-red-500"}`}
+                    style={{ width: `${passwordValidation.strength}%` }}
+                  />
+                </div>
+                <div className="text-[10px] sm:text-xs text-gray-600 space-y-0.5 sm:space-y-1">
                   <p>Le mot de passe doit contenir :</p>
                   <ul className="list-disc list-inside">
-                    <li className={passwordValidation.minLength ? "text-green-600" : "text-muted-foreground"}>
+                    <li className={passwordValidation.minLength ? "text-gray-700" : "text-gray-400"}>
                       Au moins 8 caractères
                     </li>
-                    <li className={passwordValidation.hasUpperCase ? "text-green-600" : "text-muted-foreground"}>
+                    <li className={passwordValidation.hasUpperCase ? "text-gray-700" : "text-gray-400"}>
                       Une majuscule
                     </li>
-                    <li className={passwordValidation.hasLowerCase ? "text-green-600" : "text-muted-foreground"}>
+                    <li className={passwordValidation.hasLowerCase ? "text-gray-700" : "text-gray-400"}>
                       Une minuscule
                     </li>
-                    <li className={passwordValidation.hasNumbers ? "text-green-600" : "text-muted-foreground"}>
+                    <li className={passwordValidation.hasNumbers ? "text-gray-700" : "text-gray-400"}>
                       Un chiffre
                     </li>
-                    <li className={passwordValidation.hasSpecialChar ? "text-green-600" : "text-muted-foreground"}>
+                    <li className={passwordValidation.hasSpecialChar ? "text-gray-700" : "text-gray-400"}>
                       Un caractère spécial (optionnel)
                     </li>
                   </ul>
@@ -449,29 +316,30 @@ const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: bool
             )}
 
             {passwords.confirm && (
-              <div className="text-sm">
+              <div className="text-xs sm:text-sm">
                 {passwordsMatch ? (
-                  <span className="text-green-600">✓ Les mots de passe correspondent</span>
+                  <span className="text-green-600 font-medium">✓ Les mots de passe correspondent</span>
                 ) : (
-                  <span className="text-destructive">✗ Les mots de passe ne correspondent pas</span>
+                  <span className="text-red-600">✗ Les mots de passe ne correspondent pas</span>
                 )}
               </div>
             )}
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-end pt-1 sm:pt-2">
               <Button 
                 type="submit" 
                 disabled={loading.password || !passwordsMatch || !passwordValidation.isValid}
-                className="gap-2"
+                size="sm"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm bg-primary hover:bg-primary/90 text-white"
               >
                 {loading.password ? (
                   <>
-                    <Lock className="h-4 w-4 animate-pulse" />
-                    Changement en cours...
+                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                    Changement...
                   </>
                 ) : (
                   <>
-                    <Key className="h-4 w-4" />
+                    <Key className="h-3 w-3 sm:h-4 sm:w-4" />
                     Changer le mot de passe
                   </>
                 )}
@@ -482,30 +350,30 @@ const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: bool
       </Card>
 
       {/* Sécurité du compte */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Shield className="h-5 w-5 text-primary" />
+      <Card className="border border-gray-200">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
             <div>
-              <CardTitle>Sécurité du compte</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-sm sm:text-base text-gray-900">Sécurité du compte</CardTitle>
+              <CardDescription className="text-xs sm:text-sm text-gray-600">
                 Configurez les paramètres de sécurité avancés pour protéger votre compte
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-lg mt-0.5">
-                  <Smartphone className="h-4 w-4 text-muted-foreground" />
+          <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors gap-2 sm:gap-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <Smartphone className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Authentification à deux facteurs</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-medium text-xs sm:text-sm text-gray-900">Authentification à deux facteurs</h3>
+                  <p className="text-[10px] sm:text-xs text-gray-600">
                     Ajoutez une couche supplémentaire de sécurité à votre compte
                   </p>
                 </div>
@@ -514,17 +382,18 @@ const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: bool
                 checked={twoFactorEnabled} 
                 onCheckedChange={toggleTwoFactor}
                 disabled={loading.twoFactor}
+                className="scale-90 sm:scale-100 data-[state=checked]:bg-primary"
               />
             </div>
 
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-lg mt-0.5">
-                  <Bell className="h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors gap-2 sm:gap-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <Bell className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Alertes de connexion</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-medium text-xs sm:text-sm text-gray-900">Alertes de connexion</h3>
+                  <p className="text-[10px] sm:text-xs text-gray-600">
                     Recevez des alertes email pour les nouvelles connexions suspectes
                   </p>
                 </div>
@@ -533,92 +402,12 @@ const SessionCard = ({ session, isCurrent }: { session: Session; isCurrent: bool
                 checked={sessionAlerts} 
                 onCheckedChange={toggleSessionAlerts}
                 disabled={loading.alerts}
+                className="scale-90 sm:scale-100 data-[state=checked]:bg-primary"
               />
             </div>
           </div>
         </CardContent>
       </Card>
-
-      {/* Sessions actives 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <CardTitle>Sessions actives</CardTitle>
-                <CardDescription>
-                  Appareils actuellement connectés à votre compte
-                </CardDescription>
-              </div>
-            </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={logoutOtherSessions}
-              disabled={loading.logoutOthers || sessions.length <= 1}
-              className="gap-2"
-            >
-              {loading.logoutOthers ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <LogOut className="h-4 w-4" />
-              )}
-              Déconnecter les autres
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {loading.sessions ? (
-            <div className="space-y-4">
-              {[1, 2].map((i) => (
-                <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-3 w-48" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                  <Skeleton className="h-8 w-20" />
-                </div>
-              ))}
-            </div>
-          ) : sessions.length === 0 ? (
-            <Alert className="bg-amber-50 border-amber-200">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
-              <AlertTitle className="text-amber-800">Aucune session active</AlertTitle>
-              <AlertDescription className="text-amber-700">
-                Impossible de charger les sessions actives ou aucune session n'est active.
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <div className="space-y-4">
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">SESSION ACTUELLE</h3>
-                {sessions.filter(s => s.current).map((session) => (
-                  <SessionCard key={session.session_key} session={session} isCurrent={true} />
-                ))}
-              </div>
-
-              {sessions.filter(s => !s.current).length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                    AUTRES SESSIONS ({sessions.filter(s => !s.current).length})
-                  </h3>
-                  <div className="space-y-3">
-                    {sessions.filter(s => !s.current).map((session) => (
-                      <SessionCard key={session.session_key} session={session} isCurrent={false} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>*/}
-
-      
     </div>
   );
 };

@@ -24,7 +24,7 @@ interface DataTableProps {
   columns: {
     key: string;
     label: string;
-    render?: (value: any, item: any) => React.ReactNode;
+    render?: (value: unknown, item: any) => React.ReactNode;
   }[];
   data: any[];
   emptyMessage: React.ReactNode;
@@ -92,7 +92,7 @@ const DataTable: React.FC<DataTableProps> = ({
   //    case "alert":
   //      return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">Alerte</Badge>;
   //    case "message":
-   //     return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">Message</Badge>;
+   //     return <Badge variant="outline" className="bg-green-50 text-green-700  text-xs">Message</Badge>;
   //    case "email":
    //     return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs">Email</Badge>;
   //    default:
@@ -162,8 +162,8 @@ const DataTable: React.FC<DataTableProps> = ({
     const uniquePages = [...new Set(pagesToShow)].sort((a, b) => a - b);
 
     return (
-      <Pagination className="mt-4">
-        <PaginationContent>
+      <Pagination className="mt-4 flex-wrap gap-1">
+        <PaginationContent className="flex-wrap">
           <PaginationItem>
             <PaginationPrevious
               onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
@@ -214,15 +214,17 @@ const DataTable: React.FC<DataTableProps> = ({
   const hasActions = onRowClick || onDelete || onMarkAsRead || onViewDetails;
 
   return (
-    <div className="rounded-md border overflow-x-auto">
-      <Table>
+    <div className="rounded-md border overflow-x-auto -mx-3 sm:mx-0 max-w-[100vw] sm:max-w-full">
+      <Table className="min-w-[640px]">
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
-              <TableHead key={column.key}>{column.label}</TableHead>
+              <TableHead key={column.key} className="text-xs sm:text-sm whitespace-nowrap">
+                {column.label}
+              </TableHead>
             ))}
             {hasActions && (
-              <TableHead className="text-center sticky right-0 bg-background">
+              <TableHead className="text-center sticky right-0 bg-background text-xs sm:text-sm whitespace-nowrap">
                 Actions
               </TableHead>
             )}
@@ -231,7 +233,7 @@ const DataTable: React.FC<DataTableProps> = ({
         <TableBody>
           {currentData.length > 0 ? (
             currentData.map((item) => (
-              <TableRow 
+              <TableRow
                 key={item.id}
                 className={`
                   ${rowClassName ? rowClassName(item) : ''}
@@ -241,7 +243,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 onClick={() => onRowClick && onRowClick(item)}
               >
                 {columns.map((column) => (
-                  <TableCell key={`${item.id}-${column.key}`}>
+                  <TableCell key={`${item.id}-${column.key}`} className="text-xs sm:text-sm">
                     {column.render
                       ? column.render(item[column.key], item)
                       : item[column.key]}

@@ -16,14 +16,14 @@ interface ActivityTimelineProps {
 const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
   return (
     <div className="relative before:absolute before:left-[15px] before:top-0 before:h-full before:w-[2px] before:bg-muted">
-      <div className="space-y-6 relative">
+      <div className="space-y-3 sm:space-y-4 md:space-y-6 relative">
         {activities.map((activity, index) => (
           <div key={index} className="ml-8 relative">
             <div className="absolute left-[-25px] rounded-full bg-primary w-6 h-6 flex items-center justify-center text-white font-bold">
               {index + 1}
             </div>
             <div className="space-y-1">
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
                 <h3 className="font-medium">{activity.action}</h3>
                 <span className="text-xs text-muted-foreground">
                   {formatDistanceToNow(activity.date, { addSuffix: true, locale: fr })}

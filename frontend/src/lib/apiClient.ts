@@ -86,11 +86,11 @@ apiClient.interceptors.response.use(
         // window.location.href = "/";
         
         // Vous pouvez éventuellement afficher un toast pour informer l'utilisateur
-        // toast({
-        //   title: "Session expirée",
-        //   description: "Veuillez vous reconnecter",
-        //   variant: "destructive",
-        // });
+        toast({
+        title: "Session expirée",
+        description: "Veuillez vous reconnecter",
+        variant: "destructive",
+      });
         
         return Promise.reject(err);
       } finally {

@@ -2,11 +2,11 @@
 const envConfig = {
   api: {
     // Utilise VITE_API_URL pour Vite, avec fallback sur REACT_APP_API_URL pour compatibilité
-    baseURL: import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || "http://127.0.0.1:8000/api/",
+    baseURL: import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || "https://localhost:8000/api/",
     refreshEndpoint: "/token/refresh/",
   },
   websocket: {
-    url: import.meta.env.VITE_WS_URL || "ws://127.0.0.1:8000/api/",
+    url: import.meta.env.VITE_WS_URL || "ws://185.158.5.60:8000/api/",
   },
 };
 

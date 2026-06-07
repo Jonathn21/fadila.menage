@@ -8,9 +8,9 @@ import AppearanceSettings from "@/components/AppearanceSettings";
 const Settings = () => {
   return (
     <DashboardLayout>
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Paramètres</h1>
-        
+      <div className="w-full max-w-2xl mx-auto px-1 sm:px-0">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Paramètres</h1>
+
         <Tabs defaultValue="notifications">
           {/*<TabsList className="mb-4">
             <TabsTrigger value="notifications">Notifications</TabsTrigger>

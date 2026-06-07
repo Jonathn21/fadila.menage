@@ -40,7 +40,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <Alert className="bg-orange-50 border-orange-200 dark:bg-orange-950 dark:border-orange-800">
         <AlertDescription className="text-orange-800 dark:text-orange-200">
           Ceci est un aperçu de votre envoi. Il n'a pas encore été envoyé ! 
@@ -49,7 +49,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
         </AlertDescription>
       </Alert>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
         {/* Personal Information */}
         <Card>
           <CardHeader>
@@ -95,11 +95,11 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
           <CardTitle className="text-lg">Photo Passeport</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-6 items-start">
+          <div className="flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-6 items-start">
             {/* Informations de la photo */}
             <div className="flex-1">
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-muted rounded-lg gap-2 sm:gap-0">
                   <div className="flex items-center">
                     <Image className="h-4 w-4 mr-2 text-primary" />
                     <span className="font-medium">Statut</span>
@@ -118,11 +118,11 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
                 
                 {data.documents.photoPasseport && (
                   <div className="p-3 bg-muted rounded-lg">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                       <span className="font-medium">Nom du fichier :</span>
                       <span className="text-sm text-muted-foreground">{data.documents.photoPasseport.name}</span>
                     </div>
-                    <div className="flex items-center justify-between mt-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 gap-2 sm:gap-0">
                       <span className="font-medium">Taille :</span>
                       <span className="text-sm text-muted-foreground">
                         {(data.documents.photoPasseport.size / 1024 / 1024).toFixed(2)} MB
@@ -162,7 +162,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-muted rounded-lg gap-2 sm:gap-0">
               <div className="flex items-center">
                 <FileText className="h-4 w-4 mr-2 text-primary" />
                 <span className="font-medium">CV (Curriculum Vitae)</span>
@@ -177,7 +177,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
               </div>
             </div>
             
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-muted rounded-lg gap-2 sm:gap-0">
               <div className="flex items-center">
                 <FileText className="h-4 w-4 mr-2 text-primary" />
                 <span className="font-medium">Lettre de motivation</span>
@@ -192,7 +192,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
               </div>
             </div>
             
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-muted rounded-lg gap-2 sm:gap-0">
               <div className="flex items-center">
                 <FileText className="h-4 w-4 mr-2 text-primary" />
                 <span className="font-medium">Diplômes / Attestations</span>
@@ -213,9 +213,9 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
       </Card>
 
       {/* Validation Summary */}
-      <Card className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
+      <Card className="bg-green-50  dark:bg-green-950 dark:border-green-800">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
             <div>
               <h3 className="font-medium text-green-800 dark:text-green-200">
                 Votre demande est prête à être envoyée
@@ -229,7 +229,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
         </CardContent>
       </Card>
 
-      <div className="flex justify-between">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
         <Button 
           variant="outline" 
           onClick={onPrevious}

@@ -68,61 +68,11 @@ const FinalizeAcceptanceModal: React.FC<FinalizeAcceptanceModalProps> = ({
     }
   };
 
-  const handleDownloadTemporary = async () => {
-    if (!conventionTemporaireUrl) {
-      setDownloadError("URL de convention temporaire non disponible");
-      return;
-    }
-    
-    setIsDownloading(true);
-    setDownloadError(null);
-    
-    try {
-      const response = await apiClient.get(conventionTemporaireUrl, {
-        responseType: "blob",
-      });
-      
-      const blob = response.data;
-      
-      // Vérifier si le blob est valide
-      if (!blob || blob.size === 0) {
-        throw new Error("Le fichier téléchargé est vide");
-      }
-      
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `convention_${studentName.replace(/\s+/g, "_")}_a_signer.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Téléchargement réussi",
-        description: "La convention est prête à être signée",
-        variant: "default",
-      });
-      
-    } catch (error: any) {
-      console.error("Erreur téléchargement:", error);
-      setDownloadError(error.message || "Impossible de télécharger la convention");
-      
-      toast({
-        title: "Erreur",
-        description: "Impossible de télécharger la convention",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   const handleSubmit = async () => {
     if (!file) {
       toast({
         title: "Fichier manquant",
-        description: "Veuillez uploader la convention signée",
+        description: "Veuillez uploader la lettre signée",
         variant: "destructive",
       });
       return;
@@ -205,11 +155,11 @@ const FinalizeAcceptanceModal: React.FC<FinalizeAcceptanceModalProps> = ({
             Finaliser l'acceptation
           </DialogTitle>
           <DialogDescription>
-            Téléchargez la convention, faites-la signer, puis uploadez-la
+            Téléchargez la lettre de stage, faites-la signer, puis uploadez-la
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-3 sm:space-y-4 md:space-y-6 py-4">
           
 
           {/* Étape 2: Uploader */}
@@ -218,7 +168,7 @@ const FinalizeAcceptanceModal: React.FC<FinalizeAcceptanceModalProps> = ({
               <div className="space-y-4">
                 <div>
                   <h3 className="font-medium mb-2 flex items-center gap-2">
-                    Uploader la convention signée
+                    Uploader la lettre signée
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     Après signature, uploadez le PDF signé
@@ -240,7 +190,7 @@ const FinalizeAcceptanceModal: React.FC<FinalizeAcceptanceModalProps> = ({
                   />
                   
                   {file && (
-                    <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200">
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border ">
                       <FileText className="h-4 w-4 text-green-600" />
                       <div className="flex-1">
                         <p className="text-sm font-medium truncate">{file.name}</p>
@@ -275,16 +225,16 @@ const FinalizeAcceptanceModal: React.FC<FinalizeAcceptanceModalProps> = ({
                 Instructions importantes
               </h4>
               <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Téléchargez la convention générée</li>
+                <li>• Téléchargez la lettre de stage générée</li>
                 <li>• Imprimez-la et faites-la signer par les parties concernées</li>
-                <li>• Numérisez la convention signée au format PDF</li>
+                <li>• Numérisez la lettre signée au format PDF</li>
                 <li>• Uploadez le PDF signé pour finaliser l'acceptation</li>
               </ul>
             </CardContent>
           </Card>
         </div>
 
-        <DialogFooter className="flex justify-between">
+        <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
           <Button variant="outline" onClick={handleClose} disabled={isUploading}>
             Annuler
           </Button>

@@ -297,7 +297,7 @@ export const useProcessInternshipForm = () => {
 // ========================= //
 const FormSkeleton: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <div className="space-y-4">
         <Skeleton className="h-4 w-1/3" />
         <Skeleton className="h-10 w-full" />
@@ -306,7 +306,7 @@ const FormSkeleton: React.FC = () => {
         <Skeleton className="h-4 w-1/3" />
         <Skeleton className="h-10 w-full" />
       </div>
-      <div className="flex justify-between pt-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between pt-6 gap-2 sm:gap-0">
         <Skeleton className="h-10 w-24" />
         <Skeleton className="h-10 w-24" />
       </div>
@@ -335,7 +335,7 @@ const StepNavigation: React.FC<{
   isSubmitting = false 
 }) => {
   return (
-    <div className="flex justify-between pt-6">
+    <div className="flex flex-col sm:flex-row sm:justify-between pt-6 gap-2 sm:gap-0">
       <Button 
         type="button" 
         variant="outline" 
@@ -529,7 +529,7 @@ const RemunerationSection: React.FC<{
         control={form.control}
         name="isPaid"
         render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/20">
+          <FormItem className="flex flex-col sm:flex-row flex-row sm:items-center sm:justify-between rounded-lg border p-4 bg-muted/20 gap-2 sm:gap-0">
             <div className="space-y-0.5">
               <FormLabel className="text-base flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
@@ -596,7 +596,7 @@ const GeneralInfoStep: React.FC<{
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <EnhancedSelect
         form={form}
         name="internshipType"
@@ -639,7 +639,7 @@ const DepartmentStep: React.FC<{
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <EnhancedSelect
         form={form}
         name="department"
@@ -694,7 +694,7 @@ const FinalizationStep: React.FC<{
   const endDate = form.watch("endDate");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <EnhancedSelect
         form={form}
         name="supervisor"
@@ -716,7 +716,7 @@ const FinalizationStep: React.FC<{
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
         <DatePickerField
           form={form}
           name="startDate"
@@ -732,7 +732,7 @@ const FinalizationStep: React.FC<{
 
       {/* Affichage de la durée du stage */}
       {startDate && endDate && startDate < endDate && (
-        <div className="rounded-lg bg-green-50 p-4 border border-green-200">
+        <div className="rounded-lg bg-green-50 p-4 border ">
           <div className="flex items-center gap-2 text-green-800">
             <Calendar className="h-4 w-4" />
             <span className="text-sm font-medium">
@@ -764,8 +764,8 @@ const ProgressIndicator: React.FC<{
   steps: { label: string; description: string }[];
 }> = ({ currentStep, steps }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-start relative">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start relative gap-2 sm:gap-0">
         {steps.map((step, index) => (
           <div key={step.label} className="flex flex-col items-center flex-1 z-10">
             <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
@@ -832,43 +832,43 @@ const SummaryPreview: React.FC<{
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         {values.internshipType && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Type:</span>
             <span className="font-medium">{values.internshipType}</span>
           </div>
         )}
         {values.location && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Lieu:</span>
             <span className="font-medium">{values.location}</span>
           </div>
         )}
         {values.department && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Direction:</span>
             <span className="font-medium">{values.department}</span>
           </div>
         )}
         {values.service && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Service:</span>
             <span className="font-medium">{values.service}</span>
           </div>
         )}
         {values.startDate && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Début:</span>
             <span className="font-medium">{formatDate(values.startDate)}</span>
           </div>
         )}
         {values.endDate && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Fin:</span>
             <span className="font-medium">{formatDate(values.endDate)}</span>
           </div>
         )}
         {values.isPaid && values.amount && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Rémunération:</span>
             <span className="font-medium text-green-600">{values.amount} FCFA</span>
           </div>
@@ -959,7 +959,7 @@ const ProcessInternship = () => {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="container mx-auto py-6 space-y-6 max-w-4xl">
+        <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6 max-w-4xl">
           <div className="flex items-center gap-4">
             <Skeleton className="h-10 w-10 rounded" />
             <div className="space-y-2">
@@ -979,7 +979,7 @@ const ProcessInternship = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6 max-w-4xl">
+      <div className="container mx-auto py-6 space-y-3 sm:space-y-4 md:space-y-6 max-w-4xl">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -992,7 +992,7 @@ const ProcessInternship = () => {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight  bg-clip-text ">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight  bg-clip-text ">
                 Traitement de la demande
               </h1>
               <div className="flex items-center gap-2 mt-1">
@@ -1014,7 +1014,7 @@ const ProcessInternship = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {/* Main Form */}
           <div className="lg:col-span-2">
             <Card >
@@ -1034,7 +1034,7 @@ const ProcessInternship = () => {
               
               <CardContent>
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 md:space-y-6">
                     {currentStep === 0 && (
                       <GeneralInfoStep 
                         form={form}  
@@ -1069,7 +1069,7 @@ const ProcessInternship = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-3 sm:space-y-4 md:space-y-6">
             <SummaryPreview form={form} />
             
             {/* Quick Stats */}
@@ -1080,17 +1080,17 @@ const ProcessInternship = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex justify-between text-sm">
+                <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                   <span className="text-muted-foreground">Étape actuelle:</span>
                   <span className="font-medium">{currentStep + 1}/{steps.length}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                   <span className="text-muted-foreground">Statut:</span>
                   <Badge variant={currentStep === 2 ? "default" : "secondary"}>
                     {currentStep === 2 ? "Finalisation" : "En cours"}
                   </Badge>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2 sm:gap-0">
                   <span className="text-muted-foreground">Validation:</span>
                   <Badge variant={form.formState.isValid ? "default" : "secondary"}>
                     {form.formState.isValid ? "Valide" : "En attente"}

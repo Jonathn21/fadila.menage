@@ -92,7 +92,7 @@ const InternshipApplicationForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 md:space-y-6">
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Informations personnelles</h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

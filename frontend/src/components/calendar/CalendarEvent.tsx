@@ -71,7 +71,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         };
       case 'terminé':
         return {
-          bgColor: 'bg-green-50 border-green-200 text-green-700',
+          bgColor: 'bg-green-50  text-green-700',
           icon: <CheckCircle className="h-3 w-3" />,
           textColor: 'text-green-700'
         };

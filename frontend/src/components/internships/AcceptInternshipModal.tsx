@@ -59,9 +59,6 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -113,22 +110,22 @@ const locations = [
 ];
 
 const departments = [
-  { value: "DARH", label: "DARH", description: "Direction des Affaires et Ressources Humaines" },
-  { value: "DCGIS", label: "DCGIS", description: "Direction du Centre de Gestion de l'Information et des Statistiques" },
-  { value: "DEPP", label: "DEPP", description: "Direction des Études, Planification et Projets" },
+  { value: "DARH", label: "DARH", description: "Direction de l'Administration et Ressources Humaines" },
+  { value: "DCGIS", label: "DCGIS", description: "Direction du Contrôle et de Gestion de l’Informatique et de la Statistique" },
+  { value: "DEPP", label: "DEPP", description: "Direction des Études, de la Planification et des Projets" },
   { value: "DT", label: "DT", description: "Direction Technique" },
   { value: "DM", label: "DM", description: "Direction des Marchés" },
-  { value: "DFC", label: "DFC", description: "Direction Financière et Comptable" },
+  { value: "DFC", label: "DFC", description: "Direction des Finances et de la Comptabilité" },
   { value: "DG", label: "DG", description: "Direction Générale" },
 ];
 
 const servicesByDepartment = {
   DARH: ["Administration et Archives", "Ressources Humaines et Affaires Sociales", "Secrétariat"],
-  DCGIS: ["Informatique", "Statistique", "Secrétariat"],
-  DM: ["Préparation et Suivi des Marchés", "Exécutions des Marchés, Approvisionnement et Exonérations"],
-  DT: ["Mouvements d'Energie - Dispathing", "Entretient et Télécommunications"],
-  DEPP: ["Planiification Etudes et Préparation des Projets", "Service Environnement, Génie Civil et Mécanique"],
-  DFC: ["Comptabilité", "Finance", "Infrastructures et Logistique"],
+  DCGIS: ["Informatique et Statistique", "Contrôle et Suivi du Budget et des Coûts et Prix","Budget", "Secrétariat"],
+  DM: ["Préparation et Suivi des Marchés", "Exécutions des Marchés, Approvisionnement et Exonérations", "Secrétariat"],
+  DT: ["Mouvements d'Energie - Dispathing", "Entretien et Télécommunications", "Secrétariat"],
+  DEPP: ["Planification Etudes et Préparation des Projets", "Service Environnement, Génie Civil et Mécanique", "Suivi,Contrôle et Exécution des Projets", "Secrétariat"],
+  DFC: ["Comptabilité", "Finance", "Infrastructures et Logistique", "Secrétariat"],
   DG: ["Communication", "Gestion des ressources financières"],
 };
 
@@ -150,8 +147,8 @@ const ProgressIndicator: React.FC<{
   steps: { label: string; description: string }[];
 }> = ({ currentStep, steps }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-start relative">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start relative gap-2 sm:gap-0">
         {steps.map((step, index) => (
           <div key={step.label} className="flex flex-col items-center flex-1 z-10">
             <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
@@ -325,7 +322,7 @@ const RemunerationSection: React.FC<{
         control={form.control}
         name="isPaid"
         render={({ field }: any) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/20">
+          <FormItem className="flex flex-col sm:flex-row flex-row sm:items-center sm:justify-between rounded-lg border p-4 bg-muted/20 gap-2 sm:gap-0">
         <div className="space-y-0.5">
           <FormLabel className="text-base flex items-center gap-2">
             <Coins className="h-4 w-4" />
@@ -398,7 +395,7 @@ const StepNavigation: React.FC<{
   isSubmitting = false 
 }) => {
   return (
-    <div className="flex justify-between pt-6">
+    <div className="flex flex-col sm:flex-row sm:justify-between pt-6 gap-2 sm:gap-0">
       <Button 
         type="button" 
         variant="outline" 
@@ -420,12 +417,12 @@ const StepNavigation: React.FC<{
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Générer la convention
+              Générer la lettre de stage
             </>
           ) : (
             <>
               <FileText className="h-4 w-4" />
-              Générer la convention
+              Générer la lettre de stage
             </>
           )}
         </Button>
@@ -470,43 +467,43 @@ const SummaryPreview: React.FC<{
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         {values.internshipType && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Type:</span>
             <span className="font-medium">{values.internshipType}</span>
           </div>
         )}
         {values.location && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Lieu:</span>
             <span className="font-medium">{values.location}</span>
           </div>
         )}
         {values.department && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Direction:</span>
             <span className="font-medium">{values.department}</span>
           </div>
         )}
         {values.service && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Service:</span>
             <span className="font-medium">{values.service}</span>
           </div>
         )}
         {values.startDate && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Début:</span>
             <span className="font-medium">{formatDate(values.startDate)}</span>
           </div>
         )}
         {values.endDate && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Fin:</span>
             <span className="font-medium">{formatDate(values.endDate)}</span>
           </div>
         )}
         {values.isPaid && values.amount && (
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
             <span className="text-muted-foreground">Rémunération:</span>
             <span className="font-medium text-green-600">{values.amount?.toLocaleString()} FCFA</span>
           </div>
@@ -657,7 +654,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
 
       toast({
         title: "Demande pré-acceptée avec succès",
-        description: response.data.message || "La convention a été générée. Téléchargez-la pour signature.",
+        description: response.data.message || "La lettre de stage a été générée. Téléchargez-la pour signature.",
         variant: "default",
       });
 
@@ -706,7 +703,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `convention_${studentName.replace(/\s+/g, "_")}_a_signer.pdf`;
+      link.download = `lettre_${studentName.replace(/\s+/g, "_")}_a_signer.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -714,12 +711,12 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
       
       toast({
         title: "Téléchargement réussi",
-        description: "La convention est prête à être signée",
+        description: "La lettre de stage est prête à être signée",
       });
     } catch (error) {
       toast({
         title: "Erreur",
-        description: "Impossible de télécharger la convention",
+        description: "Impossible de télécharger la lettre de stage",
         variant: "destructive",
       });
     }
@@ -735,7 +732,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
     switch (currentStep) {
       case 0: return "Informations générales du stage";
       case 1: return "Affectation du service";
-      case 2: return generatedPdf ? "Convention générée" : "Finalisation du stage";
+      case 2: return generatedPdf ? "Lettre générée" : "Finalisation du stage";
       default: return "Acceptation de la demande";
     }
   };
@@ -745,8 +742,8 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
       case 0: return "Définissez le type et le lieu du stage";
       case 1: return "Sélectionnez la direction et le service d'affectation";
       case 2: return generatedPdf 
-        ? "Téléchargez la convention pour signature" 
-        : "Complétez les détails et générez la convention";
+        ? "Téléchargez la lettre pour signature" 
+        : "Complétez les détails et générez la lettre de stage";
       default: return "Veuillez remplir le formulaire d'acceptation";
     }
   };
@@ -759,11 +756,12 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
         return !!(values.internshipType?.trim() && values.location?.trim());
       case 1:
         return !!(values.department?.trim() && values.service?.trim());
-      case 2:
+      case 2: {
         const hasValidDates = values.startDate && values.endDate;
         const noDateError = hasValidDates && values.startDate < values.endDate;
         const hasValidAmount = !values.isPaid || (values.isPaid && values.amount && values.amount > 0);
         return !!(hasValidDates && noDateError && hasValidAmount);
+      }
       default:
         return false;
     }
@@ -820,19 +818,19 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
               <CheckCircle className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <DialogTitle className="text-2xl font-bold tracking-tight">
-                {generatedPdf ? "Convention générée" : "Accepter la demande"}
+              <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
+                {generatedPdf ? "Lettre de stage générée" : "Accepter la demande"}
               </DialogTitle>
               <DialogDescription className="text-base">
                 {generatedPdf 
-                  ? "Téléchargez la convention pour signature" 
+                  ? "Téléchargez la lettre pour signature" 
                   : `Créez un stage pour ${studentName}`}
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4 md:space-y-6">
           {/* Progress Indicator */}
           <Card className="bg-gradient-to-r from-muted/50 to-muted/30">
             <CardContent className="pt-6">
@@ -842,16 +840,16 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
 
           {/* Affichage du PDF généré */}
           {generatedPdf && (
-            <Card className="border-green-200 bg-green-50/20">
+            <Card className=" bg-green-50/20">
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
                     <FileText className="h-8 w-8 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">Convention générée avec succès</h3>
+                    <h3 className="text-lg font-semibold">Lettre de stage générée avec succès</h3>
                     <p className="text-muted-foreground mt-1">
-                      La convention de stage a été générée. Téléchargez-la pour la faire signer.
+                      La lettre de stage a été générée. Téléchargez-la pour la faire signer.
                     </p>
                   </div>
                   <div className="flex gap-3 mt-4">
@@ -860,7 +858,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
                       className="gap-2"
                     >
                       <Download className="h-4 w-4" />
-                      Télécharger la convention
+                      Télécharger la lettre de stage
                     </Button>
                     <Button
                       variant="outline"
@@ -870,7 +868,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Après signature, uploadez la convention signée depuis la page de la demande.
+                    Après signature, uploadez la lettre signée depuis la page de la demande.
                   </p>
                 </div>
               </CardContent>
@@ -879,7 +877,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
 
           {/* Formulaire (uniquement si pas de PDF généré) */}
           {!generatedPdf && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
               {/* Main Form */}
               <div className="lg:col-span-2">
                 <Card>
@@ -899,10 +897,10 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
                   
                   <CardContent>
                     <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 md:space-y-6">
                         {/* Étape 1: Informations générales */}
                         {currentStep === 0 && (
-                          <div className="space-y-6">
+                          <div className="space-y-3 sm:space-y-4 md:space-y-6">
                             <EnhancedSelect
                               form={form}
                               name="internshipType"
@@ -931,7 +929,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
 
                         {/* Étape 2: Affectation */}
                         {currentStep === 1 && (
-                          <div className="space-y-6">
+                          <div className="space-y-3 sm:space-y-4 md:space-y-6">
                             <EnhancedSelect
                               form={form}
                               name="department"
@@ -972,7 +970,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
 
                         {/* Étape 3: Finalisation */}
                         {currentStep === 2 && (
-                          <div className="space-y-6">
+                          <div className="space-y-3 sm:space-y-4 md:space-y-6">
                             {/*<EnhancedSelect
                               form={form}
                               name="supervisor"
@@ -994,7 +992,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
                               </div>
                             )}*/}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                               <DatePickerField
                                 form={form}
                                 name="startDate"
@@ -1028,7 +1026,7 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
 
                             {/* Affichage de la durée du stage */}
                             {watchStartDate && watchEndDate && watchStartDate < watchEndDate && (
-                              <div className="rounded-lg bg-green-50 p-4 border border-green-200">
+                              <div className="rounded-lg bg-green-50 p-4 border ">
                                 <div className="flex items-center gap-2 text-green-800">
                                   <Calendar className="h-4 w-4" />
                                   <span className="text-sm font-medium">
@@ -1058,35 +1056,10 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
               </div>
 
               {/* Sidebar */}
-              <div className="space-y-6">
+              <div className="space-y-3 sm:space-y-4 md:space-y-6">
                 <SummaryPreview form={form} />
                 
-                {/* Quick Stats */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium">
-                      Progression
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Étape actuelle:</span>
-                      <span className="font-medium">{currentStep + 1}/{steps.length}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Statut:</span>
-                      <Badge variant={currentStep === 2 ? "default" : "secondary"}>
-                        {currentStep === 2 ? "Finalisation" : "En cours"}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Validation:</span>
-                      <Badge variant={form.formState.isValid ? "default" : "secondary"}>
-                        {form.formState.isValid ? "Valide" : "En attente"}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
+                
 
                 {/* Informations sur la demande */}
                 <Card className="bg-muted/20 border-muted">
@@ -1097,25 +1070,25 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
-                    <div className="flex justify-between">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
                       <span className="text-muted-foreground">Candidat:</span>
                       <span className="font-medium">{studentName}</span>
                     </div>
                     {existingData?.type_stage && (
-                      <div className="flex justify-between">
+                      <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
                         <span className="text-muted-foreground">Type demandé:</span>
                         <span className="font-medium">{existingData.type_stage}</span>
                       </div>
                     )}
                     {existingData?.specialite && (
-                      <div className="flex justify-between">
+                      <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
                         <span className="text-muted-foreground">Spécialité:</span>
                         <span className="font-medium">{existingData.specialite}</span>
                       </div>
                     )}
                     <div className="pt-2 mt-2 border-t">
                       <p className="text-xs text-muted-foreground">
-                        Cette action générera une convention de stage à signer.
+                        Cette action générera une lettre de stage à signer.
                       </p>
                     </div>
                   </CardContent>

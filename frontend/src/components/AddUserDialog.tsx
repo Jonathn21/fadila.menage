@@ -38,7 +38,7 @@ const formSchema = z.object({
   first_name: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères" }),
   last_name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères" }),
   email: z.string().email({ message: "Veuillez entrer une adresse email valide" }),
-  role: z.enum(["Admin", "Utilisateur"], {
+  role: z.enum(["Administrateur", "Utilisateur", "Superutilisateur"], {
     required_error: "Veuillez sélectionner un rôle",
   }),
   password: z.string().min(8, { message: "Le mot de passe doit contenir au moins 8 caractères" }),
@@ -95,19 +95,19 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children || (
-          <Button className="gap-2">
+          <Button className="gap-2 bg-green-700 hover:bg-green-600 text-white">
             <UserPlus className="h-4 w-4" />
             Ajouter un utilisateur
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] ">
         <DialogHeader>
-          <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mb-4 mx-auto">
-            <UserPlus className="h-6 w-6 text-primary" />
+          <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4 mx-auto">
+            <UserPlus className="h-6 w-6 text-green-600" />
           </div>
-          <DialogTitle className="text-center text-xl">Ajouter un nouvel utilisateur</DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogTitle className="text-center text-xl text-green-900">Ajouter un nouvel utilisateur</DialogTitle>
+          <DialogDescription className="text-center text-green-600">
             Remplissez les informations pour créer un nouveau compte utilisateur
           </DialogDescription>
         </DialogHeader>
@@ -115,27 +115,39 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="first_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Prénom *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Jean" {...field} disabled={isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
               <FormField
                 control={form.control}
                 name="last_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nom *</FormLabel>
+                    <FormLabel className="text-green-700">Nom *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Dupont" {...field} disabled={isLoading} />
+                      <Input 
+                        placeholder="Dupont" 
+                        {...field} 
+                        disabled={isLoading}
+                        className=" focus-visible:ring-green-500 text-green-900"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="first_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-green-700">Prénom *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Jean" 
+                        {...field} 
+                        disabled={isLoading}
+                        className=" focus-visible:ring-green-500 text-green-900"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -148,13 +160,14 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email *</FormLabel>
+                  <FormLabel className="text-green-700">Email *</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="utilisateur@cebnet.org" 
                       type="email" 
                       {...field} 
                       disabled={isLoading}
+                      className=" focus-visible:ring-green-500 text-green-900"
                     />
                   </FormControl>
                   <FormMessage />
@@ -167,20 +180,21 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Rôle *</FormLabel>
+                  <FormLabel className="text-green-700">Rôle *</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                     disabled={isLoading}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className=" focus:ring-green-500 text-green-900">
                         <SelectValue placeholder="Sélectionner un rôle" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Utilisateur">Utilisateur</SelectItem>
-                      <SelectItem value="Admin">Administrateur</SelectItem>
+                      <SelectItem value="Utilisateur" className="focus:bg-green-50">Utilisateur</SelectItem>
+                      <SelectItem value="Administrateur" className="focus:bg-green-50">Administrateur</SelectItem>
+                      <SelectItem value="Superutilisateur" className="focus:bg-green-50">Superutilisateur</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -193,7 +207,7 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mot de passe *</FormLabel>
+                  <FormLabel className="text-green-700">Mot de passe *</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input 
@@ -201,7 +215,7 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
                         placeholder="********" 
                         {...field} 
                         disabled={isLoading}
-                        className="pr-10"
+                        className="pr-10  focus-visible:ring-green-500 text-green-900 placeholder:text-green-400"
                       />
                       <button
                         type="button"
@@ -210,15 +224,15 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
                         disabled={isLoading}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          <EyeOff className="h-4 w-4 text-green-600" />
                         ) : (
-                          <Eye className="h-4 w-4 text-muted-foreground" />
+                          <Eye className="h-4 w-4 text-green-600" />
                         )}
                       </button>
                     </div>
                   </FormControl>
                   <FormMessage />
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-green-600 mt-1">
                     Minimum 8 caractères
                   </p>
                 </FormItem>
@@ -231,13 +245,14 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
                 variant="outline" 
                 onClick={() => setOpen(false)}
                 disabled={isLoading}
+                className=" text-green-700 hover:bg-green-50 hover:text-green-800 hover:border-green-300"
               >
                 Annuler
               </Button>
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className="gap-2"
+                className="gap-2 bg-red-600 hover:bg-green-600 text-white"
               >
                 {isLoading ? (
                   <>

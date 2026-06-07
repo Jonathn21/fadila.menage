@@ -31,8 +31,8 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     <div className="min-h-screen bg-background">
      
 
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <Card className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
+      <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8 max-w-2xl">
+        <Card className=" bg-green-50 dark:bg-green-950 dark:border-green-800">
           <CardHeader className="text-center pb-4">
             <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-4">
               <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -41,7 +41,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               Demande soumise avec succès !
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-3 sm:space-y-4 md:space-y-6">
             <div className="text-center text-green-700 dark:text-green-300">
               <p className="mb-4">
                 Merci pour votre candidature ! Votre demande de stage a été
@@ -54,7 +54,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg border">
+            <div className="bg-white dark:bg-gray-900 p-3 sm:p-4 md:p-6 rounded-lg border">
               <h3 className="font-semibold mb-3 flex items-center">
                 <Mail className="mr-2 h-5 w-5 text-primary" />
                 Code de suivi de votre demande

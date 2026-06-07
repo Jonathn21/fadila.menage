@@ -87,7 +87,7 @@ const ScoreDetailsModal: React.FC<ScoreDetailsModalProps> = ({
     switch (priority?.toUpperCase()) {
       case "ÉLEVÉ": return "text-red-600 bg-red-50 border-red-200";
       case "MOYEN": return "text-orange-600 bg-orange-50 border-orange-200";
-      case "FAIBLE": return "text-green-600 bg-green-50 border-green-200";
+      case "FAIBLE": return "text-green-600 bg-green-50 ";
       default: return "text-gray-600 bg-gray-50 border-gray-200";
     }
   };
@@ -105,7 +105,7 @@ const ScoreDetailsModal: React.FC<ScoreDetailsModalProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] p-0 overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
             <div className="flex-1">
               <DialogTitle className="flex items-center gap-2 text-xl">
                 <Star className="h-5 w-5 text-blue-600" />
@@ -127,11 +127,11 @@ const ScoreDetailsModal: React.FC<ScoreDetailsModalProps> = ({
         </DialogHeader>
 
         <ScrollArea className="h-[calc(90vh-140px)]">
-          <div className="p-6 space-y-6">
+          <div className="p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4 md:space-y-6">
             {/* Score Summary */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white border rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">{score}/100</div>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{score}/100</div>
                 <div className="text-xs text-muted-foreground">Score global</div>
               </div>
               <div className="bg-white border rounded-lg p-4 text-center">
@@ -169,11 +169,11 @@ const ScoreDetailsModal: React.FC<ScoreDetailsModalProps> = ({
 
                   return (
                     <div key={critere.key} className="space-y-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0">
                         <div className="flex items-start gap-3 flex-1">
                           <IconComponent className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
                           <div className="flex-1">
-                            <div className="flex items-center justify-between mb-1">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 gap-2 sm:gap-0">
                               <span className="font-medium text-sm">{critere.label}</span>
                               <Badge variant="secondary" className="ml-2">
                                 {Math.round(scoreValue)}/{critere.max} pts
@@ -207,7 +207,7 @@ const ScoreDetailsModal: React.FC<ScoreDetailsModalProps> = ({
 
             {/* Points forts et améliorations */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="bg-green-50 border  rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
                   <h3 className="font-semibold text-green-900">Points Forts</h3>
