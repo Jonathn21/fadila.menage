@@ -10,6 +10,7 @@ const PublicHeader = () => {
   const menuItems = [
     { label: "Soumettre une demande", path: "/" },
     { label: "Suivre ma demande", path: "/suivi-demande" },
+    { label: "Demande d'attestation", path: "/demande-attestation" },
   ];
 
   const isActive = (path: string) => location.pathname === path;

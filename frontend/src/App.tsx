@@ -32,6 +32,7 @@ import ArchivedInternships from "./pages/internships/ArchivedInternships";
 import ProcessInternship from "./pages/ProcessInternship";
 import PublicInternshipApplication from "./pages/PublicInternshipApplication";
 import TrackApplication from "./pages/TrackApplication";
+import PublicAttestationRequest from "./pages/PublicAttestationRequest";
 
 
 
@@ -88,6 +89,7 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<PublicInternshipApplication />} />
             <Route path="/suivi-demande" element={<TrackApplication />} />
+            <Route path="/demande-attestation" element={<PublicAttestationRequest />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
