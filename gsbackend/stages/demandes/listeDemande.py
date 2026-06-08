@@ -1,6 +1,5 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.db.models import Q
 from ..models import Demande
@@ -18,8 +17,6 @@ class DemandeBaseAPIView(APIView):
     """Classe de base pour toutes les vues de demande"""
     permission_classes = [IsAuthenticated]
     serializer_class = DemandeSerializer
-    page_size = 10
-    
     # Surcharger ces attributs dans les classes filles
     base_queryset = Demande.objects.all()
     default_ordering = "-date_soumission"
@@ -69,27 +66,20 @@ class DemandeBaseAPIView(APIView):
             
         return queryset
 
-    def get_paginator(self):
-        """Retourne le paginateur configuré"""
-        paginator = PageNumberPagination()
-        paginator.page_size = self.page_size
-        return paginator
-
     def get(self, request):
         """Méthode GET standardisée"""
         try:
             # Récupération et filtrage du queryset
             queryset = self.get_queryset()
             queryset = self.apply_filters(queryset, request)
-            
-            # Pagination
-            paginator = self.get_paginator()
-            result_page = paginator.paginate_queryset(queryset, request)
-            
+
             # Sérialisation
-            serializer = self.serializer_class(result_page, many=True)
-            
-            return paginator.get_paginated_response(serializer.data)
+            serializer = self.serializer_class(queryset, many=True)
+
+            return Response({
+                "count": len(serializer.data),
+                "results": serializer.data
+            })
             
         except Exception as e:
             logger.error(f"Erreur dans {self.__class__.__name__}: {str(e)}")

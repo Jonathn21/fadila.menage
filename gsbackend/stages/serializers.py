@@ -38,17 +38,18 @@ class DemandeSerializer(serializers.ModelSerializer):
     diplomes = DiplomeSerializer(many=True, read_only=True)
     score_badge = serializers.SerializerMethodField()
     score_color = serializers.SerializerMethodField()
+    date_acceptation = serializers.DateTimeField(source='date_pre_acceptation', read_only=True)
 
-    
+
     class Meta:
         model = Demande
         fields = [
-            'id', 'tracking_id', 'etudiant_nom', 'etudiant_prenom', 
+            'id', 'tracking_id', 'etudiant_nom', 'etudiant_prenom',
             'etudiant_email','genre', 'etudiant_telephone', 'etudiant_specialite',
             'etudiant_niveau', 'type_stage', 'statut_stage', 'date_soumission',
             'etablissement', 'diplomes', 'cv', 'lettre_motivation', 'resume_cv','score_ia',
             'score_details', 'score_commentaire', 'score_date',
-            'score_badge', 'score_color'
+            'score_badge', 'score_color', 'date_acceptation'
         ]
 
     def get_score_badge(self, obj):
