@@ -470,6 +470,7 @@ class SuiviDemandeAPIView(APIView):
                 "infos_supplementaires": None,
                 "date_examen": None,
                 "motif_refus": demande.raison_refus if demande.statut_stage == "Refusée" else None,
+                "date_acceptation": demande.date_pre_acceptation.isoformat() if demande.date_pre_acceptation else None,
                 "documents": documents,
                 "photo_passeport": photo_passeport_url,
             }

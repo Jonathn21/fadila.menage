@@ -38,6 +38,7 @@ interface ApplicationStatus {
   prochaines_etapes?: string;
   infos_supplementaires?: string;
   date_examen?: string;
+  date_acceptation?: string;
   motif_refus?: string;
   documents?: Array<{
     nom: string;
@@ -1111,6 +1112,15 @@ const TrackApplication = () => {
                       <strong>Soumise le:</strong> {formatDate(application.date_soumission)}
                     </span>
                   </div>
+
+                  {application.date_acceptation && (
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
+                      <span>
+                        <strong>Acceptée le:</strong> {formatDate(application.date_acceptation)}
+                      </span>
+                    </div>
+                  )}
 
                 </div>
 
