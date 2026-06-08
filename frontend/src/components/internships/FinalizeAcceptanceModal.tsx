@@ -190,9 +190,9 @@ const FinalizeAcceptanceModal: React.FC<FinalizeAcceptanceModalProps> = ({
                   />
                   
                   {file && (
-                    <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border ">
-                      <FileText className="h-4 w-4 text-green-600" />
-                      <div className="flex-1">
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border overflow-hidden">
+                      <FileText className="h-4 w-4 text-green-600 shrink-0" />
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{file.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {(file.size / 1024 / 1024).toFixed(2)} MB
@@ -202,7 +202,7 @@ const FinalizeAcceptanceModal: React.FC<FinalizeAcceptanceModalProps> = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => setFile(null)}
-                        className="h-8 w-8 p-0"
+                        className="h-8 w-8 p-0 shrink-0"
                       >
                         ×
                       </Button>

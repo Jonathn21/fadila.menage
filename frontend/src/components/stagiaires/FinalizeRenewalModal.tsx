@@ -443,7 +443,7 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                     />
                     <label htmlFor="file-upload" className="cursor-pointer block">
                       <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                      <p className="font-medium mb-1">
+                      <p className="font-medium mb-1 truncate max-w-full px-2">
                         {file ? file.name : "Cliquez pour sélectionner un fichier"}
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -456,21 +456,19 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                   </div>
                   
                   {file && (
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg bg-green-50 border border-green-200 gap-2 sm:gap-0">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-green-600" />
-                        <div>
-                          <p className="text-sm font-medium truncate">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {(file.size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        </div>
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200 overflow-hidden">
+                      <FileText className="h-5 w-5 text-green-600 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{file.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setFile(null)}
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                        className="h-8 w-8 p-0 shrink-0 text-red-600 hover:text-red-700"
                       >
                         ×
                       </Button>
