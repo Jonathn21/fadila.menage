@@ -1326,10 +1326,12 @@ class DemandeAttestation(models.Model):
         related_name='demande_attestation'
     )
 
-    # 📄 DOCUMENTS OBLIGATOIRES
+    # 📄 DOCUMENTS
     rapport_stage = models.FileField(
         upload_to='demandes_attestation/rapports/',
-        help_text="Rapport de stage signé"
+        help_text="Rapport de stage signé (obligatoire pour stages académiques et libres)",
+        blank=True,
+        null=True
     )
 
     demande_manuscrite = models.FileField(

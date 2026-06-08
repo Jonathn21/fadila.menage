@@ -15,6 +15,7 @@ const PublicAttestationRequest = () => {
   const [trackingId, setTrackingId] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [verified, setVerified] = useState(false);
+  const [typeStage, setTypeStage] = useState<string>("");
   const [stagiaireInfo, setStagiaireInfo] = useState<{
     nom: string;
     prenom: string;
@@ -37,6 +38,7 @@ const PublicAttestationRequest = () => {
     setError(null);
     setVerified(false);
     setStagiaireInfo(null);
+    setTypeStage("");
 
     try {
       const res = await apiClient.get(`suivi-demande/${trackingId.trim()}/`);
@@ -64,6 +66,7 @@ const PublicAttestationRequest = () => {
         prenom: data.stagiaire.prenom,
         statut: data.stage.statut_actuel,
       });
+      setTypeStage(data.type_stage || "");
       setVerified(true);
     } catch (e: any) {
       if (e.response?.status === 404) {
@@ -172,6 +175,7 @@ const PublicAttestationRequest = () => {
           <AttestationRequest
             trackingId={trackingId.trim()}
             onSearch={handleRefresh}
+            typeStage={typeStage}
           />
         )}
       </main>

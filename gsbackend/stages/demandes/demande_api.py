@@ -3509,29 +3509,33 @@ class DemandeAttestationAPIView(APIView):
                     "message": f"Impossible de soumettre une nouvelle demande. Statut actuel : {existing_demande.get_statut_display()}"
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # 5. Valider les fichiers
-            if 'rapport_stage' not in request.FILES:
+            # 5. Valider les fichiers selon le type de stage
+            # Fonctionnel = demande manuscrite uniquement
+            # Académique/Libre = rapport de stage + demande manuscrite
+            rapport_requis = stagiaire.type_stage in ("Académique", "Libre")
+
+            if rapport_requis and 'rapport_stage' not in request.FILES:
                 return Response({
                     "success": False,
-                    "message": "Le rapport de stage est obligatoire."
+                    "message": "Le rapport de stage est obligatoire pour un stage académique ou libre."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             if 'demande_manuscrite' not in request.FILES:
                 return Response({
                     "success": False,
                     "message": "La demande manuscrite est obligatoire."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
-            rapport_file = request.FILES['rapport_stage']
+
+            rapport_file = request.FILES.get('rapport_stage')
             demande_file = request.FILES['demande_manuscrite']
-            
+
             # Valider les extensions
-            if not rapport_file.name.lower().endswith('.pdf'):
+            if rapport_file and not rapport_file.name.lower().endswith('.pdf'):
                 return Response({
                     "success": False,
                     "message": "Le rapport de stage doit être au format PDF."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             allowed_extensions = ['.pdf', '.jpg', '.jpeg', '.png']
             demande_ext = os.path.splitext(demande_file.name)[1].lower()
             if demande_ext not in allowed_extensions:
@@ -3539,15 +3543,15 @@ class DemandeAttestationAPIView(APIView):
                     "success": False,
                     "message": "La demande manuscrite doit être en PDF, JPG ou PNG."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             # 6. Valider la taille des fichiers (max 10MB)
             max_size = 10 * 1024 * 1024  # 10MB
-            if rapport_file.size > max_size:
+            if rapport_file and rapport_file.size > max_size:
                 return Response({
                     "success": False,
                     "message": f"Le rapport de stage est trop volumineux. Taille max: 10MB"
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             if demande_file.size > max_size:
                 return Response({
                     "success": False,
@@ -3574,7 +3578,8 @@ class DemandeAttestationAPIView(APIView):
                         logger.warning(f"⚠️ Impossible de supprimer l'ancienne demande: {e}")
                 
                 # Mettre à jour la demande existante
-                existing_demande.rapport_stage = rapport_file
+                if rapport_file:
+                    existing_demande.rapport_stage = rapport_file
                 existing_demande.demande_manuscrite = demande_file
                 existing_demande.statut = 'en_attente'
                 existing_demande.motif_refus = None
@@ -3589,10 +3594,11 @@ class DemandeAttestationAPIView(APIView):
                 # 8. Créer une nouvelle demande d'attestation
                 demande_attestation_data = {
                     'stagiaire': stagiaire.id,
-                    'rapport_stage': rapport_file,
                     'demande_manuscrite': demande_file,
                     'statut': 'en_attente'
                 }
+                if rapport_file:
+                    demande_attestation_data['rapport_stage'] = rapport_file
                 
                 serializer = DemandeAttestationSerializer(data=demande_attestation_data)
                 

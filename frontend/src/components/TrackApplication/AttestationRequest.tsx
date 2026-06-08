@@ -11,12 +11,15 @@ import { useToast } from "@/hooks/use-toast";
 interface AttestationRequestProps {
   trackingId: string;
   onSearch: () => void;
+  typeStage?: string;
 }
 
 export const AttestationRequest: React.FC<AttestationRequestProps> = ({
   trackingId,
-  onSearch
+  onSearch,
+  typeStage
 }) => {
+  const rapportRequis = typeStage !== "Fonctionnel";
   const [rapportStage, setRapportStage] = useState<File | null>(null);
   const [demandeManuscrite, setDemandeManuscrite] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,17 +30,26 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
   const { toast } = useToast();
 
   const handleSubmitAttestation = async () => {
-    if (!rapportStage || !demandeManuscrite || !trackingId) {
+    if (!demandeManuscrite || !trackingId) {
       toast({
         title: "Champs requis",
-        description: "Veuillez sélectionner le rapport de stage ET la demande manuscrite",
+        description: "Veuillez sélectionner les documents requis",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (rapportRequis && !rapportStage) {
+      toast({
+        title: "Champs requis",
+        description: "Le rapport de stage est obligatoire pour un stage académique ou libre",
         variant: "destructive",
       });
       return;
     }
 
     // Vérifier les types de fichiers
-    if (!rapportStage.name.toLowerCase().endsWith('.pdf')) {
+    if (rapportStage && !rapportStage.name.toLowerCase().endsWith('.pdf')) {
       toast({
         title: "Format invalide",
         description: "Le rapport de stage doit être au format PDF",
@@ -58,7 +70,9 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
     }
 
     const formData = new FormData();
-    formData.append("rapport_stage", rapportStage);
+    if (rapportStage) {
+      formData.append("rapport_stage", rapportStage);
+    }
     formData.append("demande_manuscrite", demandeManuscrite);
 
     setIsSubmitting(true);
@@ -144,24 +158,30 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
         <div className="p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-lg">
           <h4 className="font-medium text-amber-800 mb-1 sm:mb-2 text-sm sm:text-base">Informations importantes</h4>
           <ul className="text-xs sm:text-sm text-amber-700 space-y-1">
-            <li>• Le rapport de stage doit être au format PDF</li>
+            {rapportRequis && <li>• Le rapport de stage doit être au format PDF</li>}
             <li>• La demande manuscrite doit être signée et scannée</li>
-            <li>• Les deux documents sont obligatoires pour traiter votre demande</li>
+            {rapportRequis ? (
+              <li>• Les deux documents sont obligatoires pour traiter votre demande</li>
+            ) : (
+              <li>• Seule la demande manuscrite est requise pour un stage fonctionnel</li>
+            )}
             <li>• Vous recevrez un email de confirmation après soumission</li>
           </ul>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          <FileUploadCard
-            title="Rapport de stage"
-            required={true}
-            accept=".pdf"
-            file={rapportStage}
-            onFileSelect={(files) => setRapportStage(files?.[0] || null)}
-            onFileRemove={() => setRapportStage(null)}
-            inputRef={rapportInputRef}
-            description="Format accepté: PDF uniquement. Taille max: 10MB"
-          />
+        <div className={`grid grid-cols-1 ${rapportRequis ? "md:grid-cols-2" : ""} gap-4 sm:gap-6`}>
+          {rapportRequis && (
+            <FileUploadCard
+              title="Rapport de stage"
+              required={true}
+              accept=".pdf"
+              file={rapportStage}
+              onFileSelect={(files) => setRapportStage(files?.[0] || null)}
+              onFileRemove={() => setRapportStage(null)}
+              inputRef={rapportInputRef}
+              description="Format accepté: PDF uniquement. Taille max: 10MB"
+            />
+          )}
 
           <FileUploadCard
             title="Demande manuscrite signée"
@@ -178,7 +198,7 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
         <div className="border-t pt-4 sm:pt-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-muted-foreground">
-              {rapportStage && demandeManuscrite ? (
+              {demandeManuscrite && (!rapportRequis || rapportStage) ? (
                 <div className="flex items-center text-green-600">
                   <CheckCircle className="h-4 w-4 mr-2" />
                   <span>Tous les documents sont prêts pour la soumission</span>
@@ -186,14 +206,14 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
               ) : (
                 <div className="flex items-center text-amber-600">
                   <AlertTriangle className="h-4 w-4 mr-2" />
-                  <span>Veuillez sélectionner les deux documents requis</span>
+                  <span>Veuillez sélectionner les documents requis</span>
                 </div>
               )}
             </div>
-            
+
             <Button
               onClick={handleSubmitAttestation}
-              disabled={isSubmitting || !rapportStage || !demandeManuscrite}
+              disabled={isSubmitting || !demandeManuscrite || (rapportRequis && !rapportStage)}
               className="w-full sm:w-auto"
               size="lg"
             >
