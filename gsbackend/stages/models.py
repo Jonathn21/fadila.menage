@@ -1117,8 +1117,8 @@ class Stagiaire(models.Model):
     @property
     def peut_demander_attestation(self):
         """Vérifie si une attestation peut être demandée"""
-        if self.statut_actuel != "Terminé":
-            return False, "Le stage n'est pas terminé"
+        if self.statut_actuel not in ("Terminé", "Actuel"):
+            return False, "Le stage doit être en cours ou terminé"
         
         # Vérifier si une attestation existe déjà
         try:

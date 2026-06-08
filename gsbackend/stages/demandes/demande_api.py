@@ -3482,11 +3482,11 @@ class DemandeAttestationAPIView(APIView):
             
             logger.info(f"✅ Stagiaire trouvé: {stagiaire.id} - Statut: {stagiaire.statut}")
             
-            # 3. Vérifier que le stage est terminé
-            if stagiaire.statut != "Terminé":
+            # 3. Vérifier que le stage est en cours ou terminé
+            if stagiaire.statut not in ("Terminé", "Actuel"):
                 return Response({
                     "success": False,
-                    "message": f"Le stage doit être terminé pour demander une attestation. Statut actuel : {stagiaire.statut}"
+                    "message": f"Le stage doit être en cours ou terminé pour demander une attestation. Statut actuel : {stagiaire.statut}"
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # 4. Vérifier s'il existe déjà une demande
