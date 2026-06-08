@@ -550,7 +550,7 @@ const InternshipDetailsPage: React.FC = () => {
               </Button>
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Détails de la demande</h1>
-                <p className="text-sm text-gray-600">N° {demande.tracking_id} • Soumise il y a {daysSinceSubmission} jour(s)</p>
+                <p className="text-sm text-gray-600">N° {demande.tracking_id} • {daysSinceSubmission === 0 ? "Soumise aujourd'hui" : `Soumise il y a ${daysSinceSubmission} jour(s)`}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">

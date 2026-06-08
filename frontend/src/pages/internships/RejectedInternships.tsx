@@ -780,7 +780,7 @@ const PendingInternships: React.FC = () => {
                               <div className="p-3 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                                   <span className="font-medium">Historique</span>
-                                  <span>{daysSinceSubmission} jour(s) depuis la soumission</span>
+                                  <span>{daysSinceSubmission === 0 ? "Soumise aujourd'hui" : `${daysSinceSubmission} jour(s) depuis la soumission`}</span>
                                 </div>
                                 <p className="text-xs mt-1">
                                   Cette demande a été refusée et fait partie de l'historique

@@ -803,7 +803,7 @@ const PendingInternships: React.FC = () => {
                                      daysInProcess > 15 ? 'Attention nécessaire' : 'En cours de traitement'}
                                   </span>
                                   <span>
-                                    {daysInProcess} jour(s)
+                                    {daysInProcess === 0 ? "Aujourd'hui" : `${daysInProcess} jour(s)`}
                                   </span>
                                 </div>
                                 {daysInProcess > 30 && (

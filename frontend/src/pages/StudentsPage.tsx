@@ -728,7 +728,7 @@ const getPageConfigs = (helpers: ColumnHelpers): Record<string, PageConfig> => (
           
           {daysSinceCompletion !== null && (
             <p className="mt-2 text-[10px] opacity-80 border-t border-purple-200 pt-1">
-              <span className="font-medium">Historique:</span> Terminé il y a {daysSinceCompletion} jour(s)
+              <span className="font-medium">Historique:</span> {daysSinceCompletion === 0 ? "Terminé aujourd'hui" : `Terminé il y a ${daysSinceCompletion} jour(s)`}
             </p>
           )}
         </div>

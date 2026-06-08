@@ -138,8 +138,8 @@ const OngoingInternships: React.FC = () => {
       status: "completed",
       daysSinceStart,
       daysSinceEnd,
-      displayStart: `Il y a ${daysSinceStart} jour(s)`,
-      displayEnd: `Terminé il y a ${daysSinceEnd} jour(s)`
+      displayStart: daysSinceStart === 0 ? "Aujourd'hui" : `Il y a ${daysSinceStart} jour(s)`,
+      displayEnd: daysSinceEnd === 0 ? "Terminé aujourd'hui" : `Terminé il y a ${daysSinceEnd} jour(s)`
     };
   };
 

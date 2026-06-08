@@ -771,7 +771,7 @@ const PendingInternships: React.FC = () => {
                                     {daysWaiting > 7 ? 'Attention' : 'En attente'}
                                   </span>
                                   <span>
-                                    {daysWaiting} jour(s) d'attente
+                                    {daysWaiting === 0 ? "Soumise aujourd'hui" : `${daysWaiting} jour(s) d'attente`}
                                   </span>
                                 </div>
                                 {daysWaiting > 7 && (
