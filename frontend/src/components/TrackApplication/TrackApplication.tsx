@@ -23,7 +23,7 @@ import { PersonalInfo } from "@/components/TrackApplication/PersonalInfo";
 import { AdditionalInfo } from "@/components/TrackApplication/AdditionalInfo";
 import { DocumentCard } from "@/components/TrackApplication/DocumentCard";
 import { FileUploadCard } from "@/components/TrackApplication/FileUploadCard";
-import { StageInfo } from "@/components/TrackApplication/StageInfo";
+// import { StageInfo } from "@/components/TrackApplication/StageInfo";
 import { AttestationRequest } from "@/components/TrackApplication/AttestationRequest";
 import { DocumentViewer } from "@/components/TrackApplication/DocumentViewer";
 import { PhotoViewer } from "@/components/TrackApplication/PhotoViewer";
@@ -722,10 +722,11 @@ const TrackApplication = () => {
             {/* Documents joints */}
             <DocumentsSection />
 
-            {/* Informations du Stage (si disponible) */}
+            {/* Informations du Stage (si disponible) — masqué temporairement
             {application.stage && (
               <StageInfo stage={application.stage} />
             )}
+            */}
 
             {/* SECTION DEMANDE D'ATTESTATION */}
             {application.stage?.statut_actuel === "Terminé" &&
