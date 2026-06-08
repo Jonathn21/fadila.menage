@@ -1405,7 +1405,7 @@ const TrackApplication = () => {
               </CardContent>
             </Card>
 
-            {/* Bouton pour ouvrir le modal du stage */}
+            {/* Bouton pour ouvrir le modal du stage — masqué temporairement
             {application.stage && (
               <Card>
                 <CardContent className="p-4 sm:p-6">
@@ -1417,22 +1417,22 @@ const TrackApplication = () => {
                       <div>
                         <h3 className="font-medium text-sm sm:text-base">Informations concernant votre stage</h3>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                          {application.stage.statut_actuel === "Actuel" 
-                            ? "Stage en cours" 
-                            : application.stage.statut_actuel === "Terminé" 
-                            ? "Stage terminé" 
+                          {application.stage.statut_actuel === "Actuel"
+                            ? "Stage en cours"
+                            : application.stage.statut_actuel === "Terminé"
+                            ? "Stage terminé"
                             : "Stage à venir"}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge 
-                        variant={getStageStatusVariant(application.stage.statut_actuel)} 
+                      <Badge
+                        variant={getStageStatusVariant(application.stage.statut_actuel)}
                         className={`text-xs sm:text-sm ${getStageStatusColor(application.stage.statut_actuel)}`}
                       >
                         {application.stage.statut_actuel}
                       </Badge>
-                      <Button 
+                      <Button
                         onClick={() => setIsStageModalOpen(true)}
                         variant="outline"
                         className="w-full sm:w-auto"
@@ -1445,8 +1445,9 @@ const TrackApplication = () => {
                 </CardContent>
               </Card>
             )}
+            */}
 
-            {/* Bouton pour ouvrir le modal d'attestation */}
+            {/* Bouton pour ouvrir le modal d'attestation — masqué temporairement
             {application?.stage?.statut_actuel === "Terminé" && (
               <Card>
                 <CardContent className="p-4 sm:p-6">
@@ -1458,15 +1459,15 @@ const TrackApplication = () => {
                       <div>
                         <h3 className="font-medium text-sm sm:text-base">Attestation de stage</h3>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                          {application?.stage?.demande_attestation 
-                            ? `Statut: ${application.stage.demande_attestation.statut === 'en_attente' ? 'En attente' : 
+                          {application?.stage?.demande_attestation
+                            ? `Statut: ${application.stage.demande_attestation.statut === 'en_attente' ? 'En attente' :
                                application.stage.demande_attestation.statut === 'approuvee' ? 'Approuvée' :
                                application.stage.demande_attestation.statut === 'traitee' ? 'Traitée' : 'Refusée'}`
                             : 'Documents requis pour obtenir votre attestation'}
                         </p>
                       </div>
                     </div>
-                    <Button 
+                    <Button
                       onClick={() => setIsAttestationModalOpen(true)}
                       className="w-full sm:w-auto"
                       size="lg"
@@ -1478,6 +1479,7 @@ const TrackApplication = () => {
                 </CardContent>
               </Card>
             )}
+            */}
 
             {/* Prochaines étapes - Ne s'affiche pas si le stage est Actuel ou Terminé */}
             {application.prochaines_etapes && 
