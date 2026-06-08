@@ -193,7 +193,7 @@ class SupprimerDemandeView(APIView):
                 demande = get_object_or_404(Demande, id=demande_id)
                 
                 # Vérifications de sécurité
-                if hasattr(demande, 'stagiaire'):
+                if Stagiaire.objects.filter(demande=demande).exists():
                     return Response({
                         "success": False,
                         "message": "Impossible de supprimer cette demande car un stagiaire a déjà été créé."

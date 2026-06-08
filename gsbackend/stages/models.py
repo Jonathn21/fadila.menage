@@ -512,7 +512,7 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 class Stagiaire(models.Model):
-    demande = models.ForeignKey('Demande', on_delete=models.CASCADE, null=True, blank=True)
+    demande = models.ForeignKey('Demande', on_delete=models.SET_NULL, null=True, blank=True)
 
     GENRE_CHOICES = [
         ('Masculin', 'Masculin'),

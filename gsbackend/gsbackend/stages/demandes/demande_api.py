@@ -1500,7 +1500,7 @@ class PreAccepterDemandeAPIView(APIView):
                         donnees_notif
                     )
                     
-                    logger.info(f"🔔 Notifications pré-acceptation envoyées pour demande #{demande.tracking_id}")
+                    logger.info(f" Notifications pré-acceptation envoyées pour demande #{demande.tracking_id}")
                     
                 except Exception as e:
                     logger.error(f"❌ Erreur lors de l'envoi des notifications: {e}", exc_info=True)
