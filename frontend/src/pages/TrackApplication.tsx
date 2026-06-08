@@ -1389,25 +1389,16 @@ const TrackApplication = () => {
 
                     {/* Lettre de stage / Convention signée */}
                     {application.stage?.convention?.fichier_url && (
-                      <Card className="border-2 border-dashed border-orange-300 hover:border-orange-500 transition-colors cursor-pointer group">
-                        <CardContent className="p-4 sm:p-6">
-                          <a href={application.stage.convention.fichier_url} target="_blank" rel="noopener noreferrer" className="block text-center space-y-3 sm:space-y-4">
-                            <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-orange-50 rounded-lg flex items-center justify-center group-hover:bg-orange-100 transition-colors">
-                              <FileCheck className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
-                            </div>
-                            <div>
-                              <h3 className="font-medium mb-1 sm:mb-2 text-xs sm:text-sm">Lettre de stage</h3>
-                              <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200 text-[10px] sm:text-xs">
-                                Convention {application.stage.convention.numero_convention || ''}
-                              </Badge>
-                            </div>
-                            <Button variant="outline" size="sm" className="w-full gap-2 text-xs sm:text-sm">
-                              <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                              Télécharger
-                            </Button>
-                          </a>
-                        </CardContent>
-                      </Card>
+                      <DocumentCard
+                        key="convention-stage"
+                        doc={{
+                          nom: `Lettre de stage${application.stage.convention.numero_convention ? ` (${application.stage.convention.numero_convention})` : ''}`,
+                          url: application.stage.convention.fichier_url,
+                          type: 'convention'
+                        }}
+                        index={0}
+                        isExisting={true}
+                      />
                     )}
 
                     {/* Nouveaux documents à ajouter */}
