@@ -148,10 +148,19 @@ services:
       CSRF_TRUSTED_ORIGINS: https://api.cebnet.org,https://stageemploi.cebnet.org
       CORS_ALLOWED_ORIGINS: https://stageemploi.cebnet.org,https://api.cebnet.org
       FRONTEND_URL: https://stageemploi.cebnet.org
+      MEDIA_URL: https://api.cebnet.org/media/
+
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
+
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS:-true}
 
       EMAIL_HOST_USER: ${EMAIL_HOST_USER}
 
       EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-${EMAIL_HOST_USER}}
 
       USE_X_FORWARDED_HOST: "True"
 

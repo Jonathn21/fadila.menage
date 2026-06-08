@@ -230,14 +230,14 @@ USE_TZ = True
 
 # ======================
 # STATIC / MEDIA
-# ✅ CORRECTION BUG 1 : MEDIA_URL toujours relatif ('/media/')
-# Le frontend utilise buildMediaUrl() pour construire l'URL absolue
-# vers le bon domaine backend. Ne jamais mettre une URL absolue ici.
+# En production (Cloudflare Pages), les requêtes /media/ sur le domaine
+# frontend sont interceptées par le SPA. MEDIA_URL doit pointer vers
+# api.cebnet.org pour que Django génère des URLs de téléchargement valides.
 # ======================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL  = '/media/'   # ✅ Toujours relatif — buildMediaUrl() gère le domaine
+MEDIA_URL  = os.environ.get('MEDIA_URL', '/media/')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -246,12 +246,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # EMAIL
 # ======================
 EMAIL_BACKEND     = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST        = os.environ.get('EMAIL_HOST')
-EMAIL_PORT        = int(os.environ.get('EMAIL_PORT'))
-EMAIL_USE_TLS     = os.environ.get('EMAIL_USE_TLS').lower() == 'true'
-EMAIL_HOST_USER   = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL  = os.environ.get('DEFAULT_FROM_EMAIL')
+EMAIL_HOST        = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT        = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS     = os.environ.get('EMAIL_USE_TLS', 'true').lower() == 'true'
+EMAIL_HOST_USER   = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL  = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 # ======================
 # FRONTEND
