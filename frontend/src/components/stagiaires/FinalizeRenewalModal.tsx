@@ -332,13 +332,13 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md overflow-hidden">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 shrink-0">
               <FileCheck className="h-6 w-6 text-blue-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <DialogTitle className="text-xl font-bold tracking-tight">
                 Étape 2 : Finaliser le renouvellement
               </DialogTitle>
@@ -433,7 +433,7 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                     Fichier signé (PDF uniquement)
                   </Label>
                   
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-3 sm:p-4 md:p-6 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer bg-muted/10">
+                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-3 sm:p-4 md:p-6 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer bg-muted/10 overflow-hidden">
                     <input
                       id="file-upload"
                       type="file"
@@ -441,9 +441,9 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                       onChange={handleFileChange}
                       className="hidden"
                     />
-                    <label htmlFor="file-upload" className="cursor-pointer block">
+                    <label htmlFor="file-upload" className="cursor-pointer block overflow-hidden">
                       <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                      <p className="font-medium mb-1 truncate max-w-full px-2">
+                      <p className="font-medium mb-1 truncate px-2">
                         {file ? file.name : "Cliquez pour sélectionner un fichier"}
                       </p>
                       <p className="text-sm text-muted-foreground">
