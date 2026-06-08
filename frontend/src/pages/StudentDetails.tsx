@@ -1510,8 +1510,8 @@ const OngoingInternshipDetails: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2.5 sm:space-y-3">
-              {/* CAS 1: Stage terminé ET pas en pré-renouvellement => Renouveler */}
-              {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && (
+              {/* CAS 1: Stage terminé ET pas en pré-renouvellement ET pas déjà renouvelé => Renouveler */}
+              {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && !stagiaire.a_ete_renouvele && (
                 <Button
                   variant="default"
                   className="w-full gap-1.5 sm:gap-2 text-xs sm:text-sm bg-primary hover:bg-red-800 text-white"

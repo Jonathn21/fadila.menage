@@ -1325,7 +1325,7 @@ const OngoingInternshipDetails: React.FC = () => {
                 )}
 
                 {/* Bouton Renouveler le stage (désactivé) */}
-                {stagiaire.statut === "Terminé" && (
+                {stagiaire.statut === "Terminé" && !stagiaire.a_ete_renouvele && (
                   <Button
                     variant="default"
                     className="w-full gap-2 bg-red-600 hover:bg-green-700 animate-pulse"
