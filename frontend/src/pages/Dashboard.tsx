@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Folder, LoaderCircle, Check, X } from "lucide-react";
+import { Folder, LoaderCircle, Check, X, FileSignature } from "lucide-react";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import OverviewTab from "@/components/dashboard/OverviewTab";
 import { getStatusBadge } from "@/components/dashboard/StatusBadges";
@@ -77,6 +77,15 @@ const Dashboard: React.FC = () => {
       value: data.stages_refuses.toString(),
       color: "bg-red-100",
       icon: <X className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />,
+    },
+    {
+      title: "Attestations",
+      value: data.attestations_total.toString(),
+      color: "bg-purple-100",
+      icon: <FileSignature className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />,
+      description: data.attestations_en_attente > 0
+        ? `${data.attestations_en_attente} en attente`
+        : undefined,
     },
   ];
 

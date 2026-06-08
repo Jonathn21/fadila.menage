@@ -117,6 +117,10 @@ class DashboardAPIView(APIView):
             "stages_en_cours": stages.filter(statut="Actuel").count(),
             "stages_acceptes": demandes.filter(statut_stage="Acceptée").count(),
             "stages_refuses": demandes.filter(statut_stage="Refusée").count(),
+            "attestations_total": DemandeAttestation.objects.count(),
+            "attestations_en_attente": DemandeAttestation.objects.filter(statut='en_attente').count(),
+            "attestations_approuvees": DemandeAttestation.objects.filter(statut='approuvee').count(),
+            "attestations_traitees": DemandeAttestation.objects.filter(statut='traitee').count(),
         })
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='POST')], name='dispatch')
 class MarquerDocumentVuAPI(APIView):
@@ -1051,6 +1055,10 @@ class SidebarCountsAPIView(APIView):
         stages_termines = Stagiaire.objects.filter(statut='Terminé').count()
 
         demandes_attestation = DemandeAttestation.objects.all().count()
+        attestations_en_attente = DemandeAttestation.objects.filter(statut='en_attente').count()
+        attestations_approuvees = DemandeAttestation.objects.filter(statut='approuvee').count()
+        attestations_refusees = DemandeAttestation.objects.filter(statut='refusee').count()
+        attestations_traitees = DemandeAttestation.objects.filter(statut='traitee').count()
 
         return Response({
             'count_demandes_attente': demandes_attente,
@@ -1063,6 +1071,10 @@ class SidebarCountsAPIView(APIView):
             'count_stages_en_cours': stages_en_cours,
             'count_stages_termines': stages_termines,
             'count_demandes_attestation': demandes_attestation,
+            'count_attestations_en_attente': attestations_en_attente,
+            'count_attestations_approuvees': attestations_approuvees,
+            'count_attestations_refusees': attestations_refusees,
+            'count_attestations_traitees': attestations_traitees,
         })
 
 

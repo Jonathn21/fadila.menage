@@ -21,6 +21,10 @@ export interface DashboardData {
   stages_refuses: number;
   dernieres_demandes: Demande[];
   entretiens_a_venir: Entretien[];
+  attestations_total: number;
+  attestations_en_attente: number;
+  attestations_approuvees: number;
+  attestations_traitees: number;
 }
 
 

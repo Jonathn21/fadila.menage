@@ -63,6 +63,10 @@ const SidebarNavigation = () => {
     stages_en_cours: 0,
     stages_termines: 0,
     demandes_attestation: 0,
+    attestations_en_attente: 0,
+    attestations_approuvees: 0,
+    attestations_refusees: 0,
+    attestations_traitees: 0,
   });
 
   // Récupérer rôle utilisateur
@@ -93,6 +97,10 @@ const SidebarNavigation = () => {
           stages_en_cours: res.data.count_stages_en_cours,
           stages_termines: res.data.count_stages_termines,
           demandes_attestation: res.data.count_demandes_attestation,
+          attestations_en_attente: res.data.count_attestations_en_attente,
+          attestations_approuvees: res.data.count_attestations_approuvees,
+          attestations_refusees: res.data.count_attestations_refusees,
+          attestations_traitees: res.data.count_attestations_traitees,
         });
       } catch (err) {
         console.error("Impossible de charger les counts :", err);
@@ -206,37 +214,37 @@ const SidebarNavigation = () => {
   ];
 
   const attestationSubItems = [
-    { 
-      label: "Toutes les attestations", 
-      path: "/attestations/toutes", 
+    {
+      label: "Toutes les attestations",
+      path: "/attestations/toutes",
       count: counts.demandes_attestation,
       icon: <FileText className="size-3.5" />
     },
-    { 
-      label: "En attente", 
-      path: "/attestations/en-attente", 
-      count: 0,
+    {
+      label: "En attente",
+      path: "/attestations/en-attente",
+      count: counts.attestations_en_attente,
       variant: "warning" as const,
       icon: <Clock className="size-3.5" />
     },
-    { 
-      label: "Approuvées", 
-      path: "/attestations/approuvees", 
-      count: 0,
+    {
+      label: "Approuvées",
+      path: "/attestations/approuvees",
+      count: counts.attestations_approuvees,
       variant: "success" as const,
       icon: <CheckCircle className="size-3.5" />
     },
-    { 
-      label: "Réfusées", 
-      path: "/attestations/refusees", 
-      count: 0,
+    {
+      label: "Refusées",
+      path: "/attestations/refusees",
+      count: counts.attestations_refusees,
       variant: "default" as const,
       icon: <XCircle className="size-3.5" />
     },
-     { 
-      label: "Traitées", 
-      path: "/attestations/traitees", 
-      count: 0,
+    {
+      label: "Traitées",
+      path: "/attestations/traitees",
+      count: counts.attestations_traitees,
       variant: "default" as const,
       icon: <Archive className="size-3.5" />
     },
@@ -365,7 +373,7 @@ const SidebarNavigation = () => {
             </Collapsible>
           </SidebarMenuItem>
 
-          {/* Demandes d'attestation 
+          {/* Demandes d'attestation */}
           <SidebarMenuItem className="py-1">
             <Collapsible open={openAttestations} onOpenChange={setOpenAttestations} className="w-full">
               <CollapsibleTrigger asChild>
@@ -384,11 +392,11 @@ const SidebarNavigation = () => {
                 {attestationSubItems.map((subItem, idx) => {
                   const isActive = location.pathname === subItem.path;
                   return (
-                    <Link 
-                      key={idx} 
-                      to={subItem.path} 
+                    <Link
+                      key={idx}
+                      to={subItem.path}
                       className={cn(
-                        "flex items-center rounded-lg px-3 py-2 text-xs transition-colors group/subitem text-green-100", 
+                        "flex items-center rounded-lg px-3 py-2 text-xs transition-colors group/subitem text-green-100",
                         isActive ? "bg-green-700 text-white font-medium shadow-sm" : "hover:bg-green-800/50"
                       )}
                     >
@@ -404,7 +412,7 @@ const SidebarNavigation = () => {
                 })}
               </CollapsibleContent>
             </Collapsible>
-          </SidebarMenuItem>*/}
+          </SidebarMenuItem>
 
           {/* Separator */}
           <div className="my-3 mx-2 h-px bg-green-700"></div>
