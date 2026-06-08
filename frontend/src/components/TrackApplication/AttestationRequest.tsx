@@ -80,7 +80,7 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
     try {
       console.log("🚀 Envoi de la demande d'attestation...");
       console.log("📁 Fichiers:", {
-        rapport: rapportStage.name,
+        rapport: rapportStage?.name,
         demande: demandeManuscrite.name,
         trackingId
       });

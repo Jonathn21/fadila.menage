@@ -3438,7 +3438,7 @@ class DemandesAttestationTraiteeAPI(APIView):
                 'message': 'Erreur lors de la récupération des demandes'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class DemandeAttestationAPIView(APIView):
     """
     API pour soumettre une demande d'attestation de stage
