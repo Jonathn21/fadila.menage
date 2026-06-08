@@ -320,7 +320,8 @@ class StagiaireDetailAPI(APIView):
           
             # Construction de la réponse
             response_data = {
-                "stagiaire": self.serialize_stagiaire_data(stagiaire, request)
+                "stagiaire": self.serialize_stagiaire_data(stagiaire, request),
+                "historique_stages": self.get_historique_stages(stagiaire),
             }
 
             # Audit de l'accès
@@ -617,6 +618,34 @@ class StagiaireDetailAPI(APIView):
         # Supprime les caractères potentiellement dangereux
         cleaned = re.sub(r'[^\w\s\.\-_]', '', filename)
         return cleaned[:255]
+
+    def get_historique_stages(self, stagiaire):
+        """Récupère tous les stages du même groupe (identifiant_groupe)"""
+        try:
+            stages = Stagiaire.objects.filter(
+                identifiant_groupe=stagiaire.identifiant_groupe
+            ).select_related('etablissement').order_by('date_debut')
+
+            return [
+                {
+                    "id": s.id,
+                    "nom": s.nom,
+                    "prenom": s.prenom,
+                    "type_stage": s.type_stage,
+                    "date_debut": s.date_debut.isoformat() if s.date_debut else None,
+                    "date_fin": s.date_fin.isoformat() if s.date_fin else None,
+                    "duree_jours": s.duree_jours,
+                    "statut": s.statut,
+                    "direction": s.direction,
+                    "service": s.service,
+                    "est_renouvellement": s.est_renouvellement,
+                    "est_courant": s.id == stagiaire.id,
+                }
+                for s in stages
+            ]
+        except Exception as e:
+            logger.error(f"Erreur récupération historique stages: {e}")
+            return []
 
 @method_decorator([never_cache, ratelimit(key='user', rate='10/m', method='POST')], name='dispatch')
 class PreRenouvelerStageAPIView(APIView):

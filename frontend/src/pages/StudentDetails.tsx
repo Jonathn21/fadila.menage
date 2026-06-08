@@ -144,6 +144,21 @@ type APIStagiaire = {
   nouveau_stage_id?: number | null;
 };
 
+type HistoriqueStage = {
+  id: number;
+  nom: string;
+  prenom: string;
+  type_stage: string;
+  date_debut: string | null;
+  date_fin: string | null;
+  duree_jours: number | null;
+  statut: string;
+  direction: string | null;
+  service: string | null;
+  est_renouvellement: boolean;
+  est_courant: boolean;
+};
+
 // ========================= //
 //     Données de configuration //
 // ========================= //
@@ -231,6 +246,7 @@ const OngoingInternshipDetails: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [stagiaire, setStagiaire] = useState<APIStagiaire | null>(null);
+  const [historiqueStages, setHistoriqueStages] = useState<HistoriqueStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<APIDocument | null>(null);
@@ -270,11 +286,7 @@ const OngoingInternshipDetails: React.FC = () => {
       const res = await apiClient.get(`/stagiaires/${id}/`);
       const data: APIStagiaire = res.data.stagiaire;
       setStagiaire(data);
-      
-      // Logs pour debug
-      console.log("Données stagiaire reçues:", data);
-      console.log("pre_renouvellement_en_cours:", data.pre_renouvellement_en_cours);
-      console.log("convention_renouvellement_temporaire:", data.convention_renouvellement_temporaire);
+      setHistoriqueStages(res.data.historique_stages || []);
       
       // Initialiser le résumé édité avec la valeur actuelle
       setEditedResume(data.resume_cv || data.resume || "");
@@ -1667,6 +1679,107 @@ const OngoingInternshipDetails: React.FC = () => {
           </Card>
           </div>
         </div>
+
+        {/* Historique des stages */}
+        {historiqueStages.length > 1 && (
+          <Card className="border border-gray-200 mt-4 sm:mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base text-gray-900">
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+                Historique des stages ({historiqueStages.length})
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm text-gray-600">
+                Tous les stages effectués par ce stagiaire
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="relative">
+                {/* Timeline verticale */}
+                <div className="absolute left-3 sm:left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
+
+                <div className="space-y-4">
+                  {historiqueStages.map((stage, index) => (
+                    <div key={stage.id} className="relative pl-8 sm:pl-10">
+                      {/* Point sur la timeline */}
+                      <div className={`absolute left-1.5 sm:left-2.5 top-1.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 ${
+                        stage.est_courant
+                          ? "bg-primary border-primary ring-2 ring-primary/20"
+                          : stage.statut === "Terminé"
+                          ? "bg-gray-400 border-gray-400"
+                          : stage.statut === "Actuel"
+                          ? "bg-green-500 border-green-500"
+                          : "bg-blue-400 border-blue-400"
+                      }`} />
+
+                      <div
+                        className={`p-3 sm:p-4 rounded-lg border transition-colors ${
+                          stage.est_courant
+                            ? "border-primary/30 bg-primary/5"
+                            : "border-gray-200 hover:bg-gray-50/50"
+                        }`}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-xs sm:text-sm text-gray-900">
+                              {stage.est_renouvellement ? "Renouvellement" : "Stage initial"}
+                              {stage.est_courant && (
+                                <span className="ml-1.5 text-[10px] sm:text-xs text-primary font-normal">(actuel)</span>
+                              )}
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] sm:text-xs px-1.5 py-0 ${
+                                stage.statut === "Terminé"
+                                  ? "bg-gray-50 text-gray-600 border-gray-300"
+                                  : stage.statut === "Actuel"
+                                  ? "bg-green-50 text-green-700 border-green-200"
+                                  : "bg-blue-50 text-blue-700 border-blue-200"
+                              }`}
+                            >
+                              {stage.statut}
+                            </Badge>
+                          </div>
+                          {!stage.est_courant && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs gap-1 text-gray-600 hover:text-gray-800 self-end sm:self-center"
+                              onClick={() => navigate(`/stagiaires/${stage.id}`)}
+                            >
+                              <Eye className="h-3 w-3" />
+                              Voir
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] sm:text-xs text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <CalendarRange className="h-3 w-3 flex-shrink-0" />
+                            <span>
+                              {stage.date_debut ? format(new Date(stage.date_debut), "dd/MM/yyyy") : "—"} → {stage.date_fin ? format(new Date(stage.date_fin), "dd/MM/yyyy") : "—"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3 flex-shrink-0" />
+                            <span>{stage.duree_jours ? `${stage.duree_jours} jours` : "—"}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Briefcase className="h-3 w-3 flex-shrink-0" />
+                            <span>{stage.type_stage || "—"}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Building2 className="h-3 w-3 flex-shrink-0" />
+                            <span>{stage.direction || "—"}{stage.service ? ` / ${stage.service}` : ""}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Modal document */}
         <Dialog open={!!selectedDocument} onOpenChange={() => setSelectedDocument(null)}>
