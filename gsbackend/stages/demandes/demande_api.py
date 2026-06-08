@@ -3693,7 +3693,7 @@ class DemandeAttestationAPIView(APIView):
                 "message": "Une erreur est survenue lors du traitement de votre demande."
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class ApprouverDemandeAttestationAPI(APIView):
     """
     API pour approuver une demande d'attestation
@@ -3879,7 +3879,7 @@ class ApprouverDemandeAttestationAPI(APIView):
         
         buffer.seek(0)
         return buffer
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class RefuserDemandeAttestationAPI(APIView):
     """
     API pour refuser une demande d'attestation
@@ -3974,7 +3974,7 @@ class RefuserDemandeAttestationAPI(APIView):
                 'success': False,
                 'message': f'Erreur lors du refus: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='DELETE')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='DELETE')], name='dispatch')
 class SupprimerDemandeAttestationAPI(APIView):
     """
     API pour supprimer une demande d'attestation
@@ -4028,7 +4028,7 @@ class SupprimerDemandeAttestationAPI(APIView):
                 'message': f'Erreur lors de la suppression: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class UploadAttestationSigneeAPI(APIView):
     """
     API pour uploader l'attestation signée et finaliser la demande
