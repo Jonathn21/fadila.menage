@@ -16,6 +16,7 @@ const PublicAttestationRequest = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [verified, setVerified] = useState(false);
   const [typeStage, setTypeStage] = useState<string>("");
+  const [isNewAttempt, setIsNewAttempt] = useState(false);
   const [stagiaireInfo, setStagiaireInfo] = useState<{
     nom: string;
     prenom: string;
@@ -55,10 +56,16 @@ const PublicAttestationRequest = () => {
         return;
       }
 
-      // Vérifier si une demande d'attestation existe déjà
+      // Vérifier si une demande d'attestation existe déjà (sauf si refusée)
       if (data.stage.demande_attestation) {
-        setError("Une demande d'attestation a déjà été soumise pour ce stage.");
-        return;
+        if (data.stage.demande_attestation.statut === "refusee") {
+          setIsNewAttempt(true);
+        } else {
+          setError("Une demande d'attestation a déjà été soumise pour ce stage.");
+          return;
+        }
+      } else {
+        setIsNewAttempt(false);
       }
 
       setStagiaireInfo({
@@ -176,6 +183,7 @@ const PublicAttestationRequest = () => {
             trackingId={trackingId.trim()}
             onSearch={handleRefresh}
             typeStage={typeStage}
+            isNewAttempt={isNewAttempt}
           />
         )}
       </main>

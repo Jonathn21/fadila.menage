@@ -12,12 +12,14 @@ interface AttestationRequestProps {
   trackingId: string;
   onSearch: () => void;
   typeStage?: string;
+  isNewAttempt?: boolean;
 }
 
 export const AttestationRequest: React.FC<AttestationRequestProps> = ({
   trackingId,
   onSearch,
-  typeStage
+  typeStage,
+  isNewAttempt = false,
 }) => {
   const rapportRequis = typeStage !== "Fonctionnel";
   const [rapportStage, setRapportStage] = useState<File | null>(null);
@@ -74,6 +76,9 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
       formData.append("rapport_stage", rapportStage);
     }
     formData.append("demande_manuscrite", demandeManuscrite);
+    if (isNewAttempt) {
+      formData.append("is_new_attempt", "true");
+    }
 
     setIsSubmitting(true);
 
