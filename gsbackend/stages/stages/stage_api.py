@@ -71,7 +71,7 @@ logger = logging.getLogger(__name__)
 
 import os
 from django.conf import settings
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.cache import never_cache
 import time
 from django.utils.decorators import method_decorator
@@ -275,7 +275,7 @@ class ModifierPeriodeStagiaireAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-@method_decorator([csrf_protect, never_cache], name='dispatch')
+@method_decorator([csrf_exempt, never_cache], name='dispatch')
 class StagiaireDetailAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser]
