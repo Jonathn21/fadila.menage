@@ -84,17 +84,17 @@ logger = logging.getLogger(__name__)
 @method_decorator([never_cache, ratelimit(key='user', rate='60/m', method='GET')], name='dispatch')
 class StagesEnCoursAPI(StageBaseAPIView):
     statut_filter = "Actuel"
-    default_ordering = "date_debut"
+    default_ordering = "-date_debut"
 
 @method_decorator([never_cache, ratelimit(key='user', rate='60/m', method='GET')], name='dispatch')
 class StagesTermineAPI(StageBaseAPIView):
-    statut_filter = "Terminé" 
-    default_ordering = "date_fin"
+    statut_filter = "Terminé"
+    default_ordering = "-date_fin"
 
 @method_decorator([never_cache, ratelimit(key='user', rate='60/m', method='GET')], name='dispatch')
 class StagesProchainAPI(StageBaseAPIView):
     statut_filter = "À venir"
-    default_ordering = "date_debut"
+    default_ordering = "-date_debut"
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class FinAnticipeeStagiaireAPIView(APIView):
