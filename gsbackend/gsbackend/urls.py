@@ -19,12 +19,26 @@ def serve_media_with_cors(request, path):
     Sert les fichiers média avec les headers CORS appropriés.
     Remplace static() qui est désactivé par Django quand DEBUG=False.
     """
+    import mimetypes
+
     file_path = os.path.join(settings.MEDIA_ROOT, path)
 
     if not os.path.exists(file_path) or not os.path.isfile(file_path):
         raise Http404("Fichier introuvable")
 
-    response = FileResponse(open(file_path, 'rb'))
+    # Déterminer le content-type à partir de l'extension
+    content_type, _ = mimetypes.guess_type(file_path)
+    if not content_type:
+        content_type = 'application/octet-stream'
+
+    response = FileResponse(open(file_path, 'rb'), content_type=content_type)
+
+    # Permettre l'affichage inline dans les iframes (PDF, images)
+    ext = os.path.splitext(file_path)[1].lower()
+    if ext in ('.pdf', '.jpg', '.jpeg', '.png', '.gif'):
+        response['Content-Disposition'] = f'inline; filename="{os.path.basename(file_path)}"'
+    else:
+        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
 
     # Ajouter les headers CORS manuellement sur les fichiers média
     origin = request.META.get('HTTP_ORIGIN', '')
