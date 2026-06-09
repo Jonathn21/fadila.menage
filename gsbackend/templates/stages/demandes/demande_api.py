@@ -3744,6 +3744,11 @@ class DemandeAttestationDetailAPI(APIView):
                     'montant_remuneration': stagiaire.montant_remuneration,
                     'lieu_stage': stagiaire.lieu_stage,
                     'superviseur': stagiaire.superviseur,
+                    'photo_passeport': request.build_absolute_uri(stagiaire.photo_passeport.url) if stagiaire.photo_passeport else None,
+                    'genre': getattr(stagiaire, 'genre', None),
+                    'pays_residence': getattr(stagiaire, 'pays_residence', None),
+                    'adresse': getattr(stagiaire, 'adresse', None),
+                    'niveau_etude': getattr(stagiaire, 'niveau_etude', None),
                     'etablissement': {
                         'nom': stagiaire.etablissement.nom if stagiaire.etablissement else None,
                         'email': stagiaire.etablissement.email if stagiaire.etablissement else None,

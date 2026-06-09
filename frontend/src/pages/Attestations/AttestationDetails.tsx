@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import apiClient from "@/lib/apiClient";
 
 // ---- Types ----
@@ -41,6 +42,11 @@ interface DemandeAttestation {
     montant_remuneration?: number;
     lieu_stage?: string;
     superviseur?: string;
+    photo_passeport?: string | null;
+    genre?: string;
+    pays_residence?: string;
+    adresse?: string;
+    niveau_etude?: string;
     etablissement?: {
       nom: string;
       email: string;
@@ -594,13 +600,19 @@ const AttestationDetailsPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col items-center text-center mb-4">
-                  <div className="h-24 w-24 mb-4 rounded-full bg-red-100 flex items-center justify-center">
-                    <span className="text-xl font-bold text-red-700">
+                  <Avatar className="h-24 w-24 mb-4">
+                    <AvatarImage src={stagiaire.photo_passeport || undefined} className="object-cover" />
+                    <AvatarFallback className="text-xl font-bold bg-red-100 text-red-700">
                       {(stagiaire.prenom?.[0] || "")}{(stagiaire.nom?.[0] || "")}
-                    </span>
-                  </div>
+                    </AvatarFallback>
+                  </Avatar>
                   <h3 className="font-semibold text-lg text-gray-900">{stagiaire.nom} {stagiaire.prenom}</h3>
                   <p className="text-sm text-gray-600">{stagiaire.direction} / {stagiaire.service}</p>
+                  {stagiaire.type_stage && (
+                    <Badge variant="outline" className="mt-2 gap-1 text-xs bg-gray-100 text-gray-700">
+                      <Briefcase className="h-3 w-3" />{stagiaire.type_stage}
+                    </Badge>
+                  )}
                 </div>
                 <div className="w-full space-y-3">
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
