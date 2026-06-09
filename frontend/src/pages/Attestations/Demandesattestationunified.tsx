@@ -1269,8 +1269,9 @@ const DemandesAttestationUnified: React.FC = () => {
 
                 {/* Documents */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                    {/* Rapport de stage */}
-                    {selectedDocuments.demande.fichiers?.rapport_stage ? (
+                    {/* Rapport de stage - masqué pour les stages fonctionnels */}
+                    {selectedDocuments.demande.stagiaire.type_stage?.toLowerCase() !== 'fonctionnel' && (
+                    selectedDocuments.demande.fichiers?.rapport_stage ? (
                     <Card className="">
                         <CardHeader>
                         <CardTitle className="text-base md:text-lg flex items-center text-gray-900">
@@ -1326,7 +1327,7 @@ const DemandesAttestationUnified: React.FC = () => {
                         </div>
                         </CardContent>
                     </Card>
-                    )}
+                    ))}
 
                     {/* Demande manuscrite */}
                     {selectedDocuments.demande.fichiers?.demande_manuscrite ? (
