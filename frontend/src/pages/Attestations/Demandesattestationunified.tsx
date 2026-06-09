@@ -943,11 +943,11 @@ const DemandesAttestationUnified: React.FC = () => {
                               </TableCell>
                               <TableCell className="text-right">
                                 <div className="flex justify-end space-x-2">
-                                  <Button 
-                                    variant="outline" 
+                                  <Button
+                                    variant="outline"
                                     size="icon"
-                                    onClick={() => handleOpenDocumentsModal(demande)}
-                                    title="Voir les documents"
+                                    onClick={() => navigate(`/attestations/${demande.id}`)}
+                                    title="Voir les détails"
                                   >
                                     <Eye className="h-4 w-4" />
                                   </Button>
@@ -1042,13 +1042,13 @@ const DemandesAttestationUnified: React.FC = () => {
                             </div>
 
                             <div className="flex justify-end gap-2 pt-2 border-t">
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
-                                onClick={() => handleOpenDocumentsModal(demande)}
+                                onClick={() => navigate(`/attestations/${demande.id}`)}
                               >
                                 <Eye className="h-3 w-3 md:h-4 md:w-4 mr-1" />
-                                <span className="hidden sm:inline">Documents</span>
+                                <span className="hidden sm:inline">Détails</span>
                               </Button>
                               
                               {demande.statut === 'en_attente' && (

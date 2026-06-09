@@ -24,6 +24,7 @@ import UserPermissions from "./pages/UserPermissions";
 
 import InternshipsPage from "./pages/internships/InternshipsPage";
 import DemandesAttestationUnified from "./pages/Attestations/Demandesattestationunified";
+import AttestationDetails from "./pages/Attestations/AttestationDetails";
 
 
 import StudentsPage from "./pages/StudentsPage";
@@ -77,6 +78,7 @@ const App = () => (
             <Route path="/attestations/approuvees" element={<DemandesAttestationUnified />} />
             <Route path="/attestations/refusees" element={<DemandesAttestationUnified />} />
             <Route path="/attestations/traitees" element={<DemandesAttestationUnified />} />
+            <Route path="/attestations/:id" element={<AttestationDetails />} />
 
             <Route path="/acceptation/:id" element={<ProcessInternship />}/>
             <Route path="/statistiques" element={<Analytics />} />

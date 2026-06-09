@@ -193,7 +193,7 @@ class SupprimerDemandeView(APIView):
                 demande = get_object_or_404(Demande, id=demande_id)
                 
                 # Vérifications de sécurité
-                if hasattr(demande, 'stagiaire'):
+                if Stagiaire.objects.filter(demande=demande).exists():
                     return Response({
                         "success": False,
                         "message": "Impossible de supprimer cette demande car un stagiaire a déjà été créé."
@@ -470,6 +470,7 @@ class SuiviDemandeAPIView(APIView):
                 "infos_supplementaires": None,
                 "date_examen": None,
                 "motif_refus": demande.raison_refus if demande.statut_stage == "Refusée" else None,
+                "date_acceptation": demande.date_pre_acceptation.isoformat() if demande.date_pre_acceptation else None,
                 "documents": documents,
                 "photo_passeport": photo_passeport_url,
             }
@@ -577,18 +578,19 @@ class SuiviDemandeAPIView(APIView):
                 
                 for doc in all_docs:
                     doc_type = doc.get('type', '')
-                
-                    # EXCLURE les documents de base (CV, lettre, diplôme)
                     if doc_type in ['cv', 'lettre_motivation', 'diplome']:
                         continue
-                    
+
                     url = doc.get('url', '')
-                    if url and not url.startswith('http'):
+                    # ✅ Vérification robuste avant build_absolute_uri
+                    if not url:
+                        continue
+                    if not url.startswith('http'):
                         url = request.build_absolute_uri(url)
-                    
+
                     documents_stagiaire.append({
                         "nom": doc.get('nom', 'Document'),
-                        "type": doc.get('type', 'document'),
+                        "type": doc_type,
                         "url": url,
                     })
                     logger.info(f"✅ Document stagiaire ajouté: {doc.get('nom')}")
@@ -757,47 +759,37 @@ class SuiviDemandeAPIView(APIView):
         }
 
     def get_demande_documents(self, demande, request):
-        """Récupère les documents de la demande seulement (CV, lettre, diplômes)"""
         documents = []
-        
         try:
-            if demande.cv:
+            if demande.cv and demande.cv.name:
                 documents.append({
                     'nom': 'Curriculum Vitae (CV)',
                     'url': request.build_absolute_uri(demande.cv.url),
                     'type': 'cv',
                     'id': 'cv'
                 })
-                logger.info(f"✅ CV ajouté aux documents de la demande {demande.id}")
-            
-            if demande.lettre_motivation:
+
+            if demande.lettre_motivation and demande.lettre_motivation.name:
                 documents.append({
                     'nom': 'Lettre de motivation',
                     'url': request.build_absolute_uri(demande.lettre_motivation.url),
                     'type': 'lettre_motivation',
                     'id': 'lettre_motivation'
                 })
-                logger.info(f"✅ Lettre de motivation ajoutée aux documents de la demande {demande.id}")
-            
-            # Diplômes de la demande
-            diplomes_count = 0
+
             for diplome in demande.diplomes.all():
-                documents.append({
-                    'nom': 'Diplôme',
-                    'url': request.build_absolute_uri(diplome.fichier.url),
-                    'type': 'diplome',
-                    'id': str(diplome.id)
-                })
-                diplomes_count += 1
-            
-            logger.info(f"✅ {diplomes_count} diplôme(s) ajouté(s) aux documents de la demande {demande.id}")
-            logger.info(f"📄 Total documents de la demande: {len(documents)}")
+                # ✅ Double vérification fichier + nom
+                if diplome.fichier and diplome.fichier.name:
+                    documents.append({
+                        'nom': 'Diplôme',
+                        'url': request.build_absolute_uri(diplome.fichier.url),
+                        'type': 'diplome',
+                        'id': str(diplome.id)
+                    })
 
         except Exception as e:
-            logger.error(f"❌ Erreur générale dans get_demande_documents pour demande {demande.id}: {e}")
-            import traceback
-            logger.error(f"🔥 Traceback complet:\n{traceback.format_exc()}")
-        
+            logger.error(f"Erreur get_demande_documents demande {demande.id}: {e}")
+
         return documents
 
 class DemandeModificationAPIView(APIView):
@@ -1367,24 +1359,18 @@ class DemandeDetailAPI(APIView):
             return self.get_documents_fallback(request, demande)
 
     def get_documents_fallback(self, request, demande):
-        """Méthode de fallback pour récupérer les documents"""
+        documents = []
         try:
-            # Récupérer tous les FileField du modèle Demande
-            documents = []
-            
-            # Liste des champs de fichiers potentiels
+            # ✅ Seulement les vrais FileField de Demande
             file_fields = [
                 ('photo_passeport', 'Photo passeport'),
                 ('cv', 'CV'),
                 ('lettre_motivation', 'Lettre de motivation'),
-                ('releve_notes', 'Relevé de notes'),
-                ('diplome', 'Diplôme'),
-                # Ajoutez d'autres champs de fichiers ici
             ]
-            
+
             for field_name, display_name in file_fields:
                 file_field = getattr(demande, field_name, None)
-                if file_field and file_field.name:  # Vérifier si le fichier existe
+                if file_field and file_field.name:
                     documents.append({
                         "id": None,
                         "nom": display_name,
@@ -1393,12 +1379,22 @@ class DemandeDetailAPI(APIView):
                         "date_upload": demande.date_soumission,
                         "est_modifie": False
                     })
-            
-            return documents
-            
+
+            # ✅ Les diplômes sont dans une relation séparée
+            for diplome in demande.diplomes.all():
+                if diplome.fichier and diplome.fichier.name:
+                    documents.append({
+                        "id": str(diplome.id),
+                        "nom": "Diplôme",
+                        "url": request.build_absolute_uri(diplome.fichier.url),
+                        "statut": "existing",
+                        "date_upload": demande.date_soumission,
+                        "est_modifie": False
+                    })
+
         except Exception as e:
-            logger.error(f"Erreur fallback documents: {str(e)}")
-            return []
+            logger.error(f"Erreur fallback documents: {e}")
+        return documents
 
     def has_access_to_demande(self, user, demande):
         """Vérifie si l'utilisateur a accès à la demande"""
@@ -2214,32 +2210,21 @@ class FinaliserAcceptationAPIView(APIView):
         return stagiaire
 
     def copier_diplomes_vers_stagiaire(self, demande, stagiaire):
-        """Copie tous les diplômes de la demande vers le stagiaire - IDENTIQUE À AccepterDemandeAPIView"""
         try:
             diplomes_copies = 0
-            
-            # ✅ MÊME LOGIQUE QUE AccepterDemandeAPIView
-            if hasattr(Stagiaire, 'diplomes'):
-                for diplome_demande in demande.diplomes.all():
-                    Diplome.objects.create(
-                        stagiaire=stagiaire,
-                        fichier=diplome_demande.fichier,
-                        date_upload=timezone.now()
-                    )
-                    diplomes_copies += 1
-                    
-            elif hasattr(stagiaire, 'diplome'):
-                premier_diplome = demande.diplomes.first()
-                if premier_diplome:
-                    stagiaire.diplome = premier_diplome.fichier
-                    stagiaire.save()
-                    diplomes_copies = 1
-                    
-            logger.info(f"{diplomes_copies} diplôme(s) copié(s) vers le stagiaire {stagiaire.id}")
+            premier_diplome = demande.diplomes.first()
+
+            if premier_diplome and premier_diplome.fichier and premier_diplome.fichier.name:
+                # ✅ Stagiaire a un champ 'diplome' (FileField simple)
+                stagiaire.diplome = premier_diplome.fichier
+                stagiaire.save(update_fields=['diplome'])
+                diplomes_copies = 1
+
+            logger.info(f"{diplomes_copies} diplôme(s) copié(s) vers stagiaire {stagiaire.id}")
             return diplomes_copies
-            
+
         except Exception as e:
-            logger.error(f"Erreur copie diplômes stagiaire {stagiaire.id}: {str(e)}")
+            logger.error(f"Erreur copie diplômes stagiaire {stagiaire.id}: {e}")
             return 0
 
     def valider_fichier_signe(self, fichier):
@@ -3453,7 +3438,7 @@ class DemandesAttestationTraiteeAPI(APIView):
                 'message': 'Erreur lors de la récupération des demandes'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class DemandeAttestationAPIView(APIView):
     """
     API pour soumettre une demande d'attestation de stage
@@ -3497,11 +3482,11 @@ class DemandeAttestationAPIView(APIView):
             
             logger.info(f"✅ Stagiaire trouvé: {stagiaire.id} - Statut: {stagiaire.statut}")
             
-            # 3. Vérifier que le stage est terminé
-            if stagiaire.statut != "Terminé":
+            # 3. Vérifier que le stage est en cours ou terminé
+            if stagiaire.statut not in ("Terminé", "Actuel"):
                 return Response({
                     "success": False,
-                    "message": f"Le stage doit être terminé pour demander une attestation. Statut actuel : {stagiaire.statut}"
+                    "message": f"Le stage doit être en cours ou terminé pour demander une attestation. Statut actuel : {stagiaire.statut}"
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # 4. Vérifier s'il existe déjà une demande
@@ -3524,29 +3509,33 @@ class DemandeAttestationAPIView(APIView):
                     "message": f"Impossible de soumettre une nouvelle demande. Statut actuel : {existing_demande.get_statut_display()}"
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # 5. Valider les fichiers
-            if 'rapport_stage' not in request.FILES:
+            # 5. Valider les fichiers selon le type de stage
+            # Fonctionnel = demande manuscrite uniquement
+            # Académique/Libre = rapport de stage + demande manuscrite
+            rapport_requis = stagiaire.type_stage in ("Académique", "Libre")
+
+            if rapport_requis and 'rapport_stage' not in request.FILES:
                 return Response({
                     "success": False,
-                    "message": "Le rapport de stage est obligatoire."
+                    "message": "Le rapport de stage est obligatoire pour un stage académique ou libre."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             if 'demande_manuscrite' not in request.FILES:
                 return Response({
                     "success": False,
                     "message": "La demande manuscrite est obligatoire."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
-            rapport_file = request.FILES['rapport_stage']
+
+            rapport_file = request.FILES.get('rapport_stage')
             demande_file = request.FILES['demande_manuscrite']
-            
+
             # Valider les extensions
-            if not rapport_file.name.lower().endswith('.pdf'):
+            if rapport_file and not rapport_file.name.lower().endswith('.pdf'):
                 return Response({
                     "success": False,
                     "message": "Le rapport de stage doit être au format PDF."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             allowed_extensions = ['.pdf', '.jpg', '.jpeg', '.png']
             demande_ext = os.path.splitext(demande_file.name)[1].lower()
             if demande_ext not in allowed_extensions:
@@ -3554,15 +3543,15 @@ class DemandeAttestationAPIView(APIView):
                     "success": False,
                     "message": "La demande manuscrite doit être en PDF, JPG ou PNG."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             # 6. Valider la taille des fichiers (max 10MB)
             max_size = 10 * 1024 * 1024  # 10MB
-            if rapport_file.size > max_size:
+            if rapport_file and rapport_file.size > max_size:
                 return Response({
                     "success": False,
                     "message": f"Le rapport de stage est trop volumineux. Taille max: 10MB"
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             if demande_file.size > max_size:
                 return Response({
                     "success": False,
@@ -3589,7 +3578,8 @@ class DemandeAttestationAPIView(APIView):
                         logger.warning(f"⚠️ Impossible de supprimer l'ancienne demande: {e}")
                 
                 # Mettre à jour la demande existante
-                existing_demande.rapport_stage = rapport_file
+                if rapport_file:
+                    existing_demande.rapport_stage = rapport_file
                 existing_demande.demande_manuscrite = demande_file
                 existing_demande.statut = 'en_attente'
                 existing_demande.motif_refus = None
@@ -3604,10 +3594,11 @@ class DemandeAttestationAPIView(APIView):
                 # 8. Créer une nouvelle demande d'attestation
                 demande_attestation_data = {
                     'stagiaire': stagiaire.id,
-                    'rapport_stage': rapport_file,
                     'demande_manuscrite': demande_file,
                     'statut': 'en_attente'
                 }
+                if rapport_file:
+                    demande_attestation_data['rapport_stage'] = rapport_file
                 
                 serializer = DemandeAttestationSerializer(data=demande_attestation_data)
                 
@@ -3702,7 +3693,203 @@ class DemandeAttestationAPIView(APIView):
                 "message": "Une erreur est survenue lors du traitement de votre demande."
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+@method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
+class DemandeAttestationDetailAPI(APIView):
+    """
+    API pour récupérer le détail d'une demande d'attestation
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, demande_id):
+        try:
+            demande = get_object_or_404(
+                DemandeAttestation.objects.select_related('stagiaire', 'stagiaire__etablissement'),
+                id=demande_id
+            )
+            stagiaire = demande.stagiaire
+
+            duree_jours = None
+            if stagiaire.date_debut and stagiaire.date_fin:
+                duree_jours = (stagiaire.date_fin - stagiaire.date_debut).days
+
+            data = {
+                'id': demande.id,
+                'statut': demande.statut,
+                'date_demande': demande.date_demande.isoformat() if demande.date_demande else None,
+                'date_traitement': demande.date_traitement.isoformat() if demande.date_traitement else None,
+                'date_upload_attestation_signee': demande.date_upload_attestation_signee.isoformat() if demande.date_upload_attestation_signee else None,
+                'motif_refus': demande.motif_refus,
+                'fichiers': {
+                    'rapport_stage': request.build_absolute_uri(demande.rapport_stage.url) if demande.rapport_stage else None,
+                    'demande_manuscrite': request.build_absolute_uri(demande.demande_manuscrite.url) if demande.demande_manuscrite else None,
+                    'attestation_generee': request.build_absolute_uri(demande.attestation_generee.url) if demande.attestation_generee else None,
+                    'attestation_signee': request.build_absolute_uri(demande.attestation_signee.url) if demande.attestation_signee else None,
+                },
+                'stagiaire': {
+                    'id': stagiaire.id,
+                    'nom': stagiaire.nom,
+                    'prenom': stagiaire.prenom,
+                    'email': stagiaire.email,
+                    'telephone': stagiaire.telephone,
+                    'direction': stagiaire.direction,
+                    'service': stagiaire.service,
+                    'date_debut': stagiaire.date_debut.isoformat() if stagiaire.date_debut else None,
+                    'date_fin': stagiaire.date_fin.isoformat() if stagiaire.date_fin else None,
+                    'duree_jours': duree_jours,
+                    'duree_mois': round(duree_jours / 30) if duree_jours else None,
+                    'statut': stagiaire.statut,
+                    'type_stage': stagiaire.type_stage,
+                    'specialite': getattr(stagiaire, 'specialite', None),
+                    'remunere': stagiaire.remunere,
+                    'montant_remuneration': stagiaire.montant_remuneration,
+                    'lieu_stage': stagiaire.lieu_stage,
+                    'superviseur': stagiaire.superviseur,
+                    'etablissement': {
+                        'nom': stagiaire.etablissement.nom if stagiaire.etablissement else None,
+                        'email': stagiaire.etablissement.email if stagiaire.etablissement else None,
+                    } if stagiaire.etablissement else None,
+                }
+            }
+
+            return Response({
+                'success': True,
+                'data': data
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"❌ Erreur récupération détail demande attestation {demande_id}: {str(e)}")
+            return Response({
+                'success': False,
+                'message': f'Erreur: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+class RegenerarAttestationAvecSignataireAPI(APIView):
+    """
+    API pour régénérer l'attestation PDF avec un signataire choisi
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, demande_id):
+        try:
+            with transaction.atomic():
+                demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
+
+                if demande_attestation.statut not in ('approuvee', 'traitee'):
+                    return Response({
+                        'success': False,
+                        'message': f"La demande doit être approuvée pour régénérer l'attestation. Statut actuel: {demande_attestation.statut}"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                signataire = request.data.get('signataire', 'DG')
+                if signataire not in ('DG', 'DGA'):
+                    return Response({
+                        'success': False,
+                        'message': "Signataire invalide. Valeurs possibles: DG, DGA"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                SIGNATAIRES = {
+                    'DG': {'titre': 'Le Directeur Général', 'nom': 'Dr. Karimou CHABI SIKA'},
+                    'DGA': {'titre': 'Le Directeur Général Adjoint', 'nom': 'M. Damipi NOUPOKOU'},
+                }
+                sig = SIGNATAIRES[signataire]
+
+                # Générer le PDF
+                attestation_pdf = self._generer_attestation_pdf(demande_attestation, sig)
+
+                timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
+                nom_fichier = f"attestation_generee_{demande_attestation.stagiaire.nom}_{demande_attestation.stagiaire.prenom}_{timestamp}.pdf"
+
+                demande_attestation.attestation_generee.save(
+                    nom_fichier,
+                    ContentFile(attestation_pdf.getvalue()),
+                    save=True
+                )
+
+                UserAction.objects.create(
+                    user=request.user,
+                    action=f"Attestation régénérée avec signataire {signataire} - Demande #{demande_attestation.id}",
+                    performed_by=request.user,
+                )
+
+                logger.info(f"✅ Attestation régénérée pour demande {demande_id} par {request.user.email} (signataire: {signataire})")
+
+                return Response({
+                    'success': True,
+                    'message': f'Attestation régénérée avec succès (signataire: {sig["titre"]})',
+                    'pdf_url': request.build_absolute_uri(demande_attestation.attestation_generee.url),
+                }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"❌ Erreur régénération attestation {demande_id}: {str(e)}", exc_info=True)
+            return Response({
+                'success': False,
+                'message': f'Erreur: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _generer_attestation_pdf(self, demande_attestation, signataire_info):
+        """Génère le PDF de l'attestation avec le signataire choisi"""
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+
+        p.setFont("Helvetica-Bold", 16)
+        p.drawCentredString(width/2, height - 4*cm, "ATTESTATION DE STAGE")
+        p.line(2*cm, height - 4.5*cm, width - 2*cm, height - 4.5*cm)
+
+        p.setFont("Helvetica", 12)
+        text = p.beginText(2*cm, height - 6*cm)
+        text.setLeading(14)
+
+        stagiaire = demande_attestation.stagiaire
+        date_debut = stagiaire.date_debut.strftime("%d/%m/%Y") if stagiaire.date_debut else "__________"
+        date_fin = stagiaire.date_fin.strftime("%d/%m/%Y") if stagiaire.date_fin else "__________"
+
+        duree_mois = "____"
+        if stagiaire.date_debut and stagiaire.date_fin:
+            delta = stagiaire.date_fin - stagiaire.date_debut
+            mois = delta.days // 30
+            duree_mois = f"{mois:02d}" if mois > 0 else "____"
+
+        clean_lines = [
+            f"Nous soussignés, attestons par la présente que {stagiaire.nom.upper()} {stagiaire.prenom},",
+            f"dans le cadre de son perfectionnement en {stagiaire.specialite or '__________'},",
+            f"a effectué un stage de {duree_mois} mois,",
+            f"du {date_debut} au {date_fin}",
+            f"au sein de la {stagiaire.direction or '__________'}.",
+            "",
+            f"Au cours de son stage effectué avec assiduité,",
+            f"{stagiaire.nom.upper()} {stagiaire.prenom} s'est montré dévoué",
+            f"et a attaché un grand intérêt au travail bien fait.",
+            "",
+            "En foi de quoi, la présente attestation lui est délivrée",
+            "pour servir et valoir ce que de droit.",
+        ]
+
+        for line in clean_lines:
+            text.textLine(line)
+
+        p.drawText(text)
+
+        text_y_position = 4.5*cm
+        p.setFont("Helvetica-Bold", 12)
+        p.drawRightString(width - 2*cm, text_y_position, signataire_info['titre'])
+        p.drawRightString(width - 2*cm, 3*cm, signataire_info['nom'])
+
+        p.setFont("Helvetica", 9)
+        p.setFillColorRGB(0.4, 0.4, 0.4)
+        date_generation = timezone.now().strftime("Généré le %d/%m/%Y à %H:%M")
+        p.drawString(2*cm, 1.5*cm, date_generation)
+        p.drawRightString(width - 2*cm, 1.5*cm, f"Réf: ATT-{demande_attestation.id:06d}")
+
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+        return buffer
+
+
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class ApprouverDemandeAttestationAPI(APIView):
     """
     API pour approuver une demande d'attestation
@@ -3888,7 +4075,7 @@ class ApprouverDemandeAttestationAPI(APIView):
         
         buffer.seek(0)
         return buffer
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class RefuserDemandeAttestationAPI(APIView):
     """
     API pour refuser une demande d'attestation
@@ -3983,7 +4170,7 @@ class RefuserDemandeAttestationAPI(APIView):
                 'success': False,
                 'message': f'Erreur lors du refus: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='DELETE')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='DELETE')], name='dispatch')
 class SupprimerDemandeAttestationAPI(APIView):
     """
     API pour supprimer une demande d'attestation
@@ -4037,7 +4224,7 @@ class SupprimerDemandeAttestationAPI(APIView):
                 'message': f'Erreur lors de la suppression: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-@method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class UploadAttestationSigneeAPI(APIView):
     """
     API pour uploader l'attestation signée et finaliser la demande

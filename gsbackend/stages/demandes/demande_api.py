@@ -3693,6 +3693,202 @@ class DemandeAttestationAPIView(APIView):
                 "message": "Une erreur est survenue lors du traitement de votre demande."
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
+class DemandeAttestationDetailAPI(APIView):
+    """
+    API pour récupérer le détail d'une demande d'attestation
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, demande_id):
+        try:
+            demande = get_object_or_404(
+                DemandeAttestation.objects.select_related('stagiaire', 'stagiaire__etablissement'),
+                id=demande_id
+            )
+            stagiaire = demande.stagiaire
+
+            duree_jours = None
+            if stagiaire.date_debut and stagiaire.date_fin:
+                duree_jours = (stagiaire.date_fin - stagiaire.date_debut).days
+
+            data = {
+                'id': demande.id,
+                'statut': demande.statut,
+                'date_demande': demande.date_demande.isoformat() if demande.date_demande else None,
+                'date_traitement': demande.date_traitement.isoformat() if demande.date_traitement else None,
+                'date_upload_attestation_signee': demande.date_upload_attestation_signee.isoformat() if demande.date_upload_attestation_signee else None,
+                'motif_refus': demande.motif_refus,
+                'fichiers': {
+                    'rapport_stage': request.build_absolute_uri(demande.rapport_stage.url) if demande.rapport_stage else None,
+                    'demande_manuscrite': request.build_absolute_uri(demande.demande_manuscrite.url) if demande.demande_manuscrite else None,
+                    'attestation_generee': request.build_absolute_uri(demande.attestation_generee.url) if demande.attestation_generee else None,
+                    'attestation_signee': request.build_absolute_uri(demande.attestation_signee.url) if demande.attestation_signee else None,
+                },
+                'stagiaire': {
+                    'id': stagiaire.id,
+                    'nom': stagiaire.nom,
+                    'prenom': stagiaire.prenom,
+                    'email': stagiaire.email,
+                    'telephone': stagiaire.telephone,
+                    'direction': stagiaire.direction,
+                    'service': stagiaire.service,
+                    'date_debut': stagiaire.date_debut.isoformat() if stagiaire.date_debut else None,
+                    'date_fin': stagiaire.date_fin.isoformat() if stagiaire.date_fin else None,
+                    'duree_jours': duree_jours,
+                    'duree_mois': round(duree_jours / 30) if duree_jours else None,
+                    'statut': stagiaire.statut,
+                    'type_stage': stagiaire.type_stage,
+                    'specialite': getattr(stagiaire, 'specialite', None),
+                    'remunere': stagiaire.remunere,
+                    'montant_remuneration': stagiaire.montant_remuneration,
+                    'lieu_stage': stagiaire.lieu_stage,
+                    'superviseur': stagiaire.superviseur,
+                    'etablissement': {
+                        'nom': stagiaire.etablissement.nom if stagiaire.etablissement else None,
+                        'email': stagiaire.etablissement.email if stagiaire.etablissement else None,
+                    } if stagiaire.etablissement else None,
+                }
+            }
+
+            return Response({
+                'success': True,
+                'data': data
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"❌ Erreur récupération détail demande attestation {demande_id}: {str(e)}")
+            return Response({
+                'success': False,
+                'message': f'Erreur: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
+class RegenerarAttestationAvecSignataireAPI(APIView):
+    """
+    API pour régénérer l'attestation PDF avec un signataire choisi
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, demande_id):
+        try:
+            with transaction.atomic():
+                demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
+
+                if demande_attestation.statut not in ('approuvee', 'traitee'):
+                    return Response({
+                        'success': False,
+                        'message': f"La demande doit être approuvée pour régénérer l'attestation. Statut actuel: {demande_attestation.statut}"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                signataire = request.data.get('signataire', 'DG')
+                if signataire not in ('DG', 'DGA'):
+                    return Response({
+                        'success': False,
+                        'message': "Signataire invalide. Valeurs possibles: DG, DGA"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                SIGNATAIRES = {
+                    'DG': {'titre': 'Le Directeur Général', 'nom': 'Dr. Karimou CHABI SIKA'},
+                    'DGA': {'titre': 'Le Directeur Général Adjoint', 'nom': 'M. Damipi NOUPOKOU'},
+                }
+                sig = SIGNATAIRES[signataire]
+
+                # Générer le PDF
+                attestation_pdf = self._generer_attestation_pdf(demande_attestation, sig)
+
+                timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
+                nom_fichier = f"attestation_generee_{demande_attestation.stagiaire.nom}_{demande_attestation.stagiaire.prenom}_{timestamp}.pdf"
+
+                demande_attestation.attestation_generee.save(
+                    nom_fichier,
+                    ContentFile(attestation_pdf.getvalue()),
+                    save=True
+                )
+
+                UserAction.objects.create(
+                    user=request.user,
+                    action=f"Attestation régénérée avec signataire {signataire} - Demande #{demande_attestation.id}",
+                    performed_by=request.user,
+                )
+
+                logger.info(f"✅ Attestation régénérée pour demande {demande_id} par {request.user.email} (signataire: {signataire})")
+
+                return Response({
+                    'success': True,
+                    'message': f'Attestation régénérée avec succès (signataire: {sig["titre"]})',
+                    'pdf_url': request.build_absolute_uri(demande_attestation.attestation_generee.url),
+                }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"❌ Erreur régénération attestation {demande_id}: {str(e)}", exc_info=True)
+            return Response({
+                'success': False,
+                'message': f'Erreur: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _generer_attestation_pdf(self, demande_attestation, signataire_info):
+        """Génère le PDF de l'attestation avec le signataire choisi"""
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+
+        p.setFont("Helvetica-Bold", 16)
+        p.drawCentredString(width/2, height - 4*cm, "ATTESTATION DE STAGE")
+        p.line(2*cm, height - 4.5*cm, width - 2*cm, height - 4.5*cm)
+
+        p.setFont("Helvetica", 12)
+        text = p.beginText(2*cm, height - 6*cm)
+        text.setLeading(14)
+
+        stagiaire = demande_attestation.stagiaire
+        date_debut = stagiaire.date_debut.strftime("%d/%m/%Y") if stagiaire.date_debut else "__________"
+        date_fin = stagiaire.date_fin.strftime("%d/%m/%Y") if stagiaire.date_fin else "__________"
+
+        duree_mois = "____"
+        if stagiaire.date_debut and stagiaire.date_fin:
+            delta = stagiaire.date_fin - stagiaire.date_debut
+            mois = delta.days // 30
+            duree_mois = f"{mois:02d}" if mois > 0 else "____"
+
+        clean_lines = [
+            f"Nous soussignés, attestons par la présente que {stagiaire.nom.upper()} {stagiaire.prenom},",
+            f"dans le cadre de son perfectionnement en {stagiaire.specialite or '__________'},",
+            f"a effectué un stage de {duree_mois} mois,",
+            f"du {date_debut} au {date_fin}",
+            f"au sein de la {stagiaire.direction or '__________'}.",
+            "",
+            f"Au cours de son stage effectué avec assiduité,",
+            f"{stagiaire.nom.upper()} {stagiaire.prenom} s'est montré dévoué",
+            f"et a attaché un grand intérêt au travail bien fait.",
+            "",
+            "En foi de quoi, la présente attestation lui est délivrée",
+            "pour servir et valoir ce que de droit.",
+        ]
+
+        for line in clean_lines:
+            text.textLine(line)
+
+        p.drawText(text)
+
+        text_y_position = 4.5*cm
+        p.setFont("Helvetica-Bold", 12)
+        p.drawRightString(width - 2*cm, text_y_position, signataire_info['titre'])
+        p.drawRightString(width - 2*cm, 3*cm, signataire_info['nom'])
+
+        p.setFont("Helvetica", 9)
+        p.setFillColorRGB(0.4, 0.4, 0.4)
+        date_generation = timezone.now().strftime("Généré le %d/%m/%Y à %H:%M")
+        p.drawString(2*cm, 1.5*cm, date_generation)
+        p.drawRightString(width - 2*cm, 1.5*cm, f"Réf: ATT-{demande_attestation.id:06d}")
+
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+        return buffer
+
+
 @method_decorator([csrf_exempt, never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class ApprouverDemandeAttestationAPI(APIView):
     """

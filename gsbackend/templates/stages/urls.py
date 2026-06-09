@@ -31,10 +31,10 @@ from .demandes.demande_api import (
     SupprimerDemandeView, PreAccepterDemandeAPIView, FinaliserAcceptationAPIView,
     TelechargerConventionTemporaireAPIView, AnnulerPreAcceptationSimpleAPIView,
     DemandesEnAcceptationAPI, DemandeAttestationAPIView, DemandeModificationAPIView,
-    DemandesAttestationAPI, ApprouverDemandeAttestationAPI,
+    DemandesAttestationAPI, DemandeAttestationDetailAPI, ApprouverDemandeAttestationAPI,
     RefuserDemandeAttestationAPI, SupprimerDemandeAttestationAPI,DemandesAttestationEnAttenteAPI,DemandesAttestationRefuseAPI,
     DemandesAttestationApprouveAPI, UploadAttestationSigneeAPI,DemandesAttestationTraiteeAPI, TelechargerAttestationSigneeAPI,
-    RegenererConventionAPIView
+    RegenererConventionAPIView, RegenerarAttestationAvecSignataireAPI
 )
 
 from .securite.security_api import (
@@ -182,8 +182,14 @@ urlpatterns = [
     # ============================================
     # DEMANDES D'ATTESTATION
     # ============================================
-     path('demandes-attestation/<int:demande_id>/approuver/', 
-         ApprouverDemandeAttestationAPI.as_view(), 
+     path('demandes-attestation/<int:demande_id>/detail/',
+         DemandeAttestationDetailAPI.as_view(),
+         name='demande-attestation-detail'),
+     path('demandes-attestation/<int:demande_id>/regenerer-attestation/',
+         RegenerarAttestationAvecSignataireAPI.as_view(),
+         name='regenerer-attestation-signataire'),
+     path('demandes-attestation/<int:demande_id>/approuver/',
+         ApprouverDemandeAttestationAPI.as_view(),
          name='approuver-demande-attestation'),
      path('demandes-attestation/<int:demande_id>/refuser/', 
          RefuserDemandeAttestationAPI.as_view(), 
@@ -318,6 +324,9 @@ urlpatterns = [
      path('demandes/<int:demande_id>/regenerer-convention/', RegenererConventionAPIView.as_view()),
     path('stagiaires/<int:stagiaire_id>/regenerer-convention-renouvellement/', RegenererConventionRenouvellementAPIView.as_view()),
 path('export-rapport/', views.ExportRapportAPIView.as_view(), name='export_rapport'),
+path('stagiaires/<int:stagiaire_id>/supprimer/',
+          StagiaireDetailAPI.as_view(),
+          name='supprimer_stagiaire'),
 ]
 
 urlpatterns += router.urls
