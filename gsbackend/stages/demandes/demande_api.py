@@ -1175,14 +1175,41 @@ class RefuserDemandeAPI(APIView):
         # Récupération de la demande
         demande = get_object_or_404(Demande, id=demande_id)
 
+        # Validation de l'état : un refus n'est possible que depuis un état non finalisé
+        if demande.statut_stage == Demande.Statut.ACCEPTEE:
+            return Response(
+                {"status": "error", "message": "Impossible de refuser une demande déjà acceptée (un stagiaire a été créé)."},
+                status=status.HTTP_409_CONFLICT,
+            )
+        if demande.statut_stage == Demande.Statut.REFUSEE:
+            return Response(
+                {"status": "error", "message": "Cette demande a déjà été refusée."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
         # Sauvegarde de l'ancien statut pour l'email
         ancien_statut = demande.statut_stage
 
-        # Mise à jour de la demande
-        demande.statut_stage = "Refusée"
-        demande.raison_refus = raison_refus
-        demande.traiter_candidature = True
-        demande.save()
+        with transaction.atomic():
+            # Si la demande était pré-acceptée, on nettoie la convention temporaire générée
+            if ancien_statut == Demande.Statut.PRE_ACCEPTEE:
+                conventions_temp = ConventionStage.objects.filter(demande=demande, est_temporaire=True)
+                for convention in conventions_temp:
+                    if convention.fichier and convention.fichier.name:
+                        try:
+                            convention.fichier.delete(save=False)
+                        except Exception as e:
+                            logger.warning(f"⚠️ Impossible de supprimer le fichier convention temporaire: {e}")
+                    convention.delete()
+                demande.convention_temporaire = None
+                demande.donnees_pre_acceptation = None
+                demande.date_pre_acceptation = None
+
+            # Mise à jour de la demande
+            demande.statut_stage = Demande.Statut.REFUSEE
+            demande.raison_refus = raison_refus
+            demande.traiter_candidature = True
+            demande.save()
 
         # ✅ ENVOI EMAIL SIMPLIFIÉ via le service
         try:
@@ -1930,19 +1957,19 @@ class FinaliserAcceptationAPIView(APIView):
                 convention_definitive.fichier.save(nom_fichier, fichier_signe, save=True)
 
                 # Mise à jour de la demande
-                demande.statut_stage = "Acceptée"
+                demande.statut_stage = Demande.Statut.ACCEPTEE
                 demande.traiter_candidature = True
-                
+
                 # ✅ CORRECTION: Gestion de la convention temporaire
                 convention_temporaire = demande.get_convention_temporaire()
                 if convention_temporaire:
-                    # Option 1: Supprimer la convention temporaire
-                    # convention_temporaire.delete()
-                    
-                    # Option 2: Conserver mais marquer comme obsolète
-                    convention_temporaire.est_temporaire = False  # On la conserve pour historique
+                    # On la conserve pour historique mais on la marque comme non temporaire
+                    convention_temporaire.est_temporaire = False
                     convention_temporaire.save()
-                
+
+                # Les données de pré-acceptation ont servi à créer le stagiaire : on les purge
+                demande.donnees_pre_acceptation = None
+
                 demande.save()
 
                 # ✅ CORRECTION: Ajout de la convention aux documents de la demande
@@ -3594,10 +3621,10 @@ class RegenerarAttestationAvecSignataireAPI(APIView):
             with transaction.atomic():
                 demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
 
-                if demande_attestation.statut not in ('approuvee', 'traitee'):
+                if demande_attestation.statut not in (DemandeAttestation.Statut.APPROUVEE, DemandeAttestation.Statut.TRAITEE):
                     return Response({
                         'success': False,
-                        'message': f"La demande doit être approuvée pour régénérer l'attestation. Statut actuel: {demande_attestation.statut}"
+                        'message': f"La demande doit être approuvée pour régénérer l'attestation. Statut actuel: {demande_attestation.get_statut_display()}"
                     }, status=status.HTTP_400_BAD_REQUEST)
 
                 signataire = request.data.get('signataire', 'DG')
@@ -3663,12 +3690,12 @@ class ApprouverDemandeAttestationAPI(APIView):
                 demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
                 
                 # Vérifier que la demande est en attente
-                if demande_attestation.statut != 'en_attente':
+                if demande_attestation.statut != DemandeAttestation.Statut.EN_ATTENTE:
                     return Response({
                         'success': False,
-                        'message': f"Cette demande est déjà {demande_attestation.statut}"
+                        'message': f"Cette demande est déjà {demande_attestation.get_statut_display()}"
                     }, status=status.HTTP_400_BAD_REQUEST)
-                
+
                 # 📄 GÉNÉRER ET SAUVEGARDER L'ATTESTATION WORD DANS LE CHAMP APPROPRIÉ
                 try:
                     from stages.docx_generator import generer_attestation_docx
@@ -3696,7 +3723,7 @@ class ApprouverDemandeAttestationAPI(APIView):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 # Mettre à jour le statut
-                demande_attestation.statut = 'approuvee'
+                demande_attestation.statut = DemandeAttestation.Statut.APPROUVEE
                 demande_attestation.date_traitement = timezone.now()
                 demande_attestation.motif_refus = None
                 demande_attestation.save()
@@ -3777,12 +3804,12 @@ class RefuserDemandeAttestationAPI(APIView):
                 demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
                 
                 # Vérifier que la demande est en attente
-                if demande_attestation.statut != 'en_attente':
+                if demande_attestation.statut != DemandeAttestation.Statut.EN_ATTENTE:
                     return Response({
                         'success': False,
-                        'message': f"Cette demande est déjà {demande_attestation.statut}"
+                        'message': f"Cette demande est déjà {demande_attestation.get_statut_display()}"
                     }, status=status.HTTP_400_BAD_REQUEST)
-                
+
                 # Récupérer le motif du refus
                 motif_refus = request.data.get('motif_refus', '').strip()
                 if not motif_refus:
@@ -3792,7 +3819,7 @@ class RefuserDemandeAttestationAPI(APIView):
                     }, status=status.HTTP_400_BAD_REQUEST)
                 
                 # Mettre à jour le statut
-                demande_attestation.statut = 'refusee'
+                demande_attestation.statut = DemandeAttestation.Statut.REFUSEE
                 demande_attestation.date_traitement = timezone.now()
                 demande_attestation.motif_refus = motif_refus
                 demande_attestation.save()
@@ -3927,10 +3954,10 @@ class UploadAttestationSigneeAPI(APIView):
                 demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
                 
                 # Vérifier que la demande est approuvée
-                if demande_attestation.statut != 'approuvee':
+                if demande_attestation.statut != DemandeAttestation.Statut.APPROUVEE:
                     return Response({
                         'success': False,
-                        'message': f"Impossible d'uploader l'attestation signée. Statut actuel: {demande_attestation.statut}"
+                        'message': f"Impossible d'uploader l'attestation signée. Statut actuel: {demande_attestation.get_statut_display()}"
                     }, status=status.HTTP_400_BAD_REQUEST)
                 
                 # Vérifier qu'une attestation générée existe
@@ -3984,7 +4011,7 @@ class UploadAttestationSigneeAPI(APIView):
                 )
                 
                 # Mettre à jour le statut et la date
-                demande_attestation.statut = 'traitee'
+                demande_attestation.statut = DemandeAttestation.Statut.TRAITEE
                 demande_attestation.date_upload_attestation_signee = timezone.now()
                 demande_attestation.save()
                 

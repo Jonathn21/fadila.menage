@@ -1,14 +1,9 @@
 from rest_framework import serializers
 from .models import (
-    Demande, Stagiaire, 
-    Etablissement,  AttestationStage, ConventionStage,Notification
+    Demande, Stagiaire,
+    Etablissement, ConventionStage,Notification
 )
 
-
-class AttestationStageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AttestationStage
-        fields = '__all__'
 
 class ConventionStageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -79,7 +74,6 @@ class DemandeSerializer(serializers.ModelSerializer):
             return "secondary"  # Gris
 
 class StagiaireSerializer(serializers.ModelSerializer):
-    attestation = AttestationStageSerializer(read_only=True)
     conventionstage = ConventionStageSerializer(read_only=True)
     documents = serializers.SerializerMethodField()
 

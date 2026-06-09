@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Demande,Stagiaire,Entretien,Notification,ConventionStage,Etablissement,StageEffectue,AttestationStage,Diplome
+from .models import Demande,Stagiaire,Entretien,Notification,ConventionStage,Etablissement,StageEffectue,Diplome
 from django.utils.translation import gettext_lazy as _
 
 
@@ -21,7 +21,6 @@ admin.site.register(Entretien)
 
 
 admin.site.register(Notification)
-admin.site.register(AttestationStage)
 
 admin.site.register(ConventionStage)
 admin.site.register(Etablissement)

@@ -56,7 +56,14 @@ class Demande(models.Model):
         ('Libre', 'Libre')
     ], default='Académique')
 
-    statut_stage = models.CharField(max_length=50, default="En attente")
+    class Statut(models.TextChoices):
+        EN_ATTENTE = "En attente", "En attente"
+        EN_TRAITEMENT = "En cours de traitement", "En cours de traitement"
+        PRE_ACCEPTEE = "Pré-acceptée", "Pré-acceptée"
+        ACCEPTEE = "Acceptée", "Acceptée"
+        REFUSEE = "Refusée", "Refusée"
+
+    statut_stage = models.CharField(max_length=50, choices=Statut.choices, default=Statut.EN_ATTENTE)
 
     # Détails
     date_soumission = models.DateTimeField(auto_now_add=True)
@@ -1128,14 +1135,6 @@ class Stagiaire(models.Model):
         
         return True, "Demande possible"
 
-class AttestationStage(models.Model):
-    stagiaire = models.OneToOneField('Stagiaire', on_delete=models.CASCADE, related_name='attestation')
-    fichier = models.FileField(upload_to='attestations_stages/')
-    date_generation = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Attestation de {self.stagiaire}"
-
 class HistoriqueDemande(models.Model):
     demande = models.ForeignKey('Demande', on_delete=models.CASCADE, related_name='historiques')
     action = models.CharField(max_length=255)  # Exemple : "Demande acceptée", "Refusée", etc.
@@ -1312,12 +1311,13 @@ class DocumentViewHistory(models.Model):
 
 
 class DemandeAttestation(models.Model):
-    STATUT_CHOICES = [
-        ('en_attente', 'En attente'),
-        ('approuvee', 'Approuvée'),
-        ('refusee', 'Refusée'),
-        ('traitee', 'Traitée'),
-    ]
+    class Statut(models.TextChoices):
+        EN_ATTENTE = 'en_attente', 'En attente'
+        APPROUVEE = 'approuvee', 'Approuvée'
+        REFUSEE = 'refusee', 'Refusée'
+        TRAITEE = 'traitee', 'Traitée'
+
+    STATUT_CHOICES = Statut.choices
 
     stagiaire = models.OneToOneField(
         'Stagiaire',
