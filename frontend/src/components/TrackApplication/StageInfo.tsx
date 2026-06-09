@@ -242,57 +242,6 @@ export const StageInfo: React.FC<StageInfoProps> = ({ stage }) => {
           </div>
         )}
 
-        {/* Attestation de stage */}
-        {stage.attestation && (
-          <div className="border-t pt-4 sm:pt-6">
-            <h4 className="font-medium text-sm sm:text-base flex items-center gap-2 mb-4">
-              <Award className="h-4 w-4 text-primary" />
-              Attestation de stage
-            </h4>
-            <div className="bg-green-50 border  rounded-lg p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <p className="font-medium text-green-800">
-                    Attestation générée
-                  </p>
-                  {stage.attestation.date_generation && (
-                    <p className="text-sm text-green-700">
-                      Générée le: {formatDate(stage.attestation.date_generation)}
-                    </p>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleViewDocument({
-                      nom: `Attestation de stage`,
-                      url: stage.attestation.fichier_url,
-                      type: 'attestation'
-                    })}
-                  >
-                    <Eye className="h-3 w-3 mr-1" />
-                    Voir
-                  </Button>
-                  <Button
-                    size="sm"
-                    asChild
-                  >
-                    <a 
-                      href={stage.attestation.fichier_url} 
-                      download
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Download className="h-3 w-3 mr-1" />
-                      Télécharger
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

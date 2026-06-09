@@ -2027,53 +2027,6 @@ const TrackApplication = () => {
                       </>
                     )}
 
-                    {!showNewRequestForm && application.stage.attestation && (
-                      <div className="space-y-3 sm:space-y-4 md:space-y-6">
-                        <div className="mt-2">
-                          <Card className="border-2 border-dashed border-teal-200">
-                            <CardContent className="p-4 sm:p-6">
-                              <div className="text-center space-y-3 sm:space-y-4">
-                                <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-teal-100 rounded-lg flex items-center justify-center">
-                                  <Award className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600" />
-                                </div>
-                                <div>
-                                  <h3 className="font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
-                                    Attestation de stage
-                                  </h3>
-                                  <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
-                                    PDF • Attestation officielle
-                                  </p>
-                                </div>
-                                <div className="flex gap-2 justify-center flex-wrap">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="text-xs sm:text-sm"
-                                    onClick={() => handleViewDocument({
-                                      nom: 'Attestation de stage signée',
-                                      url: application.stage.attestation.fichier_url,
-                                      type: 'attestation_signee'
-                                    })}
-                                  >
-                                    <Eye className="h-3 w-3 mr-1" />
-                                    Voir
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="text-xs sm:text-sm"
-                                    onClick={() => window.open(application.stage.attestation.fichier_url, '_blank')}
-                                  >
-                                    <Download className="h-3 w-3 mr-1" />
-                                    Télécharger
-                                  </Button>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </div>
-                    )}
                   </>
                 ) : (
                   // Afficher le formulaire de soumission initial (pas de demande précédente)
