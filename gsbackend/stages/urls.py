@@ -143,7 +143,7 @@ urlpatterns = [
          name='api_demande_detail'),
      path('demandes/<int:demande_id>/refuser/', 
          RefuserDemandeAPI.as_view(), 
-         name='api_refuer_demande'),
+         name='api_refuser_demande'),
      path('demandes/<int:demande_id>/supprimer/', 
          SupprimerDemandeView.as_view(), 
          name='supprimer_demande'),

@@ -1045,7 +1045,7 @@ class SidebarCountsAPIView(APIView):
         demandes_acceptees = Demande.objects.filter(statut_stage='Acceptée').count()
         demandes_refusees = Demande.objects.filter(statut_stage='Refusée').count()
         demandes_traitement = Demande.objects.filter(statut_stage='En cours de traitement').count()
-        demandes_en_acceptation = Demande.objects.filter(statut_stage='Pré-Acceptée').count()
+        demandes_en_acceptation = Demande.objects.filter(statut_stage='Pré-acceptée').count()
 
         demandes_archivees = Demande.objects.filter(est_archivee=True).count()
 

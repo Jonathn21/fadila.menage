@@ -90,7 +90,7 @@ CHANNEL_LAYERS = {
             "hosts": [("redis", 6379)],
         },
     },
-} if os.environ.get('DOCKERIZED', False) else {
+} if os.environ.get('DOCKERIZED', 'false').lower() == 'true' else {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     }
@@ -106,7 +106,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {

@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import models
 from datetime import datetime,date
 from django.utils import timezone
 from utilisateurs.models import Utilisateur,Profil,VerificationCode
