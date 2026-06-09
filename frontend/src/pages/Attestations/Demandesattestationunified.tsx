@@ -386,10 +386,10 @@ const DemandesAttestationUnified: React.FC = () => {
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
+      if (!file.name.toLowerCase().endsWith('.pdf') && !file.name.toLowerCase().endsWith('.docx')) {
         toast({
           title: "Format invalide",
-          description: "Seuls les fichiers PDF sont acceptés.",
+          description: "Seuls les fichiers PDF et Word (.docx) sont acceptés.",
           variant: "destructive",
         });
         return;
@@ -1422,7 +1422,7 @@ const DemandesAttestationUnified: React.FC = () => {
                             className=" text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
                             onClick={() => telechargerDocument(
                                 selectedDocuments.demande!.fichiers.attestation_generee!,
-                                `attestation_generee_${selectedDocuments.demande!.stagiaire.nom}.pdf`
+                                `attestation_generee_${selectedDocuments.demande!.stagiaire.nom}.docx`
                             )}
                             >
                             <Download className="h-4 w-4 mr-2" />
@@ -1859,7 +1859,7 @@ const DemandesAttestationUnified: React.FC = () => {
                             if (uploadModal.demande?.fichiers?.attestation_generee) {
                                 telechargerDocument(
                                 uploadModal.demande.fichiers.attestation_generee,
-                                `attestation_${uploadModal.demande.stagiaire.nom}.pdf`
+                                `attestation_${uploadModal.demande.stagiaire.nom}.docx`
                                 );
                             }
                             }}
@@ -1882,7 +1882,7 @@ const DemandesAttestationUnified: React.FC = () => {
                     <Input
                     id="attestation-file"
                     type="file"
-                    accept=".pdf"
+                    accept=".pdf,.docx"
                     onChange={handleFileSelect}
                     disabled={uploadModal.isUploading}
                     className=" focus:border-gray-400 focus:ring-gray-400"

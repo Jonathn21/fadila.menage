@@ -220,8 +220,8 @@ const AttestationDetailsPage: React.FC = () => {
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
-        toast({ title: "Format invalide", description: "Seuls les fichiers PDF sont acceptés.", variant: "destructive" });
+      if (!file.name.toLowerCase().endsWith('.pdf') && !file.name.toLowerCase().endsWith('.docx')) {
+        toast({ title: "Format invalide", description: "Seuls les fichiers PDF et Word (.docx) sont acceptés.", variant: "destructive" });
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
@@ -538,14 +538,11 @@ const AttestationDetailsPage: React.FC = () => {
                         <div className="p-2 rounded-md bg-green-100"><FileText className="h-4 w-4 text-green-600" /></div>
                         <div>
                           <p className="font-medium text-sm text-gray-900">Attestation générée</p>
-                          <p className="text-xs text-green-600">PDF prêt pour signature</p>
+                          <p className="text-xs text-green-600">Document Word prêt pour signature</p>
                         </div>
                       </div>
                       <div className="flex gap-2 self-end sm:self-center">
-                        <Button variant="ghost" size="sm" onClick={() => setSelectedDocument({ title: "Attestation générée", url: demande.fichiers.attestation_generee! })} className="h-8 gap-1 hover:bg-gray-100 text-gray-700">
-                          <Eye className="h-3.5 w-3.5" /><span className="hidden sm:inline">Voir</span>
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => telechargerDocument(demande.fichiers.attestation_generee!, `attestation_generee_${stagiaire.nom}.pdf`)} className="h-8 gap-1 text-gray-700 hover:bg-gray-100 hover:border-gray-300">
+                        <Button variant="outline" size="sm" onClick={() => telechargerDocument(demande.fichiers.attestation_generee!, `attestation_generee_${stagiaire.nom}.docx`)} className="h-8 gap-1 text-gray-700 hover:bg-gray-100 hover:border-gray-300">
                           <Download className="h-3.5 w-3.5" /><span className="hidden sm:inline">Télécharger</span>
                         </Button>
                       </div>
@@ -857,7 +854,7 @@ const AttestationDetailsPage: React.FC = () => {
                         <p className="text-sm font-medium text-blue-900 mb-1">Attestation générée disponible</p>
                         <p className="text-xs text-blue-700">Téléchargez-la, faites-la signer, puis uploadez la version signée.</p>
                         <Button variant="outline" size="sm" className="mt-2 border-blue-200 text-blue-700 hover:bg-blue-50"
-                          onClick={() => telechargerDocument(demande.fichiers.attestation_generee!, `attestation_${stagiaire.nom}.pdf`)}
+                          onClick={() => telechargerDocument(demande.fichiers.attestation_generee!, `attestation_${stagiaire.nom}.docx`)}
                         >
                           <Download className="h-3 w-3 mr-2" />Télécharger l'attestation à signer
                         </Button>
@@ -868,7 +865,7 @@ const AttestationDetailsPage: React.FC = () => {
               )}
               <div className="space-y-2">
                 <Label htmlFor="attestation-file" className="text-gray-900">Sélectionner l'attestation signée <span className="text-red-500">*</span></Label>
-                <Input id="attestation-file" type="file" accept=".pdf" onChange={handleFileSelect} disabled={isUploading} />
+                <Input id="attestation-file" type="file" accept=".pdf,.docx" onChange={handleFileSelect} disabled={isUploading} />
                 <p className="text-xs text-gray-600">Format: PDF uniquement. Taille max: 5 Mo</p>
               </div>
               {uploadFile && (

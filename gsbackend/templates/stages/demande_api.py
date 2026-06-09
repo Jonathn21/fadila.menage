@@ -2099,30 +2099,31 @@ class FinaliserAcceptationAPIView(APIView):
             return 0
 
     def valider_fichier_signe(self, fichier):
-        """Valide le fichier signé (PDF uniquement)"""
-        allowed_types = ['application/pdf']
+        """Valide le fichier signé (PDF ou Word)"""
+        allowed_types = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+        allowed_extensions = ('.pdf', '.docx')
         max_size = 10 * 1024 * 1024  # 10MB
-        
+
         if fichier.size > max_size:
             logger.warning(f"Fichier trop volumineux: {fichier.size} bytes")
             return False
-        
+
         # Vérifier le type MIME
         if hasattr(fichier, 'content_type') and fichier.content_type:
             if fichier.content_type not in allowed_types:
                 logger.warning(f"Type MIME non autorisé: {fichier.content_type}")
                 return False
-        
+
         # Vérifier l'extension
-        if not fichier.name.lower().endswith('.pdf'):
+        if not fichier.name.lower().endswith(allowed_extensions):
             logger.warning(f"Extension non autorisée: {fichier.name}")
             return False
-        
+
         # Vérifier que le fichier n'est pas vide
         if fichier.size == 0:
             logger.warning("Fichier vide")
             return False
-        
+
         return True
 
     def ajouter_convention_aux_documents(self, demande, convention):
@@ -2324,8 +2325,13 @@ class TelechargerConventionTemporaireAPIView(APIView):
             file_path = convention.fichier.path
             if os.path.exists(file_path):
                 with open(file_path, 'rb') as f:
-                    response = HttpResponse(f.read(), content_type='application/pdf')
-                    response['Content-Disposition'] = f'attachment; filename="{convention.fichier.name}"'
+                    # Déterminer le content_type selon l'extension
+                    if convention.fichier.name.lower().endswith('.docx'):
+                        ct = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    else:
+                        ct = 'application/pdf'
+                    response = HttpResponse(f.read(), content_type=ct)
+                    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(convention.fichier.name)}"'
                     return response
             else:
                 return Response({
@@ -3944,10 +3950,10 @@ class UploadAttestationSigneeAPI(APIView):
                 attestation_file = request.FILES['attestation_signee']
                 
                 # Valider l'extension
-                if not attestation_file.name.lower().endswith('.pdf'):
+                if not attestation_file.name.lower().endswith(('.pdf', '.docx')):
                     return Response({
                         'success': False,
-                        'message': "L'attestation signée doit être au format PDF."
+                        'message': "L'attestation signée doit être au format PDF ou Word (.docx)."
                     }, status=status.HTTP_400_BAD_REQUEST)
                 
                 # Valider la taille (max 5MB)
@@ -3968,7 +3974,8 @@ class UploadAttestationSigneeAPI(APIView):
                 
                 # Sauvegarder la nouvelle attestation signée
                 timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
-                nom_fichier = f"attestation_signee_{demande_attestation.stagiaire.nom}_{demande_attestation.stagiaire.prenom}_{timestamp}.pdf"
+                ext = os.path.splitext(attestation_file.name)[1].lower() or '.pdf'
+                nom_fichier = f"attestation_signee_{demande_attestation.stagiaire.nom}_{demande_attestation.stagiaire.prenom}_{timestamp}{ext}"
                 
                 demande_attestation.attestation_signee.save(
                     nom_fichier,
@@ -4098,9 +4105,14 @@ class TelechargerAttestationSigneeAPI(APIView):
             )
             
             # Retourner le fichier
+            file_path_att = demande_attestation.attestation_signee.path
+            if file_path_att.lower().endswith('.docx'):
+                ct = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            else:
+                ct = 'application/pdf'
             response = FileResponse(
-                open(demande_attestation.attestation_signee.path, 'rb'),
-                content_type='application/pdf'
+                open(file_path_att, 'rb'),
+                content_type=ct
             )
             response['Content-Disposition'] = f'attachment; filename="{os.path.basename(demande_attestation.attestation_signee.path)}"'
             

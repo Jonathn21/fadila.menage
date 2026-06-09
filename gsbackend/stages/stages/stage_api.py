@@ -1185,7 +1185,8 @@ class FinaliserRenouvellementAPIView(APIView):
                     numero_convention=f"RENEW-FINAL-{nouveau_stagiaire.id}-{int(time.time())}"
                 )
                 
-                nom_fichier = f"convention_renouvellement_{nouveau_stagiaire.nom}_{nouveau_stagiaire.prenom}.pdf"
+                ext = os.path.splitext(fichier_signe.name)[1].lower() or '.pdf'
+                nom_fichier = f"convention_renouvellement_{nouveau_stagiaire.nom}_{nouveau_stagiaire.prenom}{ext}"
                 convention_definitive.fichier.save(nom_fichier, fichier_signe, save=True)
 
                 stagiaire_original.a_ete_renouvele = True
@@ -1357,21 +1358,22 @@ class FinaliserRenouvellementAPIView(APIView):
 
     def valider_fichier_signe(self, fichier):
         """Valide le fichier signé (PDF uniquement)"""
-        allowed_types = ['application/pdf']
+        allowed_types = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+        allowed_extensions = ('.pdf', '.docx')
         max_size = 10 * 1024 * 1024  # 10MB
-        
+
         if fichier.size > max_size:
             logger.warning(f"Fichier trop volumineux: {fichier.size} bytes")
             return False
-        
+
         if hasattr(fichier, 'content_type') and fichier.content_type not in allowed_types:
             logger.warning(f"Type MIME non autorisé: {fichier.content_type}")
             return False
-        
-        if not fichier.name.lower().endswith('.pdf'):
+
+        if not fichier.name.lower().endswith(allowed_extensions):
             logger.warning(f"Extension non autorisée: {fichier.name}")
             return False
-        
+
         return True
 
     def nettoyer_convention_temporaire(self, stagiaire, convention_temporaire_id=None):
@@ -1433,7 +1435,11 @@ class TelechargerConventionRenouvellementAPIView(APIView):
                 }, status=status.HTTP_404_NOT_FOUND)
             
             # Renvoyer le fichier
-            response = HttpResponse(convention.fichier, content_type='application/pdf')
+            if convention.fichier.name.lower().endswith('.docx'):
+                ct = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            else:
+                ct = 'application/pdf'
+            response = HttpResponse(convention.fichier, content_type=ct)
             response['Content-Disposition'] = f'attachment; filename="{convention.fichier.name}"'
             return response
                 
