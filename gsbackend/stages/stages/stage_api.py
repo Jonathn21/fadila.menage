@@ -1022,155 +1022,29 @@ class PreRenouvelerStageAPIView(APIView):
             return False, None
 
     def generer_pdf_avec_donnees_renouvellement(self, convention, stagiaire, donnees):
-        """Génère le PDF avec les données de renouvellement"""
+        """Génère le document Word avec les données de renouvellement"""
         try:
-            buffer = BytesIO()
-            doc = SimpleDocTemplate(
-                buffer,
-                pagesize=A4,
-                rightMargin=2*cm,
-                leftMargin=2*cm,
-                topMargin=2*cm,
-                bottomMargin=2*cm
-            )
-            
-            elements = []
-            
-            # Styles personnalisés
-            styles = getSampleStyleSheet()
-            styles.add(ParagraphStyle(
-                name="Ref", 
-                fontSize=12, 
-                alignment=TA_LEFT, 
-                leading=14, 
-                spaceAfter=12
-            ))
-            styles.add(ParagraphStyle(
-                name="CenterTitle", 
-                fontSize=14, 
-                alignment=TA_CENTER, 
-                spaceAfter=20, 
-                leading=22,
-                textColor=colors.HexColor('#2563eb')
-            ))
-            styles.add(ParagraphStyle(
-                name="Justify", 
-                fontSize=12, 
-                alignment=TA_JUSTIFY, 
-                leading=18
-            ))
-            styles.add(ParagraphStyle(
-                name="Left", 
-                fontSize=12, 
-                alignment=TA_LEFT, 
-                leading=18
-            ))
-            styles.add(ParagraphStyle(
-                name="Signature", 
-                fontSize=12, 
-                alignment=TA_RIGHT, 
-                spaceBefore=40
-            ))
-            
-            # --- ESPACE pour l'en-tête pré-imprimé ---
-            elements.append(Spacer(1, 6*cm))
-            elements.append(Spacer(1, 20))
-            
-            # --- Title avec mention RENOUVELLEMENT ---
-            elements.append(Paragraph("<b><u>AUTORISATION DE RENOUVELLEMENT DE STAGE</u></b>", styles["CenterTitle"]))
-            elements.append(Spacer(1, 20))
-            
-            # --- Calcul de la durée du stage ---
-            duree_mois = self.calculer_duree_mois(donnees["date_debut"], donnees["date_fin"])
-            
-            # --- Formater les dates et la durée ---
-            date_debut_format = self.date_format_francais(donnees["date_debut"])
-            date_fin_format = self.date_format_francais(donnees["date_fin"])
-            duree_formatee = self.duree_en_lettres_et_chiffres(duree_mois)
-            
-            # --- Dictionnaire des descriptions des directions ---
-            descriptions_directions = {
-                "DARH": "Direction des Affaires et Ressources Humaines",
-                "DCGIS": "Direction du Centre de Gestion de l'Information et des Statistiques",
-                "DEPP": "Direction des Études, Planification et Projets",
-                "DT": "Direction Technique",
-                "DM": "Direction des Marchés",
-                "DFC": "Direction Financière et Comptable",
-                "DG": "Direction Générale",
+            from stages.docx_generator import generer_lettre_renouvellement_docx
+
+            helpers = {
+                "calculer_duree_mois": self.calculer_duree_mois,
+                "date_format_francais": self.date_format_francais,
+                "duree_en_lettres_et_chiffres": self.duree_en_lettres_et_chiffres,
             }
-            
-            # --- Récupérer la description de la direction ---
-            direction_code = donnees.get("direction", "")
-            direction_description = descriptions_directions.get(direction_code, direction_code)
-            
-            # --- Texte principal ---
-            texte_autorisation = (
-                f"Dans le cadre du renouvellement de son stage à la CEB, "
-                f"Monsieur <b>{stagiaire.nom.upper()} {stagiaire.prenom}</b> est autorisé à effectuer un nouveau stage "
-                f"pour une durée de <b>{duree_formatee}</b> mois allant du <b>{date_debut_format}</b> "
-                f"au <b>{date_fin_format}</b>."
+
+            buffer = generer_lettre_renouvellement_docx(
+                stagiaire, donnees, signataire_id="DG", helpers=helpers,
+                convention_numero=convention.numero_convention
             )
-            elements.append(Paragraph(texte_autorisation, styles["Justify"]))
-            elements.append(Spacer(1, 12))
-            
-            texte_affectation = (
-                f"L'intéressé est mis à la disposition de la Direction <b>{direction_code} ({direction_description})</b>, "
-                f"Service <b>{donnees.get('service', '')}</b>."
-            )
-            elements.append(Paragraph(texte_affectation, styles["Justify"]))
-            elements.append(Spacer(1, 12))
-            
-            # Mention du stage précédent
-            texte_precedent = (
-                f"Ce renouvellement fait suite au stage précédent effectué du "
-                f"<b>{self.date_format_francais(stagiaire.date_debut.strftime('%d/%m/%Y'))}</b> au "
-                f"<b>{self.date_format_francais(stagiaire.date_fin.strftime('%d/%m/%Y'))}</b>."
-            )
-            elements.append(Paragraph(texte_precedent, styles["Justify"]))
-            elements.append(Spacer(1, 12))
-            
-            # Rémunération (conditionnelle)
-            if donnees.get("remunere", False):
-                montant = donnees.get("montant", 0)
-                montant_formate = f"{montant:,}".replace(",", " ")
-                texte_remuneration = (
-                    f"Conformément à la décision Nº236/CEB/DG/DARH/SAA/SASR/2020 portant Révision des indemnités "
-                    f"forfaitaires de Stage en date du 3 septembre 2020, Monsieur <b>{stagiaire.nom.upper()} {stagiaire.prenom}</b> "
-                    f"bénéficie au cours de son stage d'une indemnité forfaitaire mensuelle nette de "
-                    f"<b>{montant_formate} FRANCS CFA</b>."
-                )
-                elements.append(Paragraph(texte_remuneration, styles["Justify"]))
-            
-            elements.append(Spacer(1, 40))
-            
-            # --- Signature ---
-            elements.append(Spacer(1, 40))
-            elements.append(Paragraph("Le Directeur Général", styles["Signature"]))
-            elements.append(Spacer(1, 40))
-            elements.append(Paragraph("<b>Dr. Karimou CHABI SIKA</b>", styles["Signature"]))
-            
-            # --- Pied de page - Mention TEMPORAIRE ---
-            elements.append(Spacer(1, 60))
-            elements.append(Paragraph(
-                f"<i><font color='blue'>CONVENTION DE RENOUVELLEMENT TEMPORAIRE - Réf: {convention.numero_convention}</font></i>", 
-                ParagraphStyle(name="Footer", fontSize=8, alignment=TA_CENTER, textColor=colors.blue, spaceBefore=20)
-            ))
-            
-            # Générer le PDF
-            doc.build(elements)
-            
-            # Sauvegarde du fichier
-            pdf_content = buffer.getvalue()
-            buffer.close()
-            
-            nom_fichier = f"renouvellement_{stagiaire.nom}_{stagiaire.prenom}_{int(time.time())}.pdf"
-            convention.fichier.save(nom_fichier, ContentFile(pdf_content), save=True)
-            
-            logger.info(f"Convention de renouvellement PDF générée: {nom_fichier}")
+
+            nom_fichier = f"renouvellement_{stagiaire.nom}_{stagiaire.prenom}_{int(time.time())}.docx"
+            convention.fichier.save(nom_fichier, ContentFile(buffer.getvalue()), save=True)
+
+            logger.info(f"Convention de renouvellement Word générée: {nom_fichier}")
             return True
-            
+
         except Exception as e:
-            logger.error(f"Erreur génération PDF renouvellement: {str(e)}")
+            logger.error(f"Erreur génération Word renouvellement: {str(e)}")
             import traceback
             traceback.print_exc()
             return False
@@ -1823,21 +1697,9 @@ class RegenererConventionRenouvellementAPIView(APIView):
 
     def regenerer_pdf(self, convention, stagiaire, donnees, signataire_info):
         try:
-            buffer = BytesIO()
-            doc = SimpleDocTemplate(
-                buffer, pagesize=A4,
-                rightMargin=2*cm, leftMargin=2*cm,
-                topMargin=2*cm, bottomMargin=2*cm
-            )
+            from stages.docx_generator import generer_lettre_renouvellement_docx
 
-            styles = getSampleStyleSheet()
-            styles.add(ParagraphStyle(name="CenterTitle", fontSize=12, alignment=TA_CENTER, spaceAfter=20, leading=22))
-            styles.add(ParagraphStyle(name="Justify", fontSize=12, alignment=TA_JUSTIFY, leading=18))
-            styles.add(ParagraphStyle(name="Signature", fontSize=12, alignment=TA_RIGHT, spaceBefore=40))
-
-            pre_view = PreRenouvelerStageAPIView()
-
-            # ✅ Normalisation robuste des dates du nouveau stage
+            # Normalisation des dates
             date_debut_str = self.normaliser_date(donnees, "date_debut", "date_debut_iso")
             date_fin_str = self.normaliser_date(donnees, "date_fin", "date_fin_iso")
 
@@ -1845,91 +1707,34 @@ class RegenererConventionRenouvellementAPIView(APIView):
                 logger.error(f"Dates manquantes dans donnees: {donnees}")
                 return False
 
-            duree_mois = pre_view.calculer_duree_mois(date_debut_str, date_fin_str)
-            duree_formatee = pre_view.duree_en_lettres_et_chiffres(duree_mois)
+            # Préparer les données normalisées
+            donnees_normalisees = dict(donnees)
+            donnees_normalisees["date_debut"] = date_debut_str
+            donnees_normalisees["date_fin"] = date_fin_str
 
-            # ✅ with_le=False pour éviter "du le X" et "au le Y"
-            date_debut_format = self.date_format_francais(date_debut_str, with_le=False)
-            date_fin_format = self.date_format_francais(date_fin_str, with_le=False)
+            # Déterminer le signataire_id à partir de signataire_info
+            signataire_id = "DG"
+            if "Adjoint" in signataire_info.get("titre", ""):
+                signataire_id = "DGA"
 
-            # ✅ Dates du stage précédent depuis l'objet stagiaire (objets date Python)
-            date_debut_precedent = self.date_format_francais(
-                stagiaire.date_debut.strftime("%d/%m/%Y"), with_le=False
-            )
-            date_fin_precedent = self.date_format_francais(
-                stagiaire.date_fin.strftime("%d/%m/%Y"), with_le=False
-            )
-
-            descriptions_directions = {
-                "DARH": "Direction des Affaires et Ressources Humaines",
-                "DCGIS": "Direction du Centre de Gestion de l'Information et des Statistiques",
-                "DEPP": "Direction des Études, Planification et Projets",
-                "DT": "Direction Technique",
-                "DM": "Direction des Marchés",
-                "DFC": "Direction Financière et Comptable",
-                "DG": "Direction Générale",
+            pre_view = PreRenouvelerStageAPIView()
+            helpers = {
+                "calculer_duree_mois": pre_view.calculer_duree_mois,
+                "date_format_francais": lambda d: self.date_format_francais(d, with_le=False),
+                "duree_en_lettres_et_chiffres": pre_view.duree_en_lettres_et_chiffres,
             }
-            direction_code = donnees.get("direction", "")
-            direction_description = descriptions_directions.get(direction_code, direction_code)
 
-            elements = []
-            elements.append(Spacer(1, 6*cm))
-            elements.append(Spacer(1, 20))
-            elements.append(Paragraph("<b><u>AUTORISATION DE RENOUVELLEMENT DE STAGE</u></b>", styles["CenterTitle"]))
-            elements.append(Spacer(1, 20))
-
-            texte_autorisation = (
-                f"Dans le cadre du renouvellement de son stage à la CEB, "
-                f"Monsieur <b>{stagiaire.nom.upper()} {stagiaire.prenom}</b> est autorisé à effectuer un nouveau stage "
-                f"pour une durée de <b>{duree_formatee}</b> mois allant du <b>{date_debut_format}</b> "
-                f"au <b>{date_fin_format}</b>."
+            buffer = generer_lettre_renouvellement_docx(
+                stagiaire, donnees_normalisees, signataire_id=signataire_id,
+                helpers=helpers, convention_numero=None
             )
-            elements.append(Paragraph(texte_autorisation, styles["Justify"]))
-            elements.append(Spacer(1, 12))
 
-            texte_affectation = (
-                f"L'intéressé est mis à la disposition de la Direction <b>{direction_code} ({direction_description})</b>, "
-                f"Service <b>{donnees.get('service', '')}</b>."
-            )
-            elements.append(Paragraph(texte_affectation, styles["Justify"]))
-            elements.append(Spacer(1, 12))
-
-            texte_precedent = (
-                f"Ce renouvellement fait suite au stage précédent effectué du "
-                f"<b>{date_debut_precedent}</b> au <b>{date_fin_precedent}</b>."
-            )
-            elements.append(Paragraph(texte_precedent, styles["Justify"]))
-            elements.append(Spacer(1, 12))
-
-            if donnees.get("remunere", False):
-                montant = donnees.get("montant", 0)
-                montant_formate = f"{montant:,}".replace(",", " ")
-                texte_remuneration = (
-                    f"Conformément à la décision Nº236/CEB/DG/DARH/SAA/SASR/2020 portant Révision des indemnités "
-                    f"forfaitaires de Stage en date du 3 septembre 2020, Monsieur <b>{stagiaire.nom.upper()} {stagiaire.prenom}</b> "
-                    f"bénéficie au cours de son stage d'une indemnité forfaitaire mensuelle nette de "
-                    f"<b>{montant_formate} FRANCS CFA</b>."
-                )
-                elements.append(Paragraph(texte_remuneration, styles["Justify"]))
-
-            elements.append(Spacer(1, 40))
-
-            # ✅ Signataire dynamique
-            elements.append(Spacer(1, 40))
-            elements.append(Paragraph(signataire_info["titre"], styles["Signature"]))
-            elements.append(Spacer(1, 40))
-            elements.append(Paragraph(signataire_info["nom"], styles["Signature"]))
-
-            doc.build(elements)
-            pdf_content = buffer.getvalue()
-            buffer.close()
-
-            nom_fichier = f"renouvellement_{stagiaire.nom}_{stagiaire.prenom}_{int(time.time())}.pdf"
-            convention.fichier.save(nom_fichier, ContentFile(pdf_content), save=True)
+            nom_fichier = f"renouvellement_{stagiaire.nom}_{stagiaire.prenom}_{int(time.time())}.docx"
+            convention.fichier.save(nom_fichier, ContentFile(buffer.getvalue()), save=True)
             return True
 
         except Exception as e:
-            logger.error(f"Erreur régénération PDF renouvellement: {str(e)}", exc_info=True)
+            logger.error(f"Erreur régénération Word renouvellement: {str(e)}", exc_info=True)
             import traceback
             traceback.print_exc()
             return False
