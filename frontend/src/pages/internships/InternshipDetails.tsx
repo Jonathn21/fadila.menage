@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { archiverDemande, desarchiverDemande } from "@/lib/demandes";
-import DocumentPreviewDialog from "@/components/internships/DocumentPreviewDialog";
 import PhotoDialog from "@/components/internships/PhotoDialog";
 import { RefuseDialog } from "@/components/internships/RefuseDialog";
 import apiClient from "@/lib/apiClient";
@@ -134,7 +133,6 @@ const InternshipDetailsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [demande, setDemande] = useState<APIDemande | null>(null);
   const [documents, setDocuments] = useState<APIDocument[]>([]);
-  const [selectedDocument, setSelectedDocument] = useState<{ name: string; url: string } | null>(null);
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [processingAction, setProcessingAction] = useState<string | null>(null);
   const [isRefuseDialogOpen, setIsRefuseDialogOpen] = useState(false);
@@ -196,7 +194,16 @@ const InternshipDetailsPage: React.FC = () => {
 
   const handleViewDocument = async (doc: APIDocument) => {
     if (doc.statut !== 'viewed') await markDocumentAsViewed(doc.id);
-    setSelectedDocument({ name: doc.nom, url: doc.url });
+    try {
+      const response = await apiClient.get(doc.url, { responseType: "blob" });
+      const blobUrl = window.URL.createObjectURL(response.data);
+      // Ouvre le document dans un nouvel onglet : Word prend le relais pour les
+      // .docx, le navigateur affiche directement les PDF.
+      window.open(blobUrl, "_blank");
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60000);
+    } catch {
+      toast({ title: "Erreur", description: "Impossible d'ouvrir le document", variant: "destructive" });
+    }
   };
 
   const handleDownloadDocument = async (doc: APIDocument) => {
@@ -869,12 +876,6 @@ const InternshipDetailsPage: React.FC = () => {
             }}
           />
         )}
-
-        <DocumentPreviewDialog
-          document={selectedDocument ? { nom: selectedDocument.name, url: selectedDocument.url } : null}
-          onClose={() => setSelectedDocument(null)}
-          onDownload={handleDownloadDocument}
-        />
 
         <PhotoDialog
           open={isPhotoDialogOpen}
