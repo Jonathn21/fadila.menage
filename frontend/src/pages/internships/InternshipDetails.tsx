@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  FileText, Eye, Download, XCircle, MessageSquare,
+  FileText, Download, XCircle, MessageSquare,
   CheckCircle, Mail, Phone, User, GraduationCap,
   Calendar, MapPin, ArrowLeft, BookOpen, FileCheck,
   ClipboardList, Loader2, RefreshCcw, Briefcase,
@@ -189,20 +189,6 @@ const InternshipDetailsPage: React.FC = () => {
       await refreshData();
     } catch (error) {
       console.error("Erreur marquage document vu:", error);
-    }
-  };
-
-  const handleViewDocument = async (doc: APIDocument) => {
-    if (doc.statut !== 'viewed') await markDocumentAsViewed(doc.id);
-    try {
-      const response = await apiClient.get(doc.url, { responseType: "blob" });
-      const blobUrl = window.URL.createObjectURL(response.data);
-      // Ouvre le document dans un nouvel onglet : Word prend le relais pour les
-      // .docx, le navigateur affiche directement les PDF.
-      window.open(blobUrl, "_blank");
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60000);
-    } catch {
-      toast({ title: "Erreur", description: "Impossible d'ouvrir le document", variant: "destructive" });
     }
   };
 
@@ -467,9 +453,6 @@ const InternshipDetailsPage: React.FC = () => {
           </div>
         </div>
         <div className="flex gap-2 self-end sm:self-center">
-          <Button variant="ghost" size="sm" onClick={() => handleViewDocument(doc)} className="h-8 gap-1 hover:bg-gray-100 text-gray-700">
-            <Eye className="h-3.5 w-3.5" /><span className="hidden sm:inline">Voir</span>
-          </Button>
           <Button variant="outline" size="sm" onClick={() => handleDownloadDocument(doc)} className="h-8 gap-1 text-gray-700 hover:bg-gray-100 hover:border-gray-300">
             <Download className="h-3.5 w-3.5" /><span className="hidden sm:inline">Télécharger</span>
           </Button>
