@@ -96,13 +96,6 @@ class UtilisateurSerializer(serializers.ModelSerializer):
             'is_active', 'is_2fa_verified', 'last_login', 'date_joined',
         ]
 
-class ProfilSerializer(serializers.ModelSerializer):
-    user = UtilisateurSerializer(read_only=True)
-
-    class Meta:
-        model = Profil
-        fields = '__all__'
-
 class VerificationCodeSerializer(serializers.ModelSerializer):
     user = UtilisateurSerializer(read_only=True)
 

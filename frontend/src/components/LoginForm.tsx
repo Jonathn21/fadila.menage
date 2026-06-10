@@ -78,8 +78,8 @@ const LoginForm = () => {
         const { access, refresh } = data.tokens;
         const { session } = data;
 
-        // Stockage sécurisé
-        sessionStorage.setItem("access", access);
+        // Stockage des tokens (mêmes clés que celles lues par apiClient)
+        localStorage.setItem("access", access);
         localStorage.setItem("refresh", refresh);
 
         if (session?.key) {
@@ -89,6 +89,9 @@ const LoginForm = () => {
         // Stocker les infos utilisateur si disponibles
         if (data.user) {
           localStorage.setItem("user", JSON.stringify(data.user));
+          if (data.user.role) {
+            localStorage.setItem("userRole", data.user.role);
+          }
         }
 
         toast({

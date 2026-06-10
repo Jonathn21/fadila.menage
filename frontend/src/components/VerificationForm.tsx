@@ -64,7 +64,8 @@ const VerificationForm = () => {
   // ✅ Fonction pour configurer les tokens dans apiClient
   const configureApiClient = (accessToken: string) => {
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    localStorage.setItem("access_token", accessToken);
+    // Même clé que celle lue par apiClient
+    localStorage.setItem("access", accessToken);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -96,7 +97,15 @@ const VerificationForm = () => {
           configureApiClient(response.data.tokens.access);
         }
         if (response.data.tokens?.refresh) {
-          localStorage.setItem("refresh_token", response.data.tokens.refresh);
+          localStorage.setItem("refresh", response.data.tokens.refresh);
+        }
+
+        // ✅ Stocker les infos utilisateur (rôle) renvoyées par le backend
+        if (response.data.user) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          if (response.data.user.role) {
+            localStorage.setItem("userRole", response.data.user.role);
+          }
         }
 
         // ✅ Nettoyage des infos temporaires

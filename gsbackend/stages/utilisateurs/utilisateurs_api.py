@@ -61,6 +61,10 @@ from ..serializers import (
     ProfilSerializer, UserActionSerializer
 )
 from utilisateurs.models import Utilisateur, Profil
+from utilisateurs.permissions import (
+    HasPermission, get_permissions_for_role,
+    PERM_USERS_VIEW, PERM_USERS_CREATE, PERM_USERS_EDIT, PERM_USERS_DELETE,
+)
 from services.notification_service import NotificationService
 from services.resume_service import ResumeGeneratorService
 
@@ -135,7 +139,7 @@ class ProfilAPIView(APIView):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class UtilisateursAPI(APIView):
-    permission_classes = [IsAuthenticated, IsSuperUtilisateur]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_USERS_VIEW)]
 
     def get(self, request):
         """Récupère la liste des utilisateurs avec filtres"""
@@ -182,8 +186,8 @@ class UtilisateursAPI(APIView):
             )
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
-class AjouterUtilisateurAPIView(APIView): 
-    permission_classes = [IsAuthenticated, IsSuperUtilisateur]
+class AjouterUtilisateurAPIView(APIView):
+    permission_classes = [IsAuthenticated, HasPermission(PERM_USERS_CREATE)]
 
     def post(self, request):
         # Récupération des données
@@ -198,6 +202,21 @@ class AjouterUtilisateurAPIView(APIView):
             return Response(
                 {"success": False, "message": "Email et mot de passe requis."},
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Le rôle demandé doit être valide
+        roles_valides = [choix[0] for choix in Utilisateur.ROLE_CHOICES]
+        if role not in roles_valides:
+            return Response(
+                {"success": False, "message": "Rôle invalide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Anti-escalade : seul un Superutilisateur peut créer un Superutilisateur
+        if role == "Superutilisateur" and request.user.role != "Superutilisateur":
+            return Response(
+                {"success": False, "message": "Vous n'êtes pas autorisé à créer un super-utilisateur."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         if Utilisateur.objects.filter(email=email).exists():
@@ -300,7 +319,24 @@ class AjouterUtilisateurAPIView(APIView):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class UtilisateurDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperUtilisateur]
+    # Permissions appliquées par méthode (voir get_permissions)
+    permission_classes = [IsAuthenticated]
+
+    # Permission requise selon le verbe HTTP
+    _method_permissions = {
+        "GET": PERM_USERS_VIEW,
+        "PUT": PERM_USERS_EDIT,
+        "PATCH": PERM_USERS_EDIT,
+        "DELETE": PERM_USERS_DELETE,
+    }
+
+    def get_permissions(self):
+        perms = [IsAuthenticated()]
+        required = self._method_permissions.get(self.request.method)
+        if required:
+            perms.append(HasPermission(required))
+        return perms
+
     def get(self, request, user_id):
         user = get_object_or_404(Utilisateur, id=user_id)
         serializer = UtilisateurSerializer(user)
@@ -308,7 +344,29 @@ class UtilisateurDetailAPIView(APIView):
 
     def put(self, request, user_id):
         user = get_object_or_404(Utilisateur, id=user_id)
-        serializer = UtilisateurSerializer(user, data=request.data, partial=True)
+        data = request.data.copy()
+
+        # Le rôle ne peut être modifié que par un Superutilisateur
+        new_role = data.get("role")
+        if new_role is not None and new_role != user.role:
+            if request.user.role != "Superutilisateur":
+                return Response(
+                    {"error": "Seul un super-utilisateur peut modifier le rôle."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            if new_role not in [c[0] for c in Utilisateur.ROLE_CHOICES]:
+                return Response(
+                    {"error": "Rôle invalide."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # Empêche de retirer son propre statut de super-utilisateur
+            if request.user.id == user.id and new_role != "Superutilisateur":
+                return Response(
+                    {"error": "Vous ne pouvez pas modifier votre propre rôle."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+        serializer = UtilisateurSerializer(user, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -316,13 +374,19 @@ class UtilisateurDetailAPIView(APIView):
 
     def delete(self, request, user_id):
         user = get_object_or_404(Utilisateur, id=user_id)
+        # On ne peut pas se supprimer soi-même
+        if request.user.id == user.id:
+            return Response(
+                {"error": "Vous ne pouvez pas supprimer votre propre compte."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         user.delete()
         return Response({"message": "Utilisateur supprimé"}, status=status.HTTP_204_NO_CONTENT)
 
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class UserActionHistoryAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperUtilisateur]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_USERS_VIEW)]
 
     def get(self, request, user_id):
         user = get_object_or_404(Utilisateur, id=user_id)
@@ -340,6 +404,9 @@ class CurrentUserAPIView(APIView):
         return Response({
             "id": user.id,
             "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
             "role": user.role,
             "is_superuser": user.is_superuser,
+            "permissions": get_permissions_for_role(user.role),
         })

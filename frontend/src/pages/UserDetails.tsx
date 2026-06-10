@@ -507,9 +507,9 @@ const UserDetails = () => {
                               <SelectValue placeholder="Sélectionner un rôle" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Admin" className="text-xs sm:text-sm">Administrateur</SelectItem>
                               <SelectItem value="Utilisateur" className="text-xs sm:text-sm">Utilisateur</SelectItem>
-                              <SelectItem value="Editeur" className="text-xs sm:text-sm">Éditeur</SelectItem>
+                              <SelectItem value="Admin" className="text-xs sm:text-sm">Administrateur</SelectItem>
+                              <SelectItem value="Superutilisateur" className="text-xs sm:text-sm">Super-utilisateur</SelectItem>
                             </SelectContent>
                           </Select>
                         ) : (

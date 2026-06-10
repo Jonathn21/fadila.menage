@@ -142,7 +142,9 @@ const SidebarNavigation = () => {
     { label: "Mon profil", path: "/profil", icon: <UserCircle className="size-4" /> },
     { label: "Sécurité", path: "/securite", icon: <Lock className="size-4" /> },
     { label: "Paramètres", path: "/parametres", icon: <Settings2 className="size-4" /> },
-    ...(userRole === "Superutilisateur" ? [{ label: "Utilisateurs", path: "/utilisateurs", icon: <Users2Icon className="size-4" /> }] : []),
+    ...(userRole === "Admin" || userRole === "Superutilisateur"
+      ? [{ label: "Utilisateurs", path: "/utilisateurs", icon: <Users2Icon className="size-4" /> }]
+      : []),
   ];
 
   const internshipSubItems = [

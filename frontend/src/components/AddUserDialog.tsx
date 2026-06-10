@@ -38,7 +38,7 @@ const formSchema = z.object({
   first_name: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères" }),
   last_name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères" }),
   email: z.string().email({ message: "Veuillez entrer une adresse email valide" }),
-  role: z.enum(["Administrateur", "Utilisateur", "Superutilisateur"], {
+  role: z.enum(["Admin", "Utilisateur", "Superutilisateur"], {
     required_error: "Veuillez sélectionner un rôle",
   }),
   password: z.string().min(8, { message: "Le mot de passe doit contenir au moins 8 caractères" }),
@@ -193,8 +193,8 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="Utilisateur" className="focus:bg-green-50">Utilisateur</SelectItem>
-                      <SelectItem value="Administrateur" className="focus:bg-green-50">Administrateur</SelectItem>
-                      <SelectItem value="Superutilisateur" className="focus:bg-green-50">Superutilisateur</SelectItem>
+                      <SelectItem value="Admin" className="focus:bg-green-50">Administrateur</SelectItem>
+                      <SelectItem value="Superutilisateur" className="focus:bg-green-50">Super-utilisateur</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

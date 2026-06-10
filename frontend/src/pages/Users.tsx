@@ -59,7 +59,8 @@ const Users = () => {
       if (searchValue) params.q = searchValue;
       if (roleFilter !== "all") params.role = roleFilter;
       if (statusFilter !== "all") {
-        params.statut = statusFilter === "Actif" ? "true" : "false";
+        // Le backend attend "Actif" / "Inactif"
+        params.statut = statusFilter === "Actif" ? "Actif" : "Inactif";
       }
 
       const response = await apiClient.get("/utilisateurs/", { params });
@@ -360,9 +361,9 @@ const Users = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all" className="text-xs sm:text-sm focus:bg-gray-50">Tous les rôles</SelectItem>
-                      <SelectItem value="Administrateur" className="text-xs sm:text-sm focus:bg-gray-50">Administrateur</SelectItem>
                       <SelectItem value="Utilisateur" className="text-xs sm:text-sm focus:bg-gray-50">Utilisateur</SelectItem>
-                      <SelectItem value="Superutilisateur" className="text-xs sm:text-sm focus:bg-gray-50">Superutilisateur</SelectItem>
+                      <SelectItem value="Admin" className="text-xs sm:text-sm focus:bg-gray-50">Administrateur</SelectItem>
+                      <SelectItem value="Superutilisateur" className="text-xs sm:text-sm focus:bg-gray-50">Super-utilisateur</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

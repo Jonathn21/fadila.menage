@@ -21,6 +21,7 @@ import NotificationDetails from "./pages/NotificationDetails";
 import Users from "./pages/Users";
 import UserDetails from "./pages/UserDetails";
 import UserPermissions from "./pages/UserPermissions";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import InternshipsPage from "./pages/internships/InternshipsPage";
 // === Demande d'attestation : désactivée ===
@@ -87,9 +88,30 @@ const App = () => (
             <Route path="/statistiques" element={<Analytics />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/notifications/:id" element={<NotificationDetails />}/>
-            <Route path="/utilisateurs" element={<Users />} />
-            <Route path="/utilisateurs/:userId" element={<UserDetails />} />
-            <Route path="/permissions" element={<UserPermissions />} />
+            <Route
+              path="/utilisateurs"
+              element={
+                <ProtectedRoute permission="users.view">
+                  <Users />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/utilisateurs/:userId"
+              element={
+                <ProtectedRoute permission="users.view">
+                  <UserDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/permissions"
+              element={
+                <ProtectedRoute permission="permissions.manage">
+                  <UserPermissions />
+                </ProtectedRoute>
+              }
+            />
             
             {/* Public routes */}
             <Route path="/" element={<PublicInternshipApplication />} />
