@@ -37,10 +37,10 @@ ALL_PERMISSIONS = [
 # --- Matrice rôle -> permissions ------------------------------------------
 ROLE_PERMISSIONS = {
     ROLE_SUPERUTILISATEUR: list(ALL_PERMISSIONS),
+    # La gestion des comptes (consultation/création/modification/suppression)
+    # est réservée au Superutilisateur. L'Admin n'a pas accès à la partie
+    # « Utilisateurs » ; il conserve l'export de données.
     ROLE_ADMIN: [
-        PERM_USERS_VIEW,
-        PERM_USERS_CREATE,
-        PERM_USERS_EDIT,
         PERM_DATA_EXPORT,
     ],
     # Utilisateur de base : aucun droit d'administration des comptes.

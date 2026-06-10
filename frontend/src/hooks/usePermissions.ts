@@ -41,7 +41,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'permissions.manage',
     'data.export',
   ],
-  Admin: ['users.view', 'users.create', 'users.edit', 'data.export'],
+  // L'Admin n'a pas accès à la partie « Utilisateurs » (réservée au
+  // Superutilisateur) ; il conserve uniquement l'export de données.
+  Admin: ['data.export'],
   Utilisateur: [],
 };
 
