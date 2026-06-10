@@ -189,7 +189,7 @@ class Demande(models.Model):
         convention_temp = self.get_convention_temporaire()
         if convention_temp and convention_temp.fichier:
             documents.append({
-                'nom': 'Lettre de stage à signer (PDF)',
+                'nom': 'Lettre de stage à signer',
                 'url': convention_temp.fichier.url,
                 'statut': 'new',
                 'date_upload': convention_temp.date_creation,
