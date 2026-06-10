@@ -195,7 +195,7 @@ const InternshipDetailsPage: React.FC = () => {
   // La lettre de stage générée est un Word (.docx) : le navigateur ne sait pas
   // l'afficher, donc on masque « Voir » pour ces fichiers.
   const isWordDocument = (doc: APIDocument) => {
-    const path = doc.url.split("?")[0].toLowerCase();
+    const path = (doc.url || "").split("?")[0].toLowerCase();
     return path.endsWith(".docx") || path.endsWith(".doc");
   };
 
