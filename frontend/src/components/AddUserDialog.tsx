@@ -95,7 +95,7 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children || (
-          <Button className="gap-2 bg-green-700 hover:bg-green-600 text-white">
+          <Button className="gap-2 bg-primary hover:bg-primary/90 text-white">
             <UserPlus className="h-4 w-4" />
             Ajouter un utilisateur
           </Button>
@@ -103,11 +103,11 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] ">
         <DialogHeader>
-          <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4 mx-auto">
-            <UserPlus className="h-6 w-6 text-green-600" />
+          <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mb-4 mx-auto">
+            <UserPlus className="h-6 w-6 text-primary" />
           </div>
-          <DialogTitle className="text-center text-xl text-green-900">Ajouter un nouvel utilisateur</DialogTitle>
-          <DialogDescription className="text-center text-green-600">
+          <DialogTitle className="text-center text-xl">Ajouter un nouvel utilisateur</DialogTitle>
+          <DialogDescription className="text-center">
             Remplissez les informations pour créer un nouveau compte utilisateur
           </DialogDescription>
         </DialogHeader>
@@ -121,13 +121,12 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
                 name="last_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-green-700">Nom *</FormLabel>
+                    <FormLabel>Nom *</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Dupont" 
-                        {...field} 
+                      <Input
+                        placeholder="Dupont"
+                        {...field}
                         disabled={isLoading}
-                        className=" focus-visible:ring-green-500 text-green-900"
                       />
                     </FormControl>
                     <FormMessage />
@@ -140,13 +139,12 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
                 name="first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-green-700">Prénom *</FormLabel>
+                    <FormLabel>Prénom *</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Jean" 
-                        {...field} 
+                      <Input
+                        placeholder="Jean"
+                        {...field}
                         disabled={isLoading}
-                        className=" focus-visible:ring-green-500 text-green-900"
                       />
                     </FormControl>
                     <FormMessage />
@@ -160,14 +158,13 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-green-700">Email *</FormLabel>
+                  <FormLabel>Email *</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="utilisateur@cebnet.org" 
-                      type="email" 
-                      {...field} 
+                    <Input
+                      placeholder="utilisateur@cebnet.org"
+                      type="email"
+                      {...field}
                       disabled={isLoading}
-                      className=" focus-visible:ring-green-500 text-green-900"
                     />
                   </FormControl>
                   <FormMessage />
@@ -180,21 +177,21 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-green-700">Rôle *</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
+                  <FormLabel>Rôle *</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
                     defaultValue={field.value}
                     disabled={isLoading}
                   >
                     <FormControl>
-                      <SelectTrigger className=" focus:ring-green-500 text-green-900">
+                      <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un rôle" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Utilisateur" className="focus:bg-green-50">Utilisateur</SelectItem>
-                      <SelectItem value="Admin" className="focus:bg-green-50">Administrateur</SelectItem>
-                      <SelectItem value="Superutilisateur" className="focus:bg-green-50">Super-utilisateur</SelectItem>
+                      <SelectItem value="Utilisateur">Utilisateur</SelectItem>
+                      <SelectItem value="Admin">Administrateur</SelectItem>
+                      <SelectItem value="Superutilisateur">Super-utilisateur</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -207,15 +204,15 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-green-700">Mot de passe *</FormLabel>
+                  <FormLabel>Mot de passe *</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input 
-                        type={showPassword ? "text" : "password"} 
-                        placeholder="********" 
-                        {...field} 
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="********"
+                        {...field}
                         disabled={isLoading}
-                        className="pr-10  focus-visible:ring-green-500 text-green-900 placeholder:text-green-400"
+                        className="pr-10"
                       />
                       <button
                         type="button"
@@ -224,15 +221,15 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
                         disabled={isLoading}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-green-600" />
+                          <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
                         ) : (
-                          <Eye className="h-4 w-4 text-green-600" />
+                          <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
                         )}
                       </button>
                     </div>
                   </FormControl>
                   <FormMessage />
-                  <p className="text-xs text-green-600 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Minimum 8 caractères
                   </p>
                 </FormItem>
@@ -240,19 +237,18 @@ export function AddUserDialog({ children }: { children?: React.ReactNode }) {
             />
 
             <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setOpen(false)}
                 disabled={isLoading}
-                className=" text-green-700 hover:bg-green-50 hover:text-green-800 hover:border-green-300"
               >
                 Annuler
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isLoading}
-                className="gap-2 bg-red-600 hover:bg-green-600 text-white"
+                className="gap-2 bg-primary hover:bg-primary/90 text-white"
               >
                 {isLoading ? (
                   <>
