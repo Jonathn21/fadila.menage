@@ -37,6 +37,12 @@ def serve_media_with_cors(request, path):
     ext = os.path.splitext(file_path)[1].lower()
     if ext in ('.pdf', '.jpg', '.jpeg', '.png', '.gif'):
         response['Content-Disposition'] = f'inline; filename="{os.path.basename(file_path)}"'
+        # Le middleware global pose X-Frame-Options: DENY, ce qui bloque
+        # l'affichage des PDF/images dans les iframes (modal de visualisation).
+        # Ces médias sont des documents statiques non-interactifs : on les
+        # exempte pour autoriser l'aperçu inline quelle que soit l'origine du
+        # frontend (IP, localhost ou domaine de production).
+        response.xframe_options_exempt = True
     else:
         response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
 
