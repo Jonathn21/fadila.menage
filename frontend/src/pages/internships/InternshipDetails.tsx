@@ -202,15 +202,37 @@ const InternshipDetailsPage: React.FC = () => {
   const handleDownloadDocument = async (doc: APIDocument) => {
     if (doc.statut !== 'viewed') await markDocumentAsViewed(doc.id);
     if (!demande) return;
-    const fileName = `${doc.nom.replace(/\s+/g, "_")}_${demande.etudiant.nom}_${demande.etudiant.prenom}`;
+    const baseName = `${doc.nom.replace(/\s+/g, "_")}_${demande.etudiant.nom}_${demande.etudiant.prenom}`;
     try {
       const response = await apiClient.get(doc.url, { responseType: "blob" });
       const blob = response.data;
+
+      // Déterminer l'extension réelle : Content-Disposition > URL > type MIME.
+      // Évite de forcer un .docx généré à être enregistré en .pdf.
+      const mimeToExt: Record<string, string> = {
+        "application/pdf": "pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+        "application/msword": "doc",
+        "image/jpeg": "jpg",
+        "image/png": "png",
+      };
+      const disposition = (response.headers?.["content-disposition"] as string) || "";
+      const dispMatch = /filename\*?=(?:UTF-8'')?["']?([^"';]+)/i.exec(disposition);
+      let ext = dispMatch?.[1]?.split(".").pop()?.toLowerCase() || "";
+      if (!ext) {
+        const urlExt = doc.url.split("?")[0].split(".").pop()?.toLowerCase() || "";
+        if (urlExt && urlExt.length <= 5 && !urlExt.includes("/")) ext = urlExt;
+      }
+      if (!ext && blob.type && mimeToExt[blob.type]) ext = mimeToExt[blob.type];
+      const fileName = ext ? `${baseName}.${ext}` : baseName;
+
       if (window.showSaveFilePicker) {
-        const handle = await window.showSaveFilePicker({
-          suggestedName: fileName,
-          types: [{ description: "Fichiers autorisés", accept: { "application/pdf": [".pdf"], "image/jpeg": [".jpg", ".jpeg"], "image/png": [".png"] } }],
-        });
+        const mime = blob.type
+          || Object.keys(mimeToExt).find((k) => mimeToExt[k] === ext)
+          || "application/octet-stream";
+        const pickerOptions: Parameters<typeof window.showSaveFilePicker>[0] = { suggestedName: fileName };
+        if (ext) pickerOptions.types = [{ description: "Document", accept: { [mime]: [`.${ext}`] } }];
+        const handle = await window.showSaveFilePicker(pickerOptions);
         const writable = await handle.createWritable();
         await writable.write(blob);
         await writable.close();
