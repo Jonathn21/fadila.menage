@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.db.models import Q
 from ..models import Demande
 from ..serializers import DemandeSerializer
+from utilisateurs.permissions import HasPermission, PERM_DEMANDES_VIEW
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 @method_decorator([never_cache, ratelimit(key='user', rate='60/m', method='GET')], name='dispatch')
 class DemandeBaseAPIView(APIView):
     """Classe de base pour toutes les vues de demande"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_VIEW)]
     serializer_class = DemandeSerializer
     # Surcharger ces attributs dans les classes filles
     base_queryset = Demande.objects.all()

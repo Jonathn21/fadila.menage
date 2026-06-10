@@ -18,6 +18,7 @@ import {
   serviceOptions,
 } from "@/data/internships";
 import apiClient from "@/lib/apiClient";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -80,6 +81,7 @@ interface PageConfig {
 interface ColumnHelpers {
   handleViewDetails: (id: number) => void;
   handleDelete: (id: number) => void;
+  canDelete: boolean;
   formatDate: (date: string) => string;
   calculateDaysUntilStart?: (date: string) => number;
   calculateDaysLeft?: (date: string) => number;
@@ -263,15 +265,17 @@ const getPageConfigs = (helpers: ColumnHelpers): Record<string, PageConfig> => (
             >
               <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            {h.canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => h.handleDelete(item.id)}
               className="h-7 w-7 sm:h-8 sm:w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
               title="Supprimer"
             >
               <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
+            )}
           </div>
         ),
       },
@@ -472,15 +476,17 @@ const getPageConfigs = (helpers: ColumnHelpers): Record<string, PageConfig> => (
             >
               <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            {h.canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => h.handleDelete(item.id)}
               className="h-7 w-7 sm:h-8 sm:w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
               title="Supprimer"
             >
               <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
+            )}
           </div>
         ),
       },
@@ -677,15 +683,17 @@ const getPageConfigs = (helpers: ColumnHelpers): Record<string, PageConfig> => (
             >
               <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            {h.canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => h.handleDelete(item.id)}
               className="h-7 w-7 sm:h-8 sm:w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
               title="Supprimer"
             >
               <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
+            )}
           </div>
         ),
       },
@@ -745,6 +753,8 @@ const StudentsPage: React.FC = () => {
   const location = window.location.pathname;
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { hasPermission } = usePermissions();
+  const canDelete = hasPermission("stages.delete");
 
   // 🔄 Mapper les URLs françaises vers les statuts de configuration
   const getStatusFromPath = (path: string): string => {
@@ -813,6 +823,7 @@ const StudentsPage: React.FC = () => {
   const helpers: ColumnHelpers = {
     handleViewDetails,
     handleDelete,
+    canDelete,
     formatDate,
     calculateDaysUntilStart,
     calculateDaysLeft,
@@ -1417,9 +1428,11 @@ const StudentsPage: React.FC = () => {
                                 <Button variant="ghost" size="sm" onClick={() => handleViewDetails(stagiaire.id)} className="h-7 w-7 p-0 hover:bg-gray-50 text-gray-700" title="Détails">
                                   <Eye className="h-3.5 w-3.5" />
                                 </Button>
-                                <Button variant="ghost" size="sm" onClick={() => setSelectedDelete(stagiaire.id)} className="h-7 w-7 p-0 text-red-600 hover:bg-red-50" title="Supprimer">
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
+                                {canDelete && (
+                                  <Button variant="ghost" size="sm" onClick={() => setSelectedDelete(stagiaire.id)} className="h-7 w-7 p-0 text-red-600 hover:bg-red-50" title="Supprimer">
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           </div>

@@ -40,6 +40,11 @@ from django.utils.timezone import now
 
 from rest_framework import status, parsers
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from utilisateurs.permissions import (
+    HasPermission,
+    PERM_STAGES_VIEW, PERM_STAGES_RENEW, PERM_STAGES_EDIT,
+    PERM_STAGES_END_EARLY, PERM_STAGES_DELETE,
+)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
@@ -98,7 +103,7 @@ class StagesProchainAPI(StageBaseAPIView):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class FinAnticipeeStagiaireAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_END_EARLY)]
 
     def post(self, request, stagiaire_id):
         stagiaire = get_object_or_404(Stagiaire, pk=stagiaire_id)
@@ -166,7 +171,7 @@ class FinAnticipeeStagiaireAPIView(APIView):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class ModifierPeriodeStagiaireAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_EDIT)]
 
     def post(self, request, stagiaire_id):
         stagiaire = get_object_or_404(Stagiaire, pk=stagiaire_id)
@@ -277,9 +282,25 @@ class ModifierPeriodeStagiaireAPIView(APIView):
 
 @method_decorator([csrf_exempt, never_cache], name='dispatch')
 class StagiaireDetailAPI(APIView):
+    # Permissions par méthode : consultation / modification / suppression.
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser]
-    
+
+    _method_permissions = {
+        "GET": PERM_STAGES_VIEW,
+        "PATCH": PERM_STAGES_EDIT,
+        "PUT": PERM_STAGES_EDIT,
+        "DELETE": PERM_STAGES_DELETE,
+    }
+
+    def get_permissions(self):
+        perms = [IsAuthenticated()]
+        required = self._method_permissions.get(self.request.method)
+        if required:
+            perms.append(HasPermission(required))
+        return perms
+
+
     def delete(self, request, stagiaire_id):
         stagiaire = Stagiaire.objects.filter(id=stagiaire_id).first()
         if not stagiaire:
@@ -653,7 +674,7 @@ class PreRenouvelerStageAPIView(APIView):
     Étape 1: Pré-renouvellement sans créer de nouveau stagiaire
     Génère une convention temporaire à faire signer
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_RENEW)]
 
     def post(self, request, stagiaire_id):
         """
@@ -1126,7 +1147,7 @@ class FinaliserRenouvellementAPIView(APIView):
     Étape 2: Finalisation du renouvellement avec upload du PDF signé
     Crée le nouveau stagiaire
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_RENEW)]
 
     def post(self, request, stagiaire_id):
         """
@@ -1405,7 +1426,7 @@ class FinaliserRenouvellementAPIView(APIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class TelechargerConventionRenouvellementAPIView(APIView):
     """Télécharge une convention temporaire de renouvellement"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_VIEW)]
 
     def get(self, request, convention_id):
         try:
@@ -1463,7 +1484,7 @@ class TelechargerConventionRenouvellementAPIView(APIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='10/m', method='POST')], name='dispatch')
 class AnnulerPreRenouvellementAPIView(APIView):
     """Annuler un pré-renouvellement"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_RENEW)]
 
     def post(self, request, stagiaire_id):
         try:
@@ -1574,7 +1595,7 @@ class AnnulerPreRenouvellementAPIView(APIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='10/m', method='POST')], name='dispatch')
 class RegenererConventionRenouvellementAPIView(APIView):
     """Régénère la convention de renouvellement avec le signataire choisi"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_RENEW)]
 
     SIGNATAIRES = {
         "DG": {

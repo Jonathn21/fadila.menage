@@ -20,6 +20,7 @@ import DocumentPreviewDialog from "@/components/internships/DocumentPreviewDialo
 import PhotoDialog from "@/components/internships/PhotoDialog";
 import { RefuseDialog } from "@/components/internships/RefuseDialog";
 import apiClient from "@/lib/apiClient";
+import { usePermissions } from "@/hooks/usePermissions";
 import { RequestInfoModal } from "@/components/internships/RequestInfoModal";
 import AcceptInternshipModal from "@/components/internships/AcceptInternshipModal";
 import FinalizeAcceptanceModal from "@/components/internships/FinalizeAcceptanceModal";
@@ -127,6 +128,7 @@ const InternshipDetailsPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { hasPermission } = usePermissions();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -392,13 +394,13 @@ const InternshipDetailsPage: React.FC = () => {
     if (demande.statut_stage === "Refusée") {
       actions.push({ icon: RefreshCcw, label: "Ractualiser la demande", onClick: () => handleStatusChange("Ractualiser"), variant: "outline" as const, disabled: true });
     } else {
-      if (demande.statut_stage === "En attente") {
+      if (demande.statut_stage === "En attente" && hasPermission("demandes.process")) {
         actions.push({ icon: PlayCircle, label: "Valider la candidature", onClick: () => handleStatusChange("Valider la candidature"), variant: "default" as const });
       }
-      if (demande.statut_stage === "En cours de traitement") {
+      if (demande.statut_stage === "En cours de traitement" && hasPermission("demandes.accept")) {
         actions.push({ icon: CheckCircle, label: "Accepter la demande", onClick: () => setIsAcceptModalOpen(true), variant: "default" as const });
       }
-      if (demande.statut_stage === "Pré-acceptée") {
+      if (demande.statut_stage === "Pré-acceptée" && hasPermission("demandes.accept")) {
         actions.push({
           icon: Upload, label: "Finaliser l'acceptation",
           onClick: () => { if (demande.convention_temporaire_url) setConventionTemporaireUrl(demande.convention_temporaire_url); setIsFinalizeModalOpen(true); },
@@ -407,7 +409,7 @@ const InternshipDetailsPage: React.FC = () => {
         actions.push({ icon: PenLine, label: "Faire signer", onClick: () => setIsSignatoryModalOpen(true), variant: "outline" as const });
         actions.push({ icon: XCircle, label: "Annuler l'acceptation", onClick: () => handleAnnulerAcceptation(), variant: "outline" as const });
       }
-      if (["En attente", "En cours de traitement"].includes(demande.statut_stage)) {
+      if (["En attente", "En cours de traitement"].includes(demande.statut_stage) && hasPermission("demandes.reject")) {
         actions.push({ icon: XCircle, label: "Refuser la candidature", onClick: () => setIsRefuseDialogOpen(true), variant: "outline" as const });
       }
     }

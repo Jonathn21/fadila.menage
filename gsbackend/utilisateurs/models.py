@@ -32,6 +32,10 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="Utilisateur")
+    # Permissions effectives par utilisateur (liste de codes du catalogue,
+    # cf. utilisateurs.permissions). Source de vérité des droits, sauf pour
+    # le Superutilisateur qui contourne le système.
+    permissions = models.JSONField(default=list, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)   # création du compte
     last_login = models.DateTimeField(blank=True, null=True)
 

@@ -62,8 +62,11 @@ from ..serializers import (
 )
 from utilisateurs.models import Utilisateur, Profil
 from utilisateurs.permissions import (
-    HasPermission, get_permissions_for_role,
+    HasPermission, get_user_permissions, get_default_permissions_for_role,
+    sanitize_permissions,
+    PERMISSION_CATALOG, ALL_PERMISSIONS, SENSITIVE_PERMISSIONS,
     PERM_USERS_VIEW, PERM_USERS_CREATE, PERM_USERS_EDIT, PERM_USERS_DELETE,
+    PERM_PERMISSIONS_MANAGE, ROLE_SUPERUTILISATEUR,
 )
 from services.notification_service import NotificationService
 from services.resume_service import ResumeGeneratorService
@@ -226,12 +229,15 @@ class AjouterUtilisateurAPIView(APIView):
             )
 
         # 🔑 Création de l'utilisateur
+        # Les permissions sont initialisées depuis le gabarit du rôle ;
+        # elles pourront ensuite être ajustées par utilisateur.
         user = Utilisateur.objects.create_user(
             email=email,
             password=password,
             first_name=first_name,
             last_name=last_name,
             role=role,
+            permissions=get_default_permissions_for_role(role),
             date_joined=now()
         )
 
@@ -408,5 +414,98 @@ class CurrentUserAPIView(APIView):
             "last_name": user.last_name,
             "role": user.role,
             "is_superuser": user.is_superuser,
-            "permissions": get_permissions_for_role(user.role),
+            "permissions": get_user_permissions(user),
         })
+
+
+@method_decorator(never_cache, name='dispatch')
+class PermissionCatalogAPIView(APIView):
+    """Expose le catalogue des permissions (codes, libellés, catégories).
+
+    Accessible aux gestionnaires de permissions pour alimenter l'éditeur.
+    """
+    permission_classes = [IsAuthenticated, HasPermission(PERM_PERMISSIONS_MANAGE)]
+
+    def get(self, request):
+        return Response({"permissions": PERMISSION_CATALOG})
+
+
+@method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
+class UserPermissionsAPIView(APIView):
+    """Consultation et modification des permissions d'un utilisateur donné.
+
+    Garde-fous anti-escalade :
+    - réservé aux porteurs de `permissions.manage` ;
+    - on ne modifie pas ses propres permissions ;
+    - on ne touche pas aux permissions d'un Superutilisateur ;
+    - seules des permissions valides (catalogue) sont acceptées ;
+    - les permissions sensibles (gestion comptes/permissions) ne peuvent
+      être accordées que par un Superutilisateur.
+    """
+    permission_classes = [IsAuthenticated, HasPermission(PERM_PERMISSIONS_MANAGE)]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(Utilisateur, id=user_id)
+        return Response({
+            "user_id": user.id,
+            "role": user.role,
+            "is_superuser": user.is_superuser,
+            # Permissions effectives (Super = toutes) pour l'affichage.
+            "permissions": get_user_permissions(user),
+        })
+
+    def put(self, request, user_id):
+        user = get_object_or_404(Utilisateur, id=user_id)
+
+        # On ne modifie pas ses propres permissions (anti-escalade).
+        if request.user.id == user.id:
+            return Response(
+                {"error": "Vous ne pouvez pas modifier vos propres permissions."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Le Superutilisateur contourne le système : pas de modification.
+        if user.role == ROLE_SUPERUTILISATEUR:
+            return Response(
+                {"error": "Les permissions d'un super-utilisateur ne sont pas modifiables."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        requested = request.data.get("permissions")
+        if not isinstance(requested, list):
+            return Response(
+                {"error": "Le champ 'permissions' doit être une liste de codes."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Filtre contre le catalogue (élimine les codes inconnus).
+        cleaned = sanitize_permissions(requested)
+
+        # Anti-escalade : seul un Superutilisateur peut accorder des
+        # permissions sensibles. Pour les autres gestionnaires, on retire
+        # toute permission sensible qui ne figurait pas déjà sur le compte.
+        if request.user.role != ROLE_SUPERUTILISATEUR:
+            current = set(user.permissions or [])
+            cleaned = [
+                code for code in cleaned
+                if code not in SENSITIVE_PERMISSIONS or code in current
+            ]
+
+        user.permissions = cleaned
+        user.save(update_fields=["permissions"])
+
+        # Trace l'action dans l'historique.
+        try:
+            UserAction.objects.create(
+                user=user,
+                action="Modification des permissions",
+                performed_by=request.user,
+            )
+        except Exception as e:
+            logger.error(f"❌ Erreur enregistrement action permissions: {e}")
+
+        return Response({
+            "user_id": user.id,
+            "permissions": cleaned,
+            "message": "Permissions mises à jour.",
+        }, status=status.HTTP_200_OK)

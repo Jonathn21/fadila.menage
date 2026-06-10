@@ -28,6 +28,7 @@ import {
   Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
 import apiClient from "@/lib/apiClient";
+import { usePermissions } from "@/hooks/usePermissions";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -309,8 +310,9 @@ const ReportCard: React.FC<{
   config: ReportConfig;
   isGenerating: boolean;
   activeFormat: ReportFormat | null;
+  canExport: boolean;
   onGenerate: (config: ReportConfig, format: ReportFormat, params: Record<string,string>) => void;
-}> = ({ config, isGenerating, activeFormat, onGenerate }) => {
+}> = ({ config, isGenerating, activeFormat, canExport, onGenerate }) => {
   const [open, setOpen] = useState(false);
   const [params, setParams] = useState<Record<string,string>>(
     () => Object.fromEntries(config.params.map(p => [p.key, p.defaultValue || ""]))
@@ -350,13 +352,16 @@ const ReportCard: React.FC<{
             </div>
           )}
           <div className="flex items-center gap-2">
-            {config.formats.includes("pdf") && (
+            {!canExport && (
+              <span className="text-[10px] text-gray-400 italic">Export non autorisé</span>
+            )}
+            {canExport && config.formats.includes("pdf") && (
               <Button size="sm" variant="outline" disabled={isGenerating} onClick={() => trigger("pdf")}
                 className="h-8 text-xs gap-1.5 hover:bg-red-50 hover:border-red-200 hover:text-red-700 transition-colors">
                 {isGenerating && activeFormat === "pdf" ? <Loader2 size={11} className="animate-spin"/> : <FileText size={11}/>} PDF
               </Button>
             )}
-            {config.formats.includes("excel") && (
+            {canExport && config.formats.includes("excel") && (
               <Button size="sm" variant="outline" disabled={isGenerating} onClick={() => trigger("excel")}
                 className="h-8 text-xs gap-1.5 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 transition-colors">
                 {isGenerating && activeFormat === "excel" ? <Loader2 size={11} className="animate-spin"/> : <FileSpreadsheet size={11}/>} Excel
@@ -396,13 +401,13 @@ const ReportCard: React.FC<{
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" size="sm" onClick={() => setOpen(false)} className="text-xs">Annuler</Button>
-            {config.formats.includes("excel") && (
+            {canExport && config.formats.includes("excel") && (
               <Button size="sm" variant="outline" onClick={() => { setOpen(false); onGenerate(config, "excel", params); }}
                 className="text-xs gap-1.5 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700">
                 <FileSpreadsheet size={11}/> Excel
               </Button>
             )}
-            {config.formats.includes("pdf") && (
+            {canExport && config.formats.includes("pdf") && (
               <Button size="sm" onClick={() => { setOpen(false); onGenerate(config, "pdf", params); }}
                 className="text-xs gap-1.5 bg-gray-900 hover:bg-gray-700 text-white">
                 <FileText size={11}/> PDF
@@ -418,6 +423,8 @@ const ReportCard: React.FC<{
 // ─── Analytics page ───────────────────────────────────────────────────────────
 
 const Analytics: React.FC = () => {
+  const { hasPermission } = usePermissions();
+  const canExport = hasPermission("data.export");
   // ── Stats state
   const [stats, setStats]                 = useState<Stats | null>(null);
   const [annee, setAnnee]                 = useState<number>(new Date().getFullYear());
@@ -484,6 +491,10 @@ const Analytics: React.FC = () => {
 
   // ── Génération rapport
   const doDownload = async (config: ReportConfig, format: ReportFormat, params: Record<string,string>) => {
+    if (!canExport) {
+      showToast("Vous n'avez pas la permission d'exporter les données.", "error");
+      return;
+    }
     const key = `${config.id}-${format}`;
     setGenerating(g => ({ ...g, [key]: "generating" }));
     setActiveFormats(f => ({ ...f, [config.id]: format }));
@@ -935,6 +946,7 @@ const Analytics: React.FC = () => {
                                 <ReportCard key={config.id} config={config}
                                   isGenerating={getCardGenerating(config)}
                                   activeFormat={activeFormats[config.id] || null}
+                                  canExport={canExport}
                                   onGenerate={doDownload}/>
                               ))}
                             </div>
@@ -947,6 +959,7 @@ const Analytics: React.FC = () => {
                           <ReportCard key={config.id} config={config}
                             isGenerating={getCardGenerating(config)}
                             activeFormat={activeFormats[config.id] || null}
+                            canExport={canExport}
                             onGenerate={doDownload}/>
                         ))}
                       </div>

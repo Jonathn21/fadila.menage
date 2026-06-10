@@ -48,7 +48,8 @@ from .securite.security_api import (
 
 from .utilisateurs.utilisateurs_api import (
     ProfilAPIView, UtilisateursAPI, AjouterUtilisateurAPIView,
-    UtilisateurDetailAPIView, UserActionHistoryAPIView, CurrentUserAPIView
+    UtilisateurDetailAPIView, UserActionHistoryAPIView, CurrentUserAPIView,
+    PermissionCatalogAPIView, UserPermissionsAPIView
 )
 
 router = DefaultRouter()
@@ -78,9 +79,15 @@ urlpatterns = [
      path('utilisateurs/<int:user_id>/', 
           UtilisateurDetailAPIView.as_view(), 
           name='utilisateur_detail'),
-     path('utilisateurs/<int:user_id>/actions/', 
-          UserActionHistoryAPIView.as_view(), 
+     path('utilisateurs/<int:user_id>/actions/',
+          UserActionHistoryAPIView.as_view(),
           name='user-action-history'),
+     path('permissions/catalogue/',
+          PermissionCatalogAPIView.as_view(),
+          name='permission-catalogue'),
+     path('utilisateurs/<int:user_id>/permissions/',
+          UserPermissionsAPIView.as_view(),
+          name='user-permissions'),
 
     # ============================================
     # SÉCURITÉ

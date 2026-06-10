@@ -92,9 +92,13 @@ class UtilisateurSerializer(serializers.ModelSerializer):
     class Meta:
         model = Utilisateur
         fields = [
-            'id', 'email', 'first_name', 'last_name', 'role', 
+            'id', 'email', 'first_name', 'last_name', 'role',
             'is_active', 'is_2fa_verified', 'last_login', 'date_joined',
+            'permissions',
         ]
+        # Les permissions ne sont jamais modifiées via ce serializer :
+        # elles passent par l'endpoint dédié (anti-escalade côté vue).
+        read_only_fields = ['permissions']
 
 class VerificationCodeSerializer(serializers.ModelSerializer):
     user = UtilisateurSerializer(read_only=True)

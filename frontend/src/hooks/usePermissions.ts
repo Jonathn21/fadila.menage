@@ -1,13 +1,29 @@
 import { useCallback, useEffect, useState } from 'react';
 import apiClient from '@/lib/apiClient';
 
-// Types de permissions disponibles (synchronisés avec le backend)
+// Types de permissions disponibles (synchronisés avec le backend,
+// cf. gsbackend/utilisateurs/permissions.py : PERMISSION_CATALOG)
 export type Permission =
+  // Utilisateurs
   | 'users.view'
   | 'users.create'
   | 'users.edit'
   | 'users.delete'
   | 'permissions.manage'
+  // Demandes
+  | 'demandes.view'
+  | 'demandes.process'
+  | 'demandes.accept'
+  | 'demandes.reject'
+  | 'demandes.delete'
+  // Stages
+  | 'stages.view'
+  | 'stages.renew'
+  | 'stages.edit'
+  | 'stages.end_early'
+  | 'stages.delete'
+  // Statistiques & données
+  | 'stats.view'
   | 'data.export';
 
 // Rôles canoniques (valeurs techniques, identiques au backend Django)
@@ -29,9 +45,10 @@ export const normalizeRole = (raw?: string | null): UserRole => {
   return 'Utilisateur';
 };
 
-// Matrice de repli rôle -> permissions, alignée sur le backend.
-// Utilisée uniquement le temps que /me/ réponde (évite un flash), puis
-// remplacée par les permissions renvoyées par le backend (source de vérité).
+// Gabarits rôle -> permissions (alignés sur ROLE_DEFAULT_PERMISSIONS du
+// backend). Servent uniquement de valeur de repli le temps que /me/
+// réponde (évite un flash) ; les permissions effectives proviennent ensuite
+// du backend (source de vérité, par utilisateur).
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   Superutilisateur: [
     'users.view',
@@ -39,12 +56,37 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'users.edit',
     'users.delete',
     'permissions.manage',
+    'demandes.view',
+    'demandes.process',
+    'demandes.accept',
+    'demandes.reject',
+    'demandes.delete',
+    'stages.view',
+    'stages.renew',
+    'stages.edit',
+    'stages.end_early',
+    'stages.delete',
+    'stats.view',
     'data.export',
   ],
-  // L'Admin n'a pas accès à la partie « Utilisateurs » (réservée au
-  // Superutilisateur) ; il conserve uniquement l'export de données.
-  Admin: ['data.export'],
-  Utilisateur: [],
+  // L'Admin gère tout le métier (demandes, stages, stats, export) mais
+  // n'a aucun droit sur la gestion des comptes / permissions.
+  Admin: [
+    'demandes.view',
+    'demandes.process',
+    'demandes.accept',
+    'demandes.reject',
+    'demandes.delete',
+    'stages.view',
+    'stages.renew',
+    'stages.edit',
+    'stages.end_early',
+    'stages.delete',
+    'stats.view',
+    'data.export',
+  ],
+  // L'Utilisateur de base se limite à la consultation.
+  Utilisateur: ['demandes.view', 'stages.view', 'stats.view'],
 };
 
 export const usePermissions = () => {

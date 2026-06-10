@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Q
 from ..models import Stagiaire
 from ..serializers import StagiaireSerializer
+from utilisateurs.permissions import HasPermission, PERM_STAGES_VIEW
 from datetime import datetime
 from rest_framework.response import Response
 
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 @method_decorator([never_cache, ratelimit(key='user', rate='60/m', method='GET')], name='dispatch')
 class StageBaseAPIView(APIView):
     """Classe de base pour toutes les vues de stages"""
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_VIEW)]
     serializer_class = StagiaireSerializer
     # Surcharger ces attributs dans les classes filles
     statut_filter = None

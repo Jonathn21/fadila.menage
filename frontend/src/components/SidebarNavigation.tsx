@@ -40,6 +40,8 @@ import { useLogout } from "@/hooks/use-logout";
 const SidebarNavigation = () => {
   const location = useLocation();
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
+  const hasPermission = (perm: string) => permissions.includes(perm);
   const { handleLogout } = useLogout();
 
   const [openInternships, setOpenInternships] = useState(
@@ -75,6 +77,7 @@ const SidebarNavigation = () => {
       try {
         const res = await apiClient.get("/me/");
         setUserRole(res.data.role);
+        setPermissions(Array.isArray(res.data.permissions) ? res.data.permissions : []);
       } catch (err) {
         console.error("Impossible de récupérer le rôle de l'utilisateur :", err);
       }
@@ -138,11 +141,13 @@ const SidebarNavigation = () => {
   // Sidebar items
   const navItems = [
     { label: "Tableau de bord", path: "/accueil", icon: <LayoutDashboard className="size-4" /> },
-    { label: "Statistiques", path: "/statistiques", icon: <BarChart3 className="size-4" /> },
+    ...(hasPermission("stats.view")
+      ? [{ label: "Statistiques", path: "/statistiques", icon: <BarChart3 className="size-4" /> }]
+      : []),
     { label: "Mon profil", path: "/profil", icon: <UserCircle className="size-4" /> },
     { label: "Sécurité", path: "/securite", icon: <Lock className="size-4" /> },
     { label: "Paramètres", path: "/parametres", icon: <Settings2 className="size-4" /> },
-    ...(userRole === "Superutilisateur"
+    ...(hasPermission("users.view")
       ? [{ label: "Utilisateurs", path: "/utilisateurs", icon: <Users2Icon className="size-4" /> }]
       : []),
   ];
@@ -294,6 +299,7 @@ const SidebarNavigation = () => {
           </SidebarMenuItem>
 
           {/* Demandes */}
+          {hasPermission("demandes.view") && (
           <SidebarMenuItem className="py-1">
             <Collapsible open={openInternships} onOpenChange={setOpenInternships} className="w-full">
               <CollapsibleTrigger asChild>
@@ -333,8 +339,10 @@ const SidebarNavigation = () => {
               </CollapsibleContent>
             </Collapsible>
           </SidebarMenuItem>
+          )}
 
           {/* Stagiaires */}
+          {hasPermission("stages.view") && (
           <SidebarMenuItem className="py-1">
             <Collapsible open={openStudents} onOpenChange={setOpenStudents} className="w-full">
               <CollapsibleTrigger asChild>
@@ -374,6 +382,7 @@ const SidebarNavigation = () => {
               </CollapsibleContent>
             </Collapsible>
           </SidebarMenuItem>
+          )}
 
           {/* Demandes d'attestation — désactivées */}
           {false && (

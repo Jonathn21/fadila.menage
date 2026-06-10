@@ -17,6 +17,8 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  KeyRound,
+  Lock,
 } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
@@ -50,6 +52,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import apiClient from "@/lib/apiClient";
 
 const UserDetails = () => {
@@ -57,6 +60,7 @@ const UserDetails = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { hasPermission } = usePermissions();
+  const canManagePerms = hasPermission("permissions.manage");
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -65,6 +69,11 @@ const UserDetails = () => {
 
   const [user, setUser] = useState(null);
   const [actionHistory, setActionHistory] = useState([]);
+
+  // Gestion des permissions par utilisateur
+  const [catalog, setCatalog] = useState([]); // [{ code, label, category }]
+  const [selectedPerms, setSelectedPerms] = useState([]); // string[]
+  const [savingPerms, setSavingPerms] = useState(false);
 
   // États pour la pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,6 +91,7 @@ const UserDetails = () => {
         ]);
 
         setUser(userResponse.data);
+        setSelectedPerms(userResponse.data.permissions || []);
         setActionHistory(historyResponse.data);
         setTotalPages(Math.ceil(historyResponse.data.length / itemsPerPage));
       } catch (error) {
@@ -97,6 +107,58 @@ const UserDetails = () => {
 
     fetchData();
   }, [userId, toast, itemsPerPage]);
+
+  // Charge le catalogue des permissions (uniquement pour les gestionnaires)
+  useEffect(() => {
+    if (!canManagePerms) return;
+    apiClient
+      .get("/permissions/catalogue/")
+      .then((res) => setCatalog(res.data?.permissions || []))
+      .catch(() => {
+        // Échec silencieux : l'onglet affichera une liste vide
+      });
+  }, [canManagePerms]);
+
+  const togglePerm = (code) => {
+    setSelectedPerms((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code],
+    );
+  };
+
+  const handleSavePermissions = async () => {
+    setSavingPerms(true);
+    try {
+      const res = await apiClient.put(`/utilisateurs/${userId}/permissions/`, {
+        permissions: selectedPerms,
+      });
+      const updated = res.data?.permissions || [];
+      setSelectedPerms(updated);
+      setUser((prev) => (prev ? { ...prev, permissions: updated } : prev));
+      toast({
+        title: "Permissions mises à jour",
+        description: "Les droits de l'utilisateur ont été enregistrés.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description:
+          error.response?.data?.error ||
+          "Impossible de mettre à jour les permissions.",
+      });
+    } finally {
+      setSavingPerms(false);
+    }
+  };
+
+  // Regroupe le catalogue par catégorie pour l'affichage
+  const groupedCatalog = catalog.reduce((acc, p) => {
+    (acc[p.category] = acc[p.category] || []).push(p);
+    return acc;
+  }, {});
+
+  // Les permissions d'un super-utilisateur ne sont pas modifiables
+  const permsLocked = user?.role === "Superutilisateur";
 
   // Calculer les actions à afficher pour la page actuelle
   const getCurrentPageActions = () => {
@@ -391,7 +453,11 @@ const UserDetails = () => {
         <Card className="border border-gray-200">
           <CardContent className="p-4 sm:p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-gray-50/50 border border-gray-200">
+              <TabsList
+                className={`grid w-full ${
+                  canManagePerms ? "grid-cols-3" : "grid-cols-2"
+                } bg-gray-50/50 border border-gray-200`}
+              >
                 <TabsTrigger
                   value="info"
                   className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
@@ -399,6 +465,15 @@ const UserDetails = () => {
                   <User className="h-3 w-3 sm:h-4 sm:w-4" />
                   Informations
                 </TabsTrigger>
+                {canManagePerms && (
+                  <TabsTrigger
+                    value="permissions"
+                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
+                  >
+                    <KeyRound className="h-3 w-3 sm:h-4 sm:w-4" />
+                    Permissions
+                  </TabsTrigger>
+                )}
                 <TabsTrigger
                   value="history"
                   className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
@@ -572,6 +647,78 @@ const UserDetails = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              {canManagePerms && (
+                <TabsContent
+                  value="permissions"
+                  className="mt-4 sm:mt-6 space-y-3 sm:space-y-4"
+                >
+                  <Card className="border border-gray-200">
+                    <CardHeader>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+                        <div>
+                          <CardTitle className="text-sm sm:text-base text-gray-900">
+                            Permissions
+                          </CardTitle>
+                          <CardDescription className="text-xs sm:text-sm text-gray-600">
+                            Définissez les actions autorisées pour cet utilisateur.
+                          </CardDescription>
+                        </div>
+                        {!permsLocked && (
+                          <Button
+                            size="sm"
+                            className="gap-1 sm:gap-2 text-xs sm:text-sm bg-primary hover:bg-primary/90 text-white"
+                            onClick={handleSavePermissions}
+                            disabled={savingPerms}
+                          >
+                            {savingPerms ? (
+                              <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                            ) : (
+                              <Save className="h-3 w-3 sm:h-4 sm:w-4" />
+                            )}
+                            <span className="hidden sm:inline">Enregistrer</span>
+                          </Button>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 sm:space-y-6">
+                      {permsLocked ? (
+                        <div className="flex items-center gap-2 p-3 rounded-md border border-primary/20 bg-primary/5 text-xs sm:text-sm text-gray-700">
+                          <Lock className="h-4 w-4 text-primary shrink-0" />
+                          Un super-utilisateur dispose de toutes les permissions ;
+                          elles ne sont pas modifiables.
+                        </div>
+                      ) : (
+                        Object.entries(groupedCatalog).map(([category, perms]) => (
+                          <div key={category} className="space-y-2 sm:space-y-3">
+                            <h4 className="text-xs sm:text-sm font-semibold text-gray-900">
+                              {category}
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+                              {perms.map((perm) => (
+                                <label
+                                  key={perm.code}
+                                  htmlFor={`perm-${perm.code}`}
+                                  className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border border-gray-200 rounded-md hover:bg-gray-50/50 cursor-pointer"
+                                >
+                                  <Checkbox
+                                    id={`perm-${perm.code}`}
+                                    checked={selectedPerms.includes(perm.code)}
+                                    onCheckedChange={() => togglePerm(perm.code)}
+                                  />
+                                  <span className="text-xs sm:text-sm text-gray-800">
+                                    {perm.label}
+                                  </span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
 
               <TabsContent value="history" className="mt-4 sm:mt-6">
                 <Card className="border border-gray-200">

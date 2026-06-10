@@ -17,6 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import apiClient from "@/lib/apiClient";
+import { usePermissions } from "@/hooks/usePermissions";
 import {
   DialogFooter
 } from "@/components/ui/dialog";
@@ -245,6 +246,7 @@ const OngoingInternshipDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { hasPermission } = usePermissions();
   const [stagiaire, setStagiaire] = useState<APIStagiaire | null>(null);
   const [historiqueStages, setHistoriqueStages] = useState<HistoriqueStage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1523,7 +1525,7 @@ const OngoingInternshipDetails: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-2.5 sm:space-y-3">
               {/* CAS 1: Stage terminé ET pas en pré-renouvellement ET pas déjà renouvelé => Renouveler */}
-              {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && !stagiaire.a_ete_renouvele && (
+              {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && !stagiaire.a_ete_renouvele && hasPermission("stages.renew") && (
                 <Button
                   variant="default"
                   className="w-full gap-1.5 sm:gap-2 text-xs sm:text-sm bg-primary hover:bg-red-800 text-white"
@@ -1535,7 +1537,7 @@ const OngoingInternshipDetails: React.FC = () => {
               )}
 
               {/* CAS 2: Stage terminé ET en pré-renouvellement => Finaliser */}
-              {stagiaire.statut === "Terminé" && stagiaire.pre_renouvellement_en_cours && (
+              {stagiaire.statut === "Terminé" && stagiaire.pre_renouvellement_en_cours && hasPermission("stages.renew") && (
                 <>
                   {/* Badge d'information avec données du pré-renouvellement */}
                   <div className="p-3 border border-green-200 bg-green-50 rounded-lg mb-2">
@@ -1639,6 +1641,7 @@ const OngoingInternshipDetails: React.FC = () => {
               {/* CAS 3: Stage non terminé - Modifier la période et Mettre fin */}
               {stagiaire.statut !== "Terminé" && (
                 <>
+                  {hasPermission("stages.edit") && (
                   <Button
                     variant="default"
                     className="w-full gap-1.5 sm:gap-2 justify-start text-xs sm:text-sm hover:bg-red-800"
@@ -1651,8 +1654,9 @@ const OngoingInternshipDetails: React.FC = () => {
                     <CalendarRange className="h-3 w-3 sm:h-4 sm:w-4" />
                     Modifier la période
                   </Button>
+                  )}
 
-                  {hasInternshipStarted && (
+                  {hasInternshipStarted && hasPermission("stages.end_early") && (
                     <Button
                       variant="outline"
                       className="w-full gap-1.5 sm:gap-2 justify-start text-xs sm:text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"

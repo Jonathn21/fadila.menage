@@ -19,6 +19,7 @@ import {
   educationLevelOptions,
 } from "@/data/internships";
 import apiClient from "@/lib/apiClient";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -85,6 +86,7 @@ interface PageConfig {
 interface ColumnHelpers {
   handleViewDetails: (id: string) => void;
   handleDelete: (id: string) => void;
+  canDelete: boolean;
   formatDate: (date: string) => string;
   calculateDaysWaiting?: (date: string) => number;
   calculateDaysInProcess?: (date: string) => number;
@@ -221,9 +223,11 @@ const getPageConfigs = (helpers: ColumnHelpers & { formatStatusText: (status: st
             <Button variant="ghost" size="icon" onClick={() => h.handleViewDetails(item.id)} title="Voir les détails" className="h-8 w-8 sm:h-9 sm:w-9 hover:bg-gray-100 text-gray-700">
               <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 sm:h-9 sm:w-9 text-red-600 hover:bg-red-50" title="Supprimer">
-              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </Button>
+            {h.canDelete && (
+              <Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 sm:h-9 sm:w-9 text-red-600 hover:bg-red-50" title="Supprimer">
+                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </Button>
+            )}
           </div>
         ),
       },
@@ -305,7 +309,7 @@ const getPageConfigs = (helpers: ColumnHelpers & { formatStatusText: (status: st
         render: (_: unknown, item: Internship) => (
           <div className="flex space-x-1">
             <Button variant="ghost" size="icon" onClick={() => h.handleViewDetails(item.id)} className="h-8 w-8 hover:bg-gray-50"><Eye className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>
+            {h.canDelete && (<Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>)}
           </div>
         ),
       },
@@ -414,7 +418,7 @@ const getPageConfigs = (helpers: ColumnHelpers & { formatStatusText: (status: st
         render: (_: unknown, item: Internship) => (
           <div className="flex space-x-1">
             <Button variant="ghost" size="icon" onClick={() => h.handleViewDetails(item.id)} className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600"><Trash2 className="h-4 w-4" /></Button>
+            {h.canDelete && (<Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600"><Trash2 className="h-4 w-4" /></Button>)}
           </div>
         ),
       },
@@ -528,7 +532,7 @@ const getPageConfigs = (helpers: ColumnHelpers & { formatStatusText: (status: st
         render: (_: unknown, item: Internship) => (
           <div className="flex space-x-1">
             <Button variant="ghost" size="icon" onClick={() => h.handleViewDetails(item.id)} className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600"><Trash2 className="h-4 w-4" /></Button>
+            {h.canDelete && (<Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600"><Trash2 className="h-4 w-4" /></Button>)}
           </div>
         ),
       },
@@ -642,7 +646,7 @@ const getPageConfigs = (helpers: ColumnHelpers & { formatStatusText: (status: st
         render: (_: unknown, item: Internship) => (
           <div className="flex space-x-1">
             <Button variant="ghost" size="icon" onClick={() => h.handleViewDetails(item.id)} className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600"><Trash2 className="h-4 w-4" /></Button>
+            {h.canDelete && (<Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600"><Trash2 className="h-4 w-4" /></Button>)}
           </div>
         ),
       },
@@ -756,7 +760,7 @@ const getPageConfigs = (helpers: ColumnHelpers & { formatStatusText: (status: st
         render: (_: unknown, item: Internship) => (
           <div className="flex space-x-1">
             <Button variant="ghost" size="icon" onClick={() => h.handleViewDetails(item.id)} className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600"><Trash2 className="h-4 w-4" /></Button>
+            {h.canDelete && (<Button variant="ghost" size="icon" onClick={() => h.handleDelete(item.id)} className="h-8 w-8 text-red-600"><Trash2 className="h-4 w-4" /></Button>)}
           </div>
         ),
       },
@@ -805,6 +809,8 @@ const InternshipsPage: React.FC = () => {
   const location = window.location.pathname;
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { hasPermission } = usePermissions();
+  const canDelete = hasPermission("demandes.delete");
 
   const getStatusFromPath = (path: string): string => {
     if (path.includes('/en-attente')) return 'pending';
@@ -866,6 +872,7 @@ const InternshipsPage: React.FC = () => {
   const helpers: ColumnHelpers & { formatStatusText: (status: string) => string } = {
     handleViewDetails,
     handleDelete,
+    canDelete,
     formatDate,
     formatStatusText,
     calculateDaysWaiting,
@@ -1487,9 +1494,11 @@ const InternshipsPage: React.FC = () => {
                                 <Button variant="ghost" size="sm" onClick={() => handleViewDetails(internship.id)} className="h-7 w-7 p-0 hover:bg-gray-50 text-gray-700" title="Détails">
                                   <Eye className="h-3.5 w-3.5" />
                                 </Button>
-                                <Button variant="ghost" size="sm" onClick={() => setSelectedDelete(internship.id)} className="h-7 w-7 p-0 text-red-600 hover:bg-red-50" title="Supprimer">
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
+                                {canDelete && (
+                                  <Button variant="ghost" size="sm" onClick={() => setSelectedDelete(internship.id)} className="h-7 w-7 p-0 text-red-600 hover:bg-red-50" title="Supprimer">
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           </div>

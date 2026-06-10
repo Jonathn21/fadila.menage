@@ -47,6 +47,11 @@ from ..serializers import (
     ProfilSerializer, UserActionSerializer
 )
 from utilisateurs.models import Utilisateur, Profil
+from utilisateurs.permissions import (
+    HasPermission,
+    PERM_DEMANDES_VIEW, PERM_DEMANDES_PROCESS, PERM_DEMANDES_ACCEPT,
+    PERM_DEMANDES_REJECT, PERM_DEMANDES_DELETE,
+)
 from services.notification_service import NotificationService
 from services.resume_service import ResumeGeneratorService
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -185,7 +190,7 @@ class DemandesArchiveesAPI(DemandeBaseAPIView):
 
 @method_decorator([csrf_exempt, never_cache], name='dispatch') 
 class SupprimerDemandeView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_DELETE)]
 
     def delete(self, request, demande_id):
         try:
@@ -258,7 +263,7 @@ class SupprimerDemandeView(APIView):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='20/m', method='POST')], name='dispatch')
 class MettreEnTraitementAPI(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_PROCESS)]
 
     def post(self, request, pk):
         """Met une demande en traitement"""
@@ -1161,7 +1166,7 @@ class CreerDemandeAPIView(APIView):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class RefuserDemandeAPI(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_REJECT)]
 
     def post(self, request, demande_id):
         raison_refus = request.data.get("raison_refus", "").strip()
@@ -1239,7 +1244,20 @@ class RefuserDemandeAPI(APIView):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class DemandeDetailAPI(APIView):
+    # Permissions par méthode : consultation vs modification.
     permission_classes = [IsAuthenticated]
+
+    _method_permissions = {
+        "GET": PERM_DEMANDES_VIEW,
+        "PATCH": PERM_DEMANDES_PROCESS,
+    }
+
+    def get_permissions(self):
+        perms = [IsAuthenticated()]
+        required = self._method_permissions.get(self.request.method)
+        if required:
+            perms.append(HasPermission(required))
+        return perms
 
     def get(self, request, pk):
         """Récupère les détails d'une demande spécifique"""
@@ -1434,7 +1452,7 @@ class DemandeDetailAPI(APIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='10/m', method='POST')], name='dispatch')
 class PreAccepterDemandeAPIView(APIView):
     """Étape 1: Pré-acceptation sans créer de stagiaire"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_ACCEPT)]
 
     def post(self, request, demande_id):
         try:
@@ -1900,7 +1918,7 @@ class PreAccepterDemandeAPIView(APIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='10/m', method='POST')], name='dispatch')
 class FinaliserAcceptationAPIView(APIView):
     """Étape 2: Finalisation avec upload du PDF signé"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_ACCEPT)]
 
     def post(self, request, demande_id):
         try:
@@ -2217,7 +2235,7 @@ class FinaliserAcceptationAPIView(APIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='10/m', method='POST')], name='dispatch')
 class RegenererConventionAPIView(APIView):
     """Régénère la convention avec le signataire choisi (DG ou DGA)"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_ACCEPT)]
 
     SIGNATAIRES = {
         "DG": {
@@ -2326,7 +2344,7 @@ class RegenererConventionAPIView(APIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class TelechargerConventionTemporaireAPIView(APIView):
     """Télécharge une convention temporaire"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_VIEW)]
 
     def get(self, request, convention_id):
         try:
@@ -2389,7 +2407,7 @@ class TelechargerConventionTemporaireAPIView(APIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='10/m', method='POST')], name='dispatch')
 class AnnulerPreAcceptationSimpleAPIView(APIView):
     """Annuler une pré-acceptation simplement (sans raison détaillée)"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_ACCEPT)]
 
     def post(self, request, demande_id):
         try:

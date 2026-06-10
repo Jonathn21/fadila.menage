@@ -29,6 +29,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from utilisateurs.permissions import HasPermission, PERM_STATS_VIEW, PERM_DATA_EXPORT
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import (
@@ -400,7 +401,7 @@ def to_date(value):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class StatistiquesAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STATS_VIEW)]
 
     def get(self, request):
         current_year = datetime.today().year
@@ -704,7 +705,7 @@ class StatistiquesAPIView(APIView):
 
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class ExportStatsAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DATA_EXPORT)]
 
     def get(self, request, format_type):
         annee_cible = int(request.GET.get("annee", datetime.today().year))
@@ -1192,7 +1193,7 @@ from services.rapport_service import RapportGeneratorService
 from .models import PlanificationRapport
 @method_decorator(ratelimit(key='user', rate='30/m', method='GET'), name='dispatch')
 class ExportRapportAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DATA_EXPORT)]
 
     RAPPORT_HANDLERS = {
         # Opérationnel

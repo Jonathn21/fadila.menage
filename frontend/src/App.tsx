@@ -59,22 +59,22 @@ const App = () => (
             <Route path="/securite" element={<Security />} />
             <Route path="/parametres" element={<Settings />} />
             
-            <Route path="/demandes" element={<InternshipsPage />} /> 
-            <Route path="/demandes/toutes" element={<InternshipsPage />} /> 
-            <Route path="/demandes/en-attente" element={<InternshipsPage />} /> 
-            <Route path="/demandes/en-traitement" element={<InternshipsPage />} /> 
-            <Route path="/demandes/en-acceptation" element={<InternshipsPage />} /> 
-            <Route path="/demandes/acceptees" element={<InternshipsPage />} /> 
-            <Route path="/demandes/rejetees" element={<InternshipsPage />} /> 
-            
+            <Route path="/demandes" element={<ProtectedRoute permission="demandes.view"><InternshipsPage /></ProtectedRoute>} />
+            <Route path="/demandes/toutes" element={<ProtectedRoute permission="demandes.view"><InternshipsPage /></ProtectedRoute>} />
+            <Route path="/demandes/en-attente" element={<ProtectedRoute permission="demandes.view"><InternshipsPage /></ProtectedRoute>} />
+            <Route path="/demandes/en-traitement" element={<ProtectedRoute permission="demandes.view"><InternshipsPage /></ProtectedRoute>} />
+            <Route path="/demandes/en-acceptation" element={<ProtectedRoute permission="demandes.view"><InternshipsPage /></ProtectedRoute>} />
+            <Route path="/demandes/acceptees" element={<ProtectedRoute permission="demandes.view"><InternshipsPage /></ProtectedRoute>} />
+            <Route path="/demandes/rejetees" element={<ProtectedRoute permission="demandes.view"><InternshipsPage /></ProtectedRoute>} />
+
             {/* Routes restantes */}
-            <Route path="/demandes/archivees" element={<ArchivedInternships />} />
-            <Route path="/demandes/:id" element={<InternshipDetails />} />
-            
-            <Route path="/stages/prochains" element={<StudentsPage />} /> 
-            <Route path="/stages/en-cours" element={<StudentsPage />} /> 
-            <Route path="/stages/termines" element={<StudentsPage />} /> 
-            <Route path="/stagiaires/:id" element={<OngoingInternshipDetails />} />
+            <Route path="/demandes/archivees" element={<ProtectedRoute permission="demandes.view"><ArchivedInternships /></ProtectedRoute>} />
+            <Route path="/demandes/:id" element={<ProtectedRoute permission="demandes.view"><InternshipDetails /></ProtectedRoute>} />
+
+            <Route path="/stages/prochains" element={<ProtectedRoute permission="stages.view"><StudentsPage /></ProtectedRoute>} />
+            <Route path="/stages/en-cours" element={<ProtectedRoute permission="stages.view"><StudentsPage /></ProtectedRoute>} />
+            <Route path="/stages/termines" element={<ProtectedRoute permission="stages.view"><StudentsPage /></ProtectedRoute>} />
+            <Route path="/stagiaires/:id" element={<ProtectedRoute permission="stages.view"><OngoingInternshipDetails /></ProtectedRoute>} />
             
             {/* === Demande d'attestation : désactivée === */}
             {/* <Route path="/attestations/toutes" element={<DemandesAttestationUnified />} /> */}
@@ -84,8 +84,8 @@ const App = () => (
             {/* <Route path="/attestations/traitees" element={<DemandesAttestationUnified />} /> */}
             {/* <Route path="/attestations/:id" element={<AttestationDetails />} /> */}
 
-            <Route path="/acceptation/:id" element={<ProcessInternship />}/>
-            <Route path="/statistiques" element={<Analytics />} />
+            <Route path="/acceptation/:id" element={<ProtectedRoute permission="demandes.accept"><ProcessInternship /></ProtectedRoute>}/>
+            <Route path="/statistiques" element={<ProtectedRoute permission="stats.view"><Analytics /></ProtectedRoute>} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/notifications/:id" element={<NotificationDetails />}/>
             <Route
