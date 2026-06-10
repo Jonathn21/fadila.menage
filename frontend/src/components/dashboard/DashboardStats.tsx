@@ -42,7 +42,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
   }
 
   return (
-    <div className={cn("grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5", className)}>
+    <div className={cn("grid gap-4 grid-cols-2 md:grid-cols-4", className)}>
       {stats.map((stat, index) => (
         <StatCard
           key={index}
