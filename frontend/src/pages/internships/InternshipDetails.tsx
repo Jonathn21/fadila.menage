@@ -211,54 +211,58 @@ const InternshipDetailsPage: React.FC = () => {
     }
   };
 
+  // Récupère le blob authentifié et l'enregistre en préservant l'extension réelle
+  // (Content-Disposition > URL > type MIME) pour ne pas forcer un .docx en .pdf.
+  const downloadFromUrl = async (url: string, baseName: string, displayName: string) => {
+    const response = await apiClient.get(url, { responseType: "blob" });
+    const blob = response.data;
+
+    const mimeToExt: Record<string, string> = {
+      "application/pdf": "pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+      "application/msword": "doc",
+      "image/jpeg": "jpg",
+      "image/png": "png",
+    };
+    const disposition = (response.headers?.["content-disposition"] as string) || "";
+    const dispMatch = /filename\*?=(?:UTF-8'')?["']?([^"';]+)/i.exec(disposition);
+    let ext = dispMatch?.[1]?.split(".").pop()?.toLowerCase() || "";
+    if (!ext) {
+      const urlExt = url.split("?")[0].split(".").pop()?.toLowerCase() || "";
+      if (urlExt && urlExt.length <= 5 && !urlExt.includes("/")) ext = urlExt;
+    }
+    if (!ext && blob.type && mimeToExt[blob.type]) ext = mimeToExt[blob.type];
+    const fileName = ext ? `${baseName}.${ext}` : baseName;
+
+    if (window.showSaveFilePicker) {
+      const mime = blob.type
+        || Object.keys(mimeToExt).find((k) => mimeToExt[k] === ext)
+        || "application/octet-stream";
+      const pickerOptions: Parameters<typeof window.showSaveFilePicker>[0] = { suggestedName: fileName };
+      if (ext) pickerOptions.types = [{ description: "Document", accept: { [mime]: [`.${ext}`] } }];
+      const handle = await window.showSaveFilePicker(pickerOptions);
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    } else {
+      const objectUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(objectUrl);
+    }
+    toast({ title: "Téléchargement réussi", description: `"${displayName}" téléchargé` });
+  };
+
   const handleDownloadDocument = async (doc: APIDocument) => {
     if (doc.statut !== 'viewed') await markDocumentAsViewed(doc.id);
     if (!demande) return;
     const baseName = `${doc.nom.replace(/\s+/g, "_")}_${demande.etudiant.nom}_${demande.etudiant.prenom}`;
     try {
-      const response = await apiClient.get(doc.url, { responseType: "blob" });
-      const blob = response.data;
-
-      // Déterminer l'extension réelle : Content-Disposition > URL > type MIME.
-      // Évite de forcer un .docx généré à être enregistré en .pdf.
-      const mimeToExt: Record<string, string> = {
-        "application/pdf": "pdf",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
-        "application/msword": "doc",
-        "image/jpeg": "jpg",
-        "image/png": "png",
-      };
-      const disposition = (response.headers?.["content-disposition"] as string) || "";
-      const dispMatch = /filename\*?=(?:UTF-8'')?["']?([^"';]+)/i.exec(disposition);
-      let ext = dispMatch?.[1]?.split(".").pop()?.toLowerCase() || "";
-      if (!ext) {
-        const urlExt = doc.url.split("?")[0].split(".").pop()?.toLowerCase() || "";
-        if (urlExt && urlExt.length <= 5 && !urlExt.includes("/")) ext = urlExt;
-      }
-      if (!ext && blob.type && mimeToExt[blob.type]) ext = mimeToExt[blob.type];
-      const fileName = ext ? `${baseName}.${ext}` : baseName;
-
-      if (window.showSaveFilePicker) {
-        const mime = blob.type
-          || Object.keys(mimeToExt).find((k) => mimeToExt[k] === ext)
-          || "application/octet-stream";
-        const pickerOptions: Parameters<typeof window.showSaveFilePicker>[0] = { suggestedName: fileName };
-        if (ext) pickerOptions.types = [{ description: "Document", accept: { [mime]: [`.${ext}`] } }];
-        const handle = await window.showSaveFilePicker(pickerOptions);
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-      } else {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }
-      toast({ title: "Téléchargement réussi", description: `"${doc.nom}" téléchargé` });
+      await downloadFromUrl(doc.url, baseName, doc.nom);
     } catch {
       toast({ title: "Erreur", description: "Impossible de télécharger le document", variant: "destructive" });
     }
@@ -440,7 +444,6 @@ const InternshipDetailsPage: React.FC = () => {
           onClick: () => { if (demande.convention_temporaire_url) setConventionTemporaireUrl(demande.convention_temporaire_url); setIsFinalizeModalOpen(true); },
           variant: "default" as const,
         });
-        actions.push({ icon: PenLine, label: "Faire signer", onClick: () => setIsSignatoryModalOpen(true), variant: "outline" as const });
         actions.push({ icon: XCircle, label: "Annuler l'acceptation", onClick: () => handleAnnulerAcceptation(), variant: "outline" as const });
       }
       if (["En attente", "En cours de traitement"].includes(demande.statut_stage) && hasPermission("demandes.reject")) {
@@ -477,9 +480,15 @@ const InternshipDetailsPage: React.FC = () => {
               <Eye className="h-3.5 w-3.5" /><span className="hidden sm:inline">Voir</span>
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={() => handleDownloadDocument(doc)} className="h-8 gap-1 text-gray-700 hover:bg-gray-100 hover:border-gray-300">
-            <Download className="h-3.5 w-3.5" /><span className="hidden sm:inline">Télécharger</span>
-          </Button>
+          {isWordDocument(doc) ? (
+            <Button variant="outline" size="sm" onClick={() => setIsSignatoryModalOpen(true)} className="h-8 gap-1 text-gray-700 hover:bg-gray-100 hover:border-gray-300">
+              <PenLine className="h-3.5 w-3.5" /><span className="hidden sm:inline">Faire signer et télécharger</span>
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => handleDownloadDocument(doc)} className="h-8 gap-1 text-gray-700 hover:bg-gray-100 hover:border-gray-300">
+              <Download className="h-3.5 w-3.5" /><span className="hidden sm:inline">Télécharger</span>
+            </Button>
+          )}
         </div>
       </div>
     ));
@@ -928,10 +937,19 @@ const InternshipDetailsPage: React.FC = () => {
             onOpenChange={setIsSignatoryModalOpen}
             demandeId={demande.id}
             conventionTemporaireUrl={conventionTemporaireUrl || demande.convention_temporaire_url}
-            onSuccess={(pdfUrl) => {
+            onSuccess={async (pdfUrl) => {
               setConventionTemporaireUrl(pdfUrl);
               refreshData(false);
-              toast({ title: "Lettre de stage prête", description: "La lettre de stage a été générée avec le signataire choisi." });
+              if (pdfUrl && demande) {
+                const baseName = `Lettre_de_stage_a_signer_${demande.etudiant.nom}_${demande.etudiant.prenom}`;
+                try {
+                  await downloadFromUrl(pdfUrl, baseName, "Lettre de stage à signer");
+                } catch {
+                  toast({ title: "Erreur", description: "Lettre générée mais téléchargement impossible", variant: "destructive" });
+                }
+              } else {
+                toast({ title: "Lettre de stage prête", description: "La lettre de stage a été générée avec le signataire choisi." });
+              }
             }}
           />
         )}
