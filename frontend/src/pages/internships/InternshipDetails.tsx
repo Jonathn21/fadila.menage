@@ -482,7 +482,7 @@ const InternshipDetailsPage: React.FC = () => {
           )}
           {isWordDocument(doc) ? (
             <Button variant="outline" size="sm" onClick={() => setIsSignatoryModalOpen(true)} className="h-8 gap-1 text-gray-700 hover:bg-gray-100 hover:border-gray-300">
-              <PenLine className="h-3.5 w-3.5" /><span className="hidden sm:inline">Faire signer et télécharger</span>
+              <PenLine className="h-3.5 w-3.5" /><span className="hidden sm:inline">Télécharger et faire signer</span>
             </Button>
           ) : (
             <Button variant="outline" size="sm" onClick={() => handleDownloadDocument(doc)} className="h-8 gap-1 text-gray-700 hover:bg-gray-100 hover:border-gray-300">
