@@ -200,3 +200,13 @@ class HasPermission(BasePermission):
 
     def has_permission(self, request, view):
         return user_has_permission(request.user, self.required_permission)
+
+
+class IsSuperUtilisateur(BasePermission):
+    """Autorise uniquement les super-utilisateurs."""
+
+    def has_permission(self, request, view):
+        user = request.user
+        if not user or not getattr(user, "is_authenticated", False):
+            return False
+        return getattr(user, "role", None) == ROLE_SUPERUTILISATEUR

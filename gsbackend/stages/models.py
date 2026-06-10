@@ -1393,3 +1393,27 @@ class PlanificationRapport(models.Model):
 
     def __str__(self):
         return f"{self.report_id} → {self.email_destinataire}"
+
+
+class EmailNotificationDemande(models.Model):
+    """
+    Adresses email configurées par les super-utilisateurs pour recevoir
+    les notifications des nouvelles demandes de stage.
+    """
+    email       = models.EmailField(unique=True)
+    actif       = models.BooleanField(default=True)
+    date_ajout  = models.DateTimeField(auto_now_add=True)
+    ajoute_par  = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='emails_notification_ajoutes'
+    )
+
+    class Meta:
+        ordering = ['email']
+        verbose_name = "Email de notification des demandes"
+        verbose_name_plural = "Emails de notification des demandes"
+
+    def __str__(self):
+        return f"{self.email} ({'actif' if self.actif else 'inactif'})"

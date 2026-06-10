@@ -52,6 +52,10 @@ from .utilisateurs.utilisateurs_api import (
     PermissionCatalogAPIView, UserPermissionsAPIView
 )
 
+from .parametres.notification_emails_api import (
+    NotificationEmailsAPIView, NotificationEmailDetailAPIView
+)
+
 router = DefaultRouter()
 
 urlpatterns = [
@@ -88,6 +92,16 @@ urlpatterns = [
      path('utilisateurs/<int:user_id>/permissions/',
           UserPermissionsAPIView.as_view(),
           name='user-permissions'),
+
+    # ============================================
+    # PARAMÈTRES - EMAILS DE NOTIFICATION (super-utilisateurs)
+    # ============================================
+     path('notification-emails/',
+          NotificationEmailsAPIView.as_view(),
+          name='notification-emails'),
+     path('notification-emails/<int:email_id>/',
+          NotificationEmailDetailAPIView.as_view(),
+          name='notification-email-detail'),
 
     # ============================================
     # SÉCURITÉ
