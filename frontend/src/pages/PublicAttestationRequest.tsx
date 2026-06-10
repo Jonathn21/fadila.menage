@@ -45,7 +45,7 @@ const PublicAttestationRequest = () => {
       const res = await apiClient.get(`suivi-demande/${trackingId.trim()}/`);
       const data = res.data.demande;
 
-      // Vérifier que le stage existe et est en cours ou terminé
+      // Vérifier que le stage existe et est en cours ou terminé (aligné sur le backend)
       if (!data.stage) {
         setError("Aucun stage n'est associé à cette demande. La demande d'attestation n'est possible que pour les stages en cours ou terminés.");
         return;

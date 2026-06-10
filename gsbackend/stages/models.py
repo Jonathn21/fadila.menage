@@ -1381,7 +1381,7 @@ class DemandeAttestation(models.Model):
     @property
     def est_finalisee(self):
         """Vérifie si la demande est finalisée (attestation signée uploadée)"""
-        return self.statut == 'traitee' and self.attestation_signee is not None
+        return self.statut == 'traitee' and bool(self.attestation_signee)
 
 class PlanificationRapport(models.Model):
     report_id          = models.CharField(max_length=100, unique=True)

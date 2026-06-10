@@ -71,6 +71,20 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
       return;
     }
 
+    // Vérifier la taille des fichiers (max 10 Mo, aligné sur le backend)
+    const MAX_SIZE = 10 * 1024 * 1024;
+    const tropVolumineux = [rapportStage, demandeManuscrite].find(
+      (f) => f && f.size > MAX_SIZE
+    );
+    if (tropVolumineux) {
+      toast({
+        title: "Fichier trop volumineux",
+        description: `« ${tropVolumineux.name} » dépasse la taille maximale de 10 Mo.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const formData = new FormData();
     if (rapportStage) {
       formData.append("rapport_stage", rapportStage);
@@ -83,13 +97,6 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
     setIsSubmitting(true);
 
     try {
-      console.log("🚀 Envoi de la demande d'attestation...");
-      console.log("📁 Fichiers:", {
-        rapport: rapportStage?.name,
-        demande: demandeManuscrite.name,
-        trackingId
-      });
-
       const response = await apiClient.post(
         `suivi-demande/${trackingId}/demande-attestation/`,
         formData,
@@ -100,8 +107,6 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
           timeout: 30000,
         }
       );
-
-      console.log("✅ Réponse reçue:", response.data);
 
       toast({
         title: "Succès !",
@@ -118,8 +123,6 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
       }, 2000);
 
     } catch (error: any) {
-      console.error("❌ Erreur lors de l'envoi:", error);
-      
       let errorMessage = "Une erreur est survenue lors de l'envoi";
       
       if (error.response) {
@@ -184,7 +187,7 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
               onFileSelect={(files) => setRapportStage(files?.[0] || null)}
               onFileRemove={() => setRapportStage(null)}
               inputRef={rapportInputRef}
-              description="Format accepté: PDF uniquement. Taille max: 10MB"
+              description="Format accepté : PDF uniquement · 10 Mo max"
             />
           )}
 
@@ -196,7 +199,7 @@ export const AttestationRequest: React.FC<AttestationRequestProps> = ({
             onFileSelect={(files) => setDemandeManuscrite(files?.[0] || null)}
             onFileRemove={() => setDemandeManuscrite(null)}
             inputRef={demandeInputRef}
-            description="Formats acceptés: PDF, JPG, PNG. Taille max: 5MB"
+            description="Formats acceptés : PDF, JPG, PNG · 10 Mo max"
           />
         </div>
 

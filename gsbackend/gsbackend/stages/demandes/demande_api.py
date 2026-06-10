@@ -1460,7 +1460,7 @@ class PreAccepterDemandeAPIView(APIView):
                         "message": "Échec de la génération de la convention PDF."
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                # 🔔 NOTIFICATION PUSH - Pré-acceptation
+
                 try:
                     # Calculer la durée en mois pour la notification
                     date_debut = datetime.strptime(donnees["date_debut"], "%d/%m/%Y").date()
@@ -3073,7 +3073,7 @@ class DemandeAttestationAPIView(APIView):
                 "success": False,
                 "message": "Aucune demande trouvée avec ce code de suivi."
             }, status=status.HTTP_404_NOT_FOUND)
-            
+
         except Exception as e:
             logger.error(f"❌ Erreur serveur: {str(e)}")
             import traceback

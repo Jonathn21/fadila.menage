@@ -373,7 +373,8 @@ const SidebarNavigation = () => {
             </Collapsible>
           </SidebarMenuItem>
 
-          {/* Demandes d'attestation */}
+          {/* Demandes d'attestation — désactivées */}
+          {false && (
           <SidebarMenuItem className="py-1">
             <Collapsible open={openAttestations} onOpenChange={setOpenAttestations} className="w-full">
               <CollapsibleTrigger asChild>
@@ -413,6 +414,7 @@ const SidebarNavigation = () => {
               </CollapsibleContent>
             </Collapsible>
           </SidebarMenuItem>
+          )}
 
           {/* Separator */}
           <div className="my-3 mx-2 h-px bg-green-700"></div>

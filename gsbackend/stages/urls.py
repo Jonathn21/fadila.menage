@@ -30,11 +30,14 @@ from .demandes.demande_api import (
     ModifierDemandeAPIView, RefuserDemandeAPI, DemandeDetailAPI,
     SupprimerDemandeView, PreAccepterDemandeAPIView, FinaliserAcceptationAPIView,
     TelechargerConventionTemporaireAPIView, AnnulerPreAcceptationSimpleAPIView,
-    DemandesEnAcceptationAPI, DemandeAttestationAPIView, DemandeModificationAPIView,
-    DemandesAttestationAPI, DemandeAttestationDetailAPI, ApprouverDemandeAttestationAPI,
-    RefuserDemandeAttestationAPI, SupprimerDemandeAttestationAPI,DemandesAttestationEnAttenteAPI,DemandesAttestationRefuseAPI,
-    DemandesAttestationApprouveAPI, UploadAttestationSigneeAPI,DemandesAttestationTraiteeAPI, TelechargerAttestationSigneeAPI,
-    RegenererConventionAPIView, RegenerarAttestationAvecSignataireAPI
+    DemandesEnAcceptationAPI, DemandeModificationAPIView,
+    RegenererConventionAPIView,
+    # === Demande d'attestation : désactivée ===
+    # DemandeAttestationAPIView,
+    # DemandesAttestationAPI, DemandeAttestationDetailAPI, ApprouverDemandeAttestationAPI,
+    # RefuserDemandeAttestationAPI, SupprimerDemandeAttestationAPI, DemandesAttestationEnAttenteAPI, DemandesAttestationRefuseAPI,
+    # DemandesAttestationApprouveAPI, UploadAttestationSigneeAPI, DemandesAttestationTraiteeAPI, TelechargerAttestationSigneeAPI,
+    # RegenerarAttestationAvecSignataireAPI
 )
 
 from .securite.security_api import (
@@ -126,14 +129,15 @@ urlpatterns = [
      path('demande-toutes/', 
          DemandesToutesAPI.as_view(), 
          name='demandes-toutes-api'),
-     path('demande-archivees/', 
-         DemandesArchiveesAPI.as_view(), 
+     path('demande-archivees/',
+         DemandesArchiveesAPI.as_view(),
          name='demandes-archivees-api'),
-     path('demandes-attestation/', 
-         DemandesAttestationAPI.as_view(), 
-         name='demandes-attestation'),
-     
-     
+     # === Demande d'attestation : désactivée ===
+     # path('demandes-attestation/',
+     #     DemandesAttestationAPI.as_view(),
+     #     name='demandes-attestation'),
+
+
 
     # ============================================
     # DEMANDES - ACTIONS INDIVIDUELLES
@@ -172,52 +176,50 @@ urlpatterns = [
      path('suivi-demande/<str:tracking_id>/', 
          SuiviDemandeAPIView.as_view(), 
          name='suivi-demande-detail'),
-     path('suivi-demande/<str:tracking_id>/modifier/', 
-         ModifierDemandeAPIView.as_view(), 
+     path('suivi-demande/<str:tracking_id>/modifier/',
+         ModifierDemandeAPIView.as_view(),
          name='modifier-demande-suivi'),
-     path('suivi-demande/<str:tracking_id>/demande-attestation/', 
-         DemandeAttestationAPIView.as_view(), 
-         name='demande-attestation'),
+     # === Demande d'attestation : désactivée ===
+     # path('suivi-demande/<str:tracking_id>/demande-attestation/',
+     #     DemandeAttestationAPIView.as_view(),
+     #     name='demande-attestation'),
 
     # ============================================
-    # DEMANDES D'ATTESTATION
+    # DEMANDES D'ATTESTATION (désactivées)
     # ============================================
-     path('demandes-attestation/<int:demande_id>/detail/',
-         DemandeAttestationDetailAPI.as_view(),
-         name='demande-attestation-detail'),
-     path('demandes-attestation/<int:demande_id>/regenerer-attestation/',
-         RegenerarAttestationAvecSignataireAPI.as_view(),
-         name='regenerer-attestation-signataire'),
-     path('demandes-attestation/<int:demande_id>/approuver/',
-         ApprouverDemandeAttestationAPI.as_view(),
-         name='approuver-demande-attestation'),
-     path('demandes-attestation/<int:demande_id>/refuser/', 
-         RefuserDemandeAttestationAPI.as_view(), 
-         name='refuser-demande-attestation'),
-     path('demandes-attestation/<int:demande_id>/supprimer/', 
-         SupprimerDemandeAttestationAPI.as_view(), 
-         name='supprimer-demande-attestation'),
-     path('demandes-attestation/en-attente/', 
-         DemandesAttestationEnAttenteAPI.as_view(), 
-         name='demandes-attestation-en-attente'),
-     path('demandes-attestation/refusees/',
-           DemandesAttestationRefuseAPI.as_view(),
-           name='demandes-attestation-refusees'),
-     path('demandes-attestation/approuvees/',
-               DemandesAttestationApprouveAPI.as_view(),
-               name='demandes-attestation-approuvees'),
-     path('demandes-attestation/traitees/',
-               DemandesAttestationTraiteeAPI.as_view(),
-               name='demandes-attestation-traitees'),
-
-     path('demandes-attestation/<int:demande_id>/upload-attestation/', 
-         UploadAttestationSigneeAPI.as_view(), 
-         name='upload_attestation_signee'),
-    
-     path('demandes-attestation/<int:demande_id>/telecharger-attestation/', 
-         TelechargerAttestationSigneeAPI.as_view(), 
-         name='telecharger_attestation_signee'),
-     
+     # path('demandes-attestation/<int:demande_id>/detail/',
+     #     DemandeAttestationDetailAPI.as_view(),
+     #     name='demande-attestation-detail'),
+     # path('demandes-attestation/<int:demande_id>/regenerer-attestation/',
+     #     RegenerarAttestationAvecSignataireAPI.as_view(),
+     #     name='regenerer-attestation-signataire'),
+     # path('demandes-attestation/<int:demande_id>/approuver/',
+     #     ApprouverDemandeAttestationAPI.as_view(),
+     #     name='approuver-demande-attestation'),
+     # path('demandes-attestation/<int:demande_id>/refuser/',
+     #     RefuserDemandeAttestationAPI.as_view(),
+     #     name='refuser-demande-attestation'),
+     # path('demandes-attestation/<int:demande_id>/supprimer/',
+     #     SupprimerDemandeAttestationAPI.as_view(),
+     #     name='supprimer-demande-attestation'),
+     # path('demandes-attestation/en-attente/',
+     #     DemandesAttestationEnAttenteAPI.as_view(),
+     #     name='demandes-attestation-en-attente'),
+     # path('demandes-attestation/refusees/',
+     #       DemandesAttestationRefuseAPI.as_view(),
+     #       name='demandes-attestation-refusees'),
+     # path('demandes-attestation/approuvees/',
+     #           DemandesAttestationApprouveAPI.as_view(),
+     #           name='demandes-attestation-approuvees'),
+     # path('demandes-attestation/traitees/',
+     #           DemandesAttestationTraiteeAPI.as_view(),
+     #           name='demandes-attestation-traitees'),
+     # path('demandes-attestation/<int:demande_id>/upload-attestation/',
+     #     UploadAttestationSigneeAPI.as_view(),
+     #     name='upload_attestation_signee'),
+     # path('demandes-attestation/<int:demande_id>/telecharger-attestation/',
+     #     TelechargerAttestationSigneeAPI.as_view(),
+     #     name='telecharger_attestation_signee'),
 
     # ============================================
     # STAGES - LISTES

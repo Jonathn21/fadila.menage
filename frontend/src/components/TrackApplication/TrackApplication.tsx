@@ -728,8 +728,9 @@ const TrackApplication = () => {
             )}
             */}
 
-            {/* SECTION DEMANDE D'ATTESTATION */}
-            {application.stage?.statut_actuel === "Terminé" &&
+            {/* SECTION DEMANDE D'ATTESTATION — désactivée */}
+            {false &&
+              application.stage?.statut_actuel === "Terminé" &&
               !application.stage.demande_attestation && (
                 <AttestationRequest
                   trackingId={application.tracking_id}

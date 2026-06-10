@@ -3524,6 +3524,14 @@ class DemandeAttestationAPIView(APIView):
                 "message": "Aucune demande trouvée avec ce code de suivi."
             }, status=status.HTTP_404_NOT_FOUND)
             
+        except IntegrityError:
+            # Collision : une demande a été créée en parallèle (contrainte OneToOne).
+            logger.warning(f"⚠️ Collision de demande d'attestation pour le tracking {tracking_id}")
+            return Response({
+                "success": False,
+                "message": "Une demande d'attestation existe déjà pour ce stage."
+            }, status=status.HTTP_409_CONFLICT)
+
         except Exception as e:
             logger.error(f"❌ Erreur serveur: {str(e)}")
             import traceback
@@ -3619,7 +3627,7 @@ class RegenerarAttestationAvecSignataireAPI(APIView):
     def post(self, request, demande_id):
         try:
             with transaction.atomic():
-                demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
+                demande_attestation = get_object_or_404(DemandeAttestation.objects.select_for_update(), id=demande_id)
 
                 if demande_attestation.statut not in (DemandeAttestation.Statut.APPROUVEE, DemandeAttestation.Statut.TRAITEE):
                     return Response({
@@ -3687,7 +3695,7 @@ class ApprouverDemandeAttestationAPI(APIView):
         try:
             with transaction.atomic():
                 # Récupérer la demande d'attestation
-                demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
+                demande_attestation = get_object_or_404(DemandeAttestation.objects.select_for_update(), id=demande_id)
                 
                 # Vérifier que la demande est en attente
                 if demande_attestation.statut != DemandeAttestation.Statut.EN_ATTENTE:
@@ -3801,7 +3809,7 @@ class RefuserDemandeAttestationAPI(APIView):
         try:
             with transaction.atomic():
                 # Récupérer la demande d'attestation
-                demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
+                demande_attestation = get_object_or_404(DemandeAttestation.objects.select_for_update(), id=demande_id)
                 
                 # Vérifier que la demande est en attente
                 if demande_attestation.statut != DemandeAttestation.Statut.EN_ATTENTE:
@@ -3896,7 +3904,7 @@ class SupprimerDemandeAttestationAPI(APIView):
         try:
             with transaction.atomic():
                 # Récupérer la demande d'attestation
-                demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
+                demande_attestation = get_object_or_404(DemandeAttestation.objects.select_for_update(), id=demande_id)
                 
                 # Sauvegarder les informations pour le log
                 stagiaire_info = f"{demande_attestation.stagiaire.nom} {demande_attestation.stagiaire.prenom}"
@@ -3951,7 +3959,7 @@ class UploadAttestationSigneeAPI(APIView):
         try:
             with transaction.atomic():
                 # Récupérer la demande d'attestation
-                demande_attestation = get_object_or_404(DemandeAttestation, id=demande_id)
+                demande_attestation = get_object_or_404(DemandeAttestation.objects.select_for_update(), id=demande_id)
                 
                 # Vérifier que la demande est approuvée
                 if demande_attestation.statut != DemandeAttestation.Statut.APPROUVEE:

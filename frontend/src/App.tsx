@@ -23,8 +23,9 @@ import UserDetails from "./pages/UserDetails";
 import UserPermissions from "./pages/UserPermissions";
 
 import InternshipsPage from "./pages/internships/InternshipsPage";
-import DemandesAttestationUnified from "./pages/Attestations/Demandesattestationunified";
-import AttestationDetails from "./pages/Attestations/AttestationDetails";
+// === Demande d'attestation : désactivée ===
+// import DemandesAttestationUnified from "./pages/Attestations/Demandesattestationunified";
+// import AttestationDetails from "./pages/Attestations/AttestationDetails";
 
 
 import StudentsPage from "./pages/StudentsPage";
@@ -33,7 +34,8 @@ import ArchivedInternships from "./pages/internships/ArchivedInternships";
 import ProcessInternship from "./pages/ProcessInternship";
 import PublicInternshipApplication from "./pages/PublicInternshipApplication";
 import TrackApplication from "./pages/TrackApplication";
-import PublicAttestationRequest from "./pages/PublicAttestationRequest";
+// === Demande d'attestation : désactivée ===
+// import PublicAttestationRequest from "./pages/PublicAttestationRequest";
 
 
 
@@ -73,12 +75,13 @@ const App = () => (
             <Route path="/stages/termines" element={<StudentsPage />} /> 
             <Route path="/stagiaires/:id" element={<OngoingInternshipDetails />} />
             
-            <Route path="/attestations/toutes" element={<DemandesAttestationUnified />} />
-            <Route path="/attestations/en-attente" element={<DemandesAttestationUnified />} />
-            <Route path="/attestations/approuvees" element={<DemandesAttestationUnified />} />
-            <Route path="/attestations/refusees" element={<DemandesAttestationUnified />} />
-            <Route path="/attestations/traitees" element={<DemandesAttestationUnified />} />
-            <Route path="/attestations/:id" element={<AttestationDetails />} />
+            {/* === Demande d'attestation : désactivée === */}
+            {/* <Route path="/attestations/toutes" element={<DemandesAttestationUnified />} /> */}
+            {/* <Route path="/attestations/en-attente" element={<DemandesAttestationUnified />} /> */}
+            {/* <Route path="/attestations/approuvees" element={<DemandesAttestationUnified />} /> */}
+            {/* <Route path="/attestations/refusees" element={<DemandesAttestationUnified />} /> */}
+            {/* <Route path="/attestations/traitees" element={<DemandesAttestationUnified />} /> */}
+            {/* <Route path="/attestations/:id" element={<AttestationDetails />} /> */}
 
             <Route path="/acceptation/:id" element={<ProcessInternship />}/>
             <Route path="/statistiques" element={<Analytics />} />
@@ -91,7 +94,8 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<PublicInternshipApplication />} />
             <Route path="/suivi-demande" element={<TrackApplication />} />
-            <Route path="/demande-attestation" element={<PublicAttestationRequest />} />
+            {/* === Demande d'attestation : désactivée === */}
+            {/* <Route path="/demande-attestation" element={<PublicAttestationRequest />} /> */}
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
