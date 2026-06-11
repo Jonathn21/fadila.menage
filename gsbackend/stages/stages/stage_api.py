@@ -1610,9 +1610,9 @@ class AnnulerPreRenouvellementAPIView(APIView):
 
                 stagiaire.save(update_fields=[
                     'statut_renouvellement',
-                    'donnees_renouvellement',
+                    'donnees_pre_renouvellement',
                     'date_pre_renouvellement',
-                    'pre_renouvellement_en_cours'  
+                    'pre_renouvellement_en_cours'
                 ])
 
                 # Nettoyer les conventions temporaires
