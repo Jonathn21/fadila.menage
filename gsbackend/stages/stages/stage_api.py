@@ -43,7 +43,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from utilisateurs.permissions import (
     HasPermission,
     PERM_STAGES_VIEW, PERM_STAGES_RENEW, PERM_STAGES_EDIT,
-    PERM_STAGES_END_EARLY, PERM_STAGES_DELETE,
+    PERM_STAGES_END_EARLY, PERM_STAGES_CLOSE, PERM_STAGES_DELETE,
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -108,9 +108,15 @@ class FinAnticipeeStagiaireAPIView(APIView):
     def post(self, request, stagiaire_id):
         stagiaire = get_object_or_404(Stagiaire, pk=stagiaire_id)
 
+        if stagiaire.est_cloture:
+            return Response(
+                {"success": False, "message": "Dossier clôturé : rouvrez-le avant d'agir sur le stage."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         # Sauvegarde de l'ancien statut pour l'email
         ancien_statut = stagiaire.statut
-        
+
         stagiaire.statut = "Terminé"
         stagiaire.date_fin = now().date()
         stagiaire.save()
@@ -159,7 +165,7 @@ class FinAnticipeeStagiaireAPIView(APIView):
 
         return Response({
             "success": True,
-            "message": f"Le stage de {stagiaire.prenom} {stagiaire.nom} a été clôturé avec succès.",
+            "message": f"Il a été mis fin au stage de {stagiaire.prenom} {stagiaire.nom} avec succès.",
             "email_envoye": email_envoye,
             "stagiaire": {
                 "id": stagiaire.id,
@@ -169,12 +175,96 @@ class FinAnticipeeStagiaireAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
+@method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='POST')], name='dispatch')
+class ClotureStageAPIView(APIView):
+    """Clôture (POST) ou réouverture (DELETE) du dossier d'un stage terminé.
+
+    La clôture verrouille le dossier : plus de renouvellement, de modification
+    de période ni de fin anticipée possibles. L'opération est réversible par
+    un utilisateur disposant de la permission dédiée ``stages.close``.
+    """
+    permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_CLOSE)]
+
+    def post(self, request, stagiaire_id):
+        stagiaire = get_object_or_404(Stagiaire, pk=stagiaire_id)
+
+        if stagiaire.est_cloture:
+            return Response(
+                {"success": False, "message": "Ce dossier est déjà clôturé."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if stagiaire.statut != "Terminé":
+            return Response(
+                {"success": False, "message": "Seul un stage terminé peut être clôturé."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if stagiaire.pre_renouvellement_en_cours:
+            return Response(
+                {"success": False, "message": "Un renouvellement est en cours : finalisez ou annulez-le avant de clôturer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        stagiaire.date_cloture = now()
+        stagiaire.cloture_par = request.user
+        stagiaire.save(update_fields=["date_cloture", "cloture_par"])
+
+        UserAction.objects.create(
+            user=request.user,
+            action=f"Clôture du dossier de stage de {stagiaire.prenom} {stagiaire.nom}",
+            performed_by=request.user,
+        )
+
+        return Response({
+            "success": True,
+            "message": f"Le dossier de {stagiaire.prenom} {stagiaire.nom} a été clôturé.",
+            "stagiaire": {
+                "id": stagiaire.id,
+                "est_cloture": True,
+                "date_cloture": stagiaire.date_cloture.isoformat(),
+            }
+        }, status=status.HTTP_200_OK)
+
+    def delete(self, request, stagiaire_id):
+        stagiaire = get_object_or_404(Stagiaire, pk=stagiaire_id)
+
+        if not stagiaire.est_cloture:
+            return Response(
+                {"success": False, "message": "Ce dossier n'est pas clôturé."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        stagiaire.date_cloture = None
+        stagiaire.cloture_par = None
+        stagiaire.save(update_fields=["date_cloture", "cloture_par"])
+
+        UserAction.objects.create(
+            user=request.user,
+            action=f"Réouverture du dossier de stage de {stagiaire.prenom} {stagiaire.nom}",
+            performed_by=request.user,
+        )
+
+        return Response({
+            "success": True,
+            "message": f"Le dossier de {stagiaire.prenom} {stagiaire.nom} a été rouvert.",
+            "stagiaire": {
+                "id": stagiaire.id,
+                "est_cloture": False,
+                "date_cloture": None,
+            }
+        }, status=status.HTTP_200_OK)
+
 @method_decorator([never_cache, ratelimit(key='user', rate='30/m', method='GET')], name='dispatch')
 class ModifierPeriodeStagiaireAPIView(APIView):
     permission_classes = [IsAuthenticated, HasPermission(PERM_STAGES_EDIT)]
 
     def post(self, request, stagiaire_id):
         stagiaire = get_object_or_404(Stagiaire, pk=stagiaire_id)
+
+        if stagiaire.est_cloture:
+            return Response(
+                {"detail": "Dossier clôturé : rouvrez-le avant de modifier la période."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         date_debut_str = request.data.get("date_debut")
         date_fin_str = request.data.get("date_fin")
@@ -524,6 +614,8 @@ class StagiaireDetailAPI(APIView):
             "pays_residence": stagiaire.pays_residence if stagiaire.pays_residence else None,
             "type_stage": stagiaire.type_stage,
             "statut": stagiaire.statut,
+            "est_cloture": stagiaire.est_cloture,
+            "date_cloture": stagiaire.date_cloture.isoformat() if stagiaire.date_cloture else None,
             "resume": stagiaire.resume_cv,
             "date_debut": stagiaire.date_debut.isoformat() if stagiaire.date_debut else None,
             "date_fin": stagiaire.date_fin.isoformat() if stagiaire.date_fin else None,
@@ -687,6 +779,13 @@ class PreRenouvelerStageAPIView(APIView):
                     Stagiaire.objects.select_related('etablissement'),
                     id=stagiaire_id
                 )
+
+                # Dossier clôturé => verrouillé
+                if stagiaire.est_cloture:
+                    return Response({
+                        "success": False,
+                        "message": "Dossier clôturé : rouvrez-le avant de renouveler le stage."
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
                 # Vérifier que le stage est terminé
                 if stagiaire.statut != "Terminé":

@@ -21,6 +21,7 @@ export type Permission =
   | 'stages.renew'
   | 'stages.edit'
   | 'stages.end_early'
+  | 'stages.close'
   | 'stages.delete'
   // Statistiques & données
   | 'stats.view'
@@ -65,6 +66,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'stages.renew',
     'stages.edit',
     'stages.end_early',
+    'stages.close',
     'stages.delete',
     'stats.view',
     'data.export',
@@ -81,6 +83,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'stages.renew',
     'stages.edit',
     'stages.end_early',
+    'stages.close',
     'stages.delete',
     'stats.view',
     'data.export',

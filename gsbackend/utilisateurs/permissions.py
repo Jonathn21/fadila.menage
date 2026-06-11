@@ -48,6 +48,7 @@ PERM_STAGES_VIEW = "stages.view"
 PERM_STAGES_RENEW = "stages.renew"
 PERM_STAGES_EDIT = "stages.edit"
 PERM_STAGES_END_EARLY = "stages.end_early"
+PERM_STAGES_CLOSE = "stages.close"
 PERM_STAGES_DELETE = "stages.delete"
 
 # Statistiques & données
@@ -75,6 +76,7 @@ PERMISSION_CATALOG = [
     {"code": PERM_STAGES_RENEW, "label": "Renouveler les stages", "category": "Stages"},
     {"code": PERM_STAGES_EDIT, "label": "Modifier les stages", "category": "Stages"},
     {"code": PERM_STAGES_END_EARLY, "label": "Mettre fin à un stage par anticipation", "category": "Stages"},
+    {"code": PERM_STAGES_CLOSE, "label": "Clôturer / rouvrir un dossier de stage", "category": "Stages"},
     {"code": PERM_STAGES_DELETE, "label": "Supprimer les stages", "category": "Stages"},
     # Catégorie : Statistiques & données
     {"code": PERM_STATS_VIEW, "label": "Consulter les statistiques", "category": "Statistiques & données"},
@@ -115,6 +117,7 @@ ROLE_DEFAULT_PERMISSIONS = {
         PERM_STAGES_RENEW,
         PERM_STAGES_EDIT,
         PERM_STAGES_END_EARLY,
+        PERM_STAGES_CLOSE,
         PERM_STAGES_DELETE,
         PERM_STATS_VIEW,
         PERM_DATA_EXPORT,

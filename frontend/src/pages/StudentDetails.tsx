@@ -12,7 +12,8 @@ import {
   Mail, Phone, Upload, User, FileText, Eye, AlertCircle, X, FileCheck, GraduationCap,
   UserCheck, Building2, ClipboardList, MapPin, Download, ArrowLeft, Briefcase, Clock,
   DollarSign, FileBarChart, CalendarRange, Loader2, Calendar,
-  Award, TrendingUp, BookOpen, Users, Shield, ExternalLink, Printer, PenLine, Flag, RefreshCw
+  Award, TrendingUp, BookOpen, Users, Shield, ExternalLink, Printer, PenLine, Flag, RefreshCw,
+  Lock, Unlock
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
@@ -115,6 +116,9 @@ type APIStagiaire = {
   montant_remuneration?: number | null;
   documents: APIDocument[];
   statut: string;
+  // Clôture du dossier (verrouillage)
+  est_cloture?: boolean;
+  date_cloture?: string | null;
   // ✅ Nouveaux champs pour le renouvellement
   pre_renouvellement_en_cours?: boolean;
   convention_renouvellement_temporaire?: ConventionRenouvellement | null;
@@ -772,6 +776,50 @@ const OngoingInternshipDetails: React.FC = () => {
       toast({
         title: "Erreur",
         description: "Impossible de clôturer le stage",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Clôturer le dossier (verrouille le stage terminé)
+  const handleCloturer = async () => {
+    if (!stagiaire) return;
+    try {
+      const res = await apiClient.post(`/stagiaires/${stagiaire.id}/cloture/`);
+      toast({
+        title: "Dossier clôturé",
+        description: `Le dossier de ${stagiaire.prenom} ${stagiaire.nom} a été clôturé.`,
+      });
+      setStagiaire({
+        ...stagiaire,
+        est_cloture: true,
+        date_cloture: res.data?.stagiaire?.date_cloture ?? new Date().toISOString(),
+      });
+    } catch (err: any) {
+      console.error("Erreur clôture :", err);
+      toast({
+        title: "Erreur",
+        description: err.response?.data?.message || "Impossible de clôturer le dossier",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Rouvrir un dossier clôturé (réservé aux détenteurs de stages.close)
+  const handleRouvrir = async () => {
+    if (!stagiaire) return;
+    try {
+      await apiClient.delete(`/stagiaires/${stagiaire.id}/cloture/`);
+      toast({
+        title: "Dossier rouvert",
+        description: `Le dossier de ${stagiaire.prenom} ${stagiaire.nom} a été rouvert.`,
+      });
+      setStagiaire({ ...stagiaire, est_cloture: false, date_cloture: null });
+    } catch (err: any) {
+      console.error("Erreur réouverture :", err);
+      toast({
+        title: "Erreur",
+        description: err.response?.data?.message || "Impossible de rouvrir le dossier",
         variant: "destructive",
       });
     }
@@ -1524,6 +1572,31 @@ const OngoingInternshipDetails: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2.5 sm:space-y-3">
+              {stagiaire.est_cloture ? (
+                /* Dossier clôturé : verrouillé */
+                <div className="space-y-2.5 sm:space-y-3">
+                  <div className="p-2.5 sm:p-3 border border-amber-200 bg-amber-50 rounded-lg">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Lock className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                      <p className="text-xs sm:text-sm font-medium text-amber-700">Dossier clôturé</p>
+                    </div>
+                    <p className="text-xs text-amber-600">
+                      Le dossier est verrouillé{stagiaire.date_cloture ? ` depuis le ${format(new Date(stagiaire.date_cloture), "dd/MM/yyyy")}` : ""}. Renouvellement et modifications désactivés.
+                    </p>
+                  </div>
+                  {hasPermission("stages.close") && (
+                    <Button
+                      variant="outline"
+                      className="w-full gap-1.5 sm:gap-2 justify-start text-xs sm:text-sm text-amber-700 hover:bg-amber-50 hover:text-amber-800 border-amber-200"
+                      onClick={handleRouvrir}
+                    >
+                      <Unlock className="h-3 w-3 sm:h-4 sm:w-4" />
+                      Rouvrir le dossier
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <>
               {/* CAS 1: Stage terminé ET pas en pré-renouvellement ET pas déjà renouvelé => Renouveler */}
               {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && !stagiaire.a_ete_renouvele && hasPermission("stages.renew") && (
                 <Button
@@ -1678,6 +1751,20 @@ const OngoingInternshipDetails: React.FC = () => {
                     Le stage débutera le {format(new Date(student.startDate), "dd/MM/yyyy")}
                   </p>
                 </div>
+              )}
+
+              {/* Clôturer le dossier : stage terminé, non clôturé, hors renouvellement en cours */}
+              {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && hasPermission("stages.close") && (
+                <Button
+                  variant="outline"
+                  className="w-full gap-1.5 sm:gap-2 justify-start text-xs sm:text-sm text-amber-700 hover:bg-amber-50 hover:text-amber-800 border-amber-200"
+                  onClick={handleCloturer}
+                >
+                  <Lock className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Clôturer le stage
+                </Button>
+              )}
+                </>
               )}
             </CardContent>
           </Card>

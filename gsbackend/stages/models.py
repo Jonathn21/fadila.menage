@@ -663,6 +663,24 @@ class Stagiaire(models.Model):
         help_text="Indique si ce stage est un renouvellement d'un stage précédent"
     )
 
+    # ==================== CLÔTURE DU DOSSIER ====================
+    # La clôture est orthogonale au statut : un stage « Terminé » peut être
+    # ouvert (renouvelable/modifiable) ou clôturé (dossier verrouillé).
+    date_cloture = models.DateTimeField(
+        "Date de clôture du dossier",
+        null=True,
+        blank=True,
+        help_text="Si renseignée, le dossier est clôturé (verrouillé)."
+    )
+    cloture_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="stagiaires_clotures",
+        help_text="Utilisateur ayant clôturé le dossier."
+    )
+
     class Meta:
         ordering = ['-date_debut']
         indexes = [
@@ -725,6 +743,11 @@ class Stagiaire(models.Model):
         super().save(*args, **kwargs)
 
     # ==================== PROPRIÉTÉS DE BASE ====================
+
+    @property
+    def est_cloture(self):
+        """Indique si le dossier est clôturé (verrouillé)."""
+        return self.date_cloture is not None
 
     @property
     def statut_actuel(self):
