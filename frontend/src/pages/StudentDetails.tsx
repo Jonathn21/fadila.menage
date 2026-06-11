@@ -1587,7 +1587,7 @@ const OngoingInternshipDetails: React.FC = () => {
                   {hasPermission("stages.close") && (
                     <Button
                       variant="outline"
-                      className="w-full gap-1.5 sm:gap-2 justify-start text-xs sm:text-sm text-amber-700 hover:bg-amber-50 hover:text-amber-800 border-amber-200"
+                      className="w-full gap-1.5 sm:gap-2 justify-center text-xs sm:text-sm text-amber-700 hover:bg-amber-50 hover:text-amber-800 border-amber-200"
                       onClick={handleRouvrir}
                     >
                       <Unlock className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -1757,7 +1757,7 @@ const OngoingInternshipDetails: React.FC = () => {
               {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && hasPermission("stages.close") && (
                 <Button
                   variant="outline"
-                  className="w-full gap-1.5 sm:gap-2 justify-start text-xs sm:text-sm text-amber-700 hover:bg-amber-50 hover:text-amber-800 border-amber-200"
+                  className="w-full gap-1.5 sm:gap-2 justify-center text-xs sm:text-sm text-amber-700 hover:bg-amber-50 hover:text-amber-800 border-amber-200"
                   onClick={handleCloturer}
                 >
                   <Lock className="h-3 w-3 sm:h-4 sm:w-4" />

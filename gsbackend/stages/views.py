@@ -1053,7 +1053,8 @@ class SidebarCountsAPIView(APIView):
 
         stages_a_venir = Stagiaire.objects.filter(statut='À venir').count()
         stages_en_cours = Stagiaire.objects.filter(statut='Actuel').count()
-        stages_termines = Stagiaire.objects.filter(statut='Terminé').count()
+        stages_termines = Stagiaire.objects.filter(statut='Terminé', date_cloture__isnull=True).count()
+        stages_clotures = Stagiaire.objects.filter(statut='Terminé', date_cloture__isnull=False).count()
 
         demandes_attestation = DemandeAttestation.objects.all().count()
         attestations_en_attente = DemandeAttestation.objects.filter(statut='en_attente').count()
@@ -1071,6 +1072,7 @@ class SidebarCountsAPIView(APIView):
             'count_stages_avenir': stages_a_venir,
             'count_stages_en_cours': stages_en_cours,
             'count_stages_termines': stages_termines,
+            'count_stages_clotures': stages_clotures,
             'count_demandes_attestation': demandes_attestation,
             'count_attestations_en_attente': attestations_en_attente,
             'count_attestations_approuvees': attestations_approuvees,

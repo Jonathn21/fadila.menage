@@ -64,6 +64,7 @@ const SidebarNavigation = () => {
     stages_avenir: 0,
     stages_en_cours: 0,
     stages_termines: 0,
+    stages_clotures: 0,
     demandes_attestation: 0,
     attestations_en_attente: 0,
     attestations_approuvees: 0,
@@ -99,6 +100,7 @@ const SidebarNavigation = () => {
           stages_avenir: res.data.count_stages_avenir,
           stages_en_cours: res.data.count_stages_en_cours,
           stages_termines: res.data.count_stages_termines,
+          stages_clotures: res.data.count_stages_clotures,
           demandes_attestation: res.data.count_demandes_attestation,
           attestations_en_attente: res.data.count_attestations_en_attente,
           attestations_approuvees: res.data.count_attestations_approuvees,
@@ -136,7 +138,7 @@ const SidebarNavigation = () => {
   const totalDemandes = counts.demandes_attente + counts.demandes_acceptees + counts.demandes_refusees + counts.demandes_traitement + counts.demandes_en_acceptation;
   
   // Calcul du total des stagiaires
-  const totalStagiaires = counts.stages_avenir + counts.stages_en_cours + counts.stages_termines;
+  const totalStagiaires = counts.stages_avenir + counts.stages_en_cours + counts.stages_termines + counts.stages_clotures;
 
   // Sidebar items
   const navItems = [
@@ -211,12 +213,19 @@ const SidebarNavigation = () => {
       variant: "success" as const,
       icon: <Briefcase className="size-3.5" />
     },
-    { 
-      label: "Stages terminés", 
-      path: "/stages/termines", 
+    {
+      label: "Stages terminés",
+      path: "/stages/termines",
       count: counts.stages_termines,
       variant: "default" as const,
       icon: <GraduationCap className="size-3.5" />
+    },
+    {
+      label: "Stages clôturés",
+      path: "/stages/clotures",
+      count: counts.stages_clotures,
+      variant: "default" as const,
+      icon: <Lock className="size-3.5" />
     },
   ];
 

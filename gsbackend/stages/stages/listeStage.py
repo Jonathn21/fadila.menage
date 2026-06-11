@@ -22,6 +22,9 @@ class StageBaseAPIView(APIView):
     # Surcharger ces attributs dans les classes filles
     statut_filter = None
     default_ordering = None
+    # Filtre de clôture : None = indifférent, True = uniquement clôturés,
+    # False = uniquement non clôturés.
+    cloture_filter = None
     
     # Configuration des filtres
     filters_config = {
@@ -84,7 +87,12 @@ class StageBaseAPIView(APIView):
         
         if self.statut_filter:
             queryset = queryset.filter(statut=self.statut_filter)
-            
+
+        if self.cloture_filter is True:
+            queryset = queryset.filter(date_cloture__isnull=False)
+        elif self.cloture_filter is False:
+            queryset = queryset.filter(date_cloture__isnull=True)
+
         if self.default_ordering:
             queryset = queryset.order_by(self.default_ordering)
             

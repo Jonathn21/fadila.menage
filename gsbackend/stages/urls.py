@@ -15,7 +15,7 @@ from .notifications.notifications_api import (
 )
 
 from .stages.stage_api import (
-    StagesEnCoursAPI, StagesTermineAPI, StagesProchainAPI,
+    StagesEnCoursAPI, StagesTermineAPI, StagesCloturesAPI, StagesProchainAPI,
     FinAnticipeeStagiaireAPIView, ClotureStageAPIView, ModifierPeriodeStagiaireAPIView,
     StagiaireDetailAPI, PreRenouvelerStageAPIView,
     FinaliserRenouvellementAPIView,
@@ -248,9 +248,12 @@ urlpatterns = [
      path('stages/en-cours/', 
          StagesEnCoursAPI.as_view(), 
          name='stages-en-cours-api'),
-     path('stages/termines/', 
-         StagesTermineAPI.as_view(), 
+     path('stages/termines/',
+         StagesTermineAPI.as_view(),
          name='stages-termine-api'),
+     path('stages/clotures/',
+         StagesCloturesAPI.as_view(),
+         name='stages-clotures-api'),
      path('stages/prochains/', 
          StagesProchainAPI.as_view(), 
          name='stages-prochain-api'),

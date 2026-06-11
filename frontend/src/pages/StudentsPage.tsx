@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { 
   Clock, BookOpen, Eye, Trash2, Search, Filter, Users, 
   ChevronUp, ChevronDown, ChevronLeft, ChevronRight, 
-  RefreshCw, Calendar, Award, AlertCircle, TrendingUp, CheckCircle 
+  RefreshCw, Calendar, Award, AlertCircle, TrendingUp, CheckCircle, Lock
 } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
@@ -743,6 +743,171 @@ const getPageConfigs = (helpers: ColumnHelpers): Record<string, PageConfig> => (
       );
     },
   },
+
+  closed: {
+    title: "Stages clôturés",
+    description: "Consultez les dossiers de stage clôturés (verrouillés)",
+    endpoint: "/stages/clotures/",
+    errorMessage: "Impossible de charger les stages clôturés.",
+    emptyMessage: "Aucun stage clôturé",
+    emptyIcon: (
+          <div className="flex items-center justify-center">
+            <Lock className="h-12 w-12 text-gray-400" />
+          </div>
+        ),
+    defaultSort: { field: "date_fin", direction: "desc" },
+    cardBorderColor: "border-amber-200 hover:border-amber-300",
+    getColumns: (h) => [
+      {
+        key: "nom",
+        label: "Stagiaire",
+        sortable: true,
+        render: (value: string, item: Stagiaire) => (
+          <div className="flex flex-col min-w-0 max-w-[140px]">
+            <span className="font-medium text-sm sm:text-base truncate text-gray-900">
+              {item.nom} {item.prenom}
+            </span>
+            <span className="text-xs text-gray-600 truncate">{item.specialite}</span>
+          </div>
+        ),
+      },
+      {
+        key: "genre",
+        label: "Genre",
+        sortable: true,
+        render: (value: string) => (
+          <div className="max-w-[70px]">
+            <Badge variant="outline" className="capitalize px-2 py-0.5 text-xs sm:text-sm whitespace-nowrap truncate bg-gray-50 text-gray-700 w-full">
+              {value}
+            </Badge>
+          </div>
+        ),
+      },
+      {
+        key: "niveau_etude",
+        label: "Niveau",
+        sortable: true,
+        render: (value: string) => (
+          <div className="max-w-[80px]">
+            <span className="text-xs sm:text-sm whitespace-nowrap truncate block text-gray-800">{value}</span>
+          </div>
+        ),
+      },
+      {
+        key: "type_stage",
+        label: "Type",
+        sortable: true,
+        render: (value: string) => (
+          <div className="flex items-center min-w-0 max-w-[90px]">
+            <BookOpen className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 text-gray-600 flex-shrink-0" />
+            <span className="text-xs sm:text-sm truncate text-gray-800">{value}</span>
+          </div>
+        ),
+      },
+      {
+        key: "direction",
+        label: "Direction",
+        sortable: true,
+        render: (value: string) => (
+          <div className="max-w-[110px]">
+            <span className="text-xs sm:text-sm whitespace-nowrap truncate block text-gray-800">{value}</span>
+          </div>
+        ),
+      },
+      {
+        key: "service",
+        label: "Service",
+        sortable: true,
+        render: (value: string) => (
+          <div className="max-w-[120px]">
+            <span className="text-xs sm:text-sm whitespace-nowrap truncate block text-gray-800">{value}</span>
+          </div>
+        ),
+      },
+      {
+        key: "date_fin",
+        label: "Date de fin",
+        sortable: true,
+        render: (value: string, item: Stagiaire) => {
+          return (
+            <div className="flex flex-col min-w-0 max-w-[110px]">
+              <div className="flex items-center">
+                <span className="text-xs sm:text-sm whitespace-nowrap font-medium truncate">
+                  {h.formatDate(value)}
+                </span>
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        key: "actions",
+        label: "",
+        sortable: false,
+        render: (_: unknown, item: Stagiaire) => (
+          <div className="flex space-x-1 justify-end">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => h.handleViewDetails(item.id)}
+              title="Voir les détails"
+              className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-gray-50 text-gray-700 hover:text-gray-800"
+            >
+              <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
+            {h.canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => h.handleDelete(item.id)}
+              className="h-7 w-7 sm:h-8 sm:w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+              title="Supprimer"
+            >
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
+            )}
+          </div>
+        ),
+      },
+    ],
+    getMobileCardBadge: () => (
+      <Badge
+        variant="outline"
+        className="px-2 py-0.5 text-xs bg-amber-50 text-amber-700 border-amber-200 transition-colors"
+      >
+        <Lock className="h-3 w-3 mr-1 inline" />
+        Clôturé
+      </Badge>
+    ),
+    getMobileCardDetails: (stagiaire, h) => {
+      const duration = h.calculateDuration(stagiaire.date_debut, stagiaire.date_fin);
+
+      return (
+        <div className="p-2 rounded text-xs bg-amber-50 text-amber-800 border border-amber-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+            <div className="flex items-center gap-1">
+              <Lock className="h-3 w-3 text-amber-600" />
+              <span className="font-medium">Dossier clôturé (verrouillé)</span>
+            </div>
+            <span className="text-[10px] font-medium text-amber-700">Durée: {duration}j</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="flex items-center text-[10px]">
+              <Calendar className="h-2.5 w-2.5 mr-1 text-amber-600" />
+              <span className="font-medium text-amber-700">Début:</span>
+              <span className="ml-1 text-amber-800">{h.formatDate(stagiaire.date_debut)}</span>
+            </div>
+            <div className="flex items-center text-[10px] justify-end">
+              <Calendar className="h-2.5 w-2.5 mr-1 text-amber-600" />
+              <span className="font-medium text-amber-700">Fin:</span>
+              <span className="ml-1 text-amber-800">{h.formatDate(stagiaire.date_fin)}</span>
+            </div>
+          </div>
+        </div>
+      );
+    },
+  },
 });
 
 // ==============================
@@ -760,6 +925,7 @@ const StudentsPage: React.FC = () => {
   const getStatusFromPath = (path: string): string => {
     if (path.includes('/prochains')) return 'upcoming';
     if (path.includes('/en-cours')) return 'ongoing';
+    if (path.includes('/clotures')) return 'closed';
     if (path.includes('/termines')) return 'completed';
     return 'upcoming'; // Par défaut
   };

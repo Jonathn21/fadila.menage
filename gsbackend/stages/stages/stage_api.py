@@ -94,7 +94,14 @@ class StagesEnCoursAPI(StageBaseAPIView):
 @method_decorator([never_cache, ratelimit(key='user', rate='60/m', method='GET')], name='dispatch')
 class StagesTermineAPI(StageBaseAPIView):
     statut_filter = "Terminé"
+    cloture_filter = False  # Terminés « tout court » : exclut les dossiers clôturés
     default_ordering = "-date_fin"
+
+@method_decorator([never_cache, ratelimit(key='user', rate='60/m', method='GET')], name='dispatch')
+class StagesCloturesAPI(StageBaseAPIView):
+    statut_filter = "Terminé"
+    cloture_filter = True  # Uniquement les dossiers clôturés
+    default_ordering = "-date_cloture"
 
 @method_decorator([never_cache, ratelimit(key='user', rate='60/m', method='GET')], name='dispatch')
 class StagesProchainAPI(StageBaseAPIView):

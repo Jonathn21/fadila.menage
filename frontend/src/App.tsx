@@ -74,6 +74,7 @@ const App = () => (
             <Route path="/stages/prochains" element={<ProtectedRoute permission="stages.view"><StudentsPage /></ProtectedRoute>} />
             <Route path="/stages/en-cours" element={<ProtectedRoute permission="stages.view"><StudentsPage /></ProtectedRoute>} />
             <Route path="/stages/termines" element={<ProtectedRoute permission="stages.view"><StudentsPage /></ProtectedRoute>} />
+            <Route path="/stages/clotures" element={<ProtectedRoute permission="stages.view"><StudentsPage /></ProtectedRoute>} />
             <Route path="/stagiaires/:id" element={<ProtectedRoute permission="stages.view"><OngoingInternshipDetails /></ProtectedRoute>} />
             
             {/* === Demande d'attestation : désactivée === */}
