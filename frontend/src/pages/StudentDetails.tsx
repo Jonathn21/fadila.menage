@@ -256,6 +256,8 @@ const OngoingInternshipDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<APIDocument | null>(null);
+  const [documentPreviewUrl, setDocumentPreviewUrl] = useState<string | null>(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [isEditPeriodOpen, setIsEditPeriodOpen] = useState(false);
   const [newStartDate, setNewStartDate] = useState<Date>();
@@ -703,8 +705,45 @@ const OngoingInternshipDetails: React.FC = () => {
     };
   }, [stagiaire]);
 
-  // Fonction pour visualiser un document
-  const handleViewDocument = (doc: APIDocument) => setSelectedDocument(doc);
+  // Ferme l'aperçu et libère l'URL blob
+  const closeDocumentPreview = () => {
+    setSelectedDocument(null);
+    setDocumentPreviewUrl((prev) => {
+      if (prev && prev.startsWith("blob:")) window.URL.revokeObjectURL(prev);
+      return null;
+    });
+    setIsPreviewLoading(false);
+  };
+
+  // Visualisation d'un document : on récupère le fichier authentifié (JWT) sous
+  // forme de blob pour l'afficher dans le modal. Charger l'URL brute dans l'iframe
+  // échoue (401/403) car le navigateur n'envoie pas le token → « erreur d'affichage du PDF ».
+  const handleViewDocument = async (doc: APIDocument) => {
+    setSelectedDocument(doc);
+    setDocumentPreviewUrl(null);
+
+    // Lien externe (autre domaine) : on l'utilise tel quel
+    const isExternal = /^https?:\/\//i.test(doc.url) && !doc.url.includes(window.location.host);
+    if (isExternal) {
+      setDocumentPreviewUrl(doc.url);
+      return;
+    }
+
+    setIsPreviewLoading(true);
+    try {
+      const response = await apiClient.get(doc.url, { responseType: "blob" });
+      const isPdf = (doc.url || "").split("?")[0].toLowerCase().endsWith(".pdf");
+      const blob = isPdf && response.data.type !== "application/pdf"
+        ? new Blob([response.data], { type: "application/pdf" })
+        : response.data;
+      const blobUrl = window.URL.createObjectURL(blob);
+      setDocumentPreviewUrl(blobUrl);
+    } catch {
+      toast({ title: "Erreur", description: "Impossible d'afficher le document", variant: "destructive" });
+    } finally {
+      setIsPreviewLoading(false);
+    }
+  };
 
   // Fonction pour télécharger un document
   const handleDownloadDocument = async (doc: APIDocument) => {
@@ -1873,7 +1912,7 @@ const OngoingInternshipDetails: React.FC = () => {
         )}
 
         {/* Modal document */}
-        <Dialog open={!!selectedDocument} onOpenChange={() => setSelectedDocument(null)}>
+        <Dialog open={!!selectedDocument} onOpenChange={(open) => { if (!open) closeDocumentPreview(); }}>
           <DialogContent className="max-w-4xl max-h-[90vh]">
             <DialogHeader>
               <DialogTitle className="text-sm sm:text-base text-gray-900">{selectedDocument?.nom}</DialogTitle>
@@ -1882,23 +1921,33 @@ const OngoingInternshipDetails: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="flex justify-center p-3 sm:p-4 bg-gray-50/30 rounded-lg">
-              {selectedDocument?.url?.endsWith(".pdf") ?
+              {isPreviewLoading ? (
+                <div className="flex flex-col items-center justify-center h-[60vh] sm:h-[70vh] w-full text-gray-500">
+                  <Loader2 className="h-8 w-8 animate-spin mb-2" />
+                  <span className="text-xs sm:text-sm">Chargement du document…</span>
+                </div>
+              ) : !documentPreviewUrl ? (
+                <div className="flex items-center justify-center h-[60vh] sm:h-[70vh] w-full text-gray-500 text-xs sm:text-sm">
+                  Impossible d'afficher ce document.
+                </div>
+              ) : (selectedDocument?.url || "").split("?")[0].toLowerCase().endsWith(".pdf") ? (
                 <iframe
-                  src={selectedDocument.url}
+                  src={documentPreviewUrl}
                   className="w-full h-[60vh] sm:h-[70vh] border border-gray-300 rounded-md"
-                  title={selectedDocument.nom}
-                /> :
+                  title={selectedDocument?.nom}
+                />
+              ) : (
                 <img
-                  src={selectedDocument?.url}
+                  src={documentPreviewUrl}
                   alt={selectedDocument?.nom}
                   className="max-w-full max-h-[60vh] sm:max-h-[70vh] object-contain border border-gray-300 rounded-md"
                 />
-              }
+              )}
             </div>
             <div className="flex justify-end gap-1.5 sm:gap-2">
               <Button
                 variant="outline"
-                onClick={() => setSelectedDocument(null)}
+                onClick={closeDocumentPreview}
                 className="text-xs sm:text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
               >
                 Fermer

@@ -15,6 +15,7 @@ import {
   Printer, Flag, PenLine
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { archiverDemande, desarchiverDemande } from "@/lib/demandes";
 import PhotoDialog from "@/components/internships/PhotoDialog";
 import { RefuseDialog } from "@/components/internships/RefuseDialog";
@@ -133,6 +134,9 @@ const InternshipDetailsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [demande, setDemande] = useState<APIDemande | null>(null);
   const [documents, setDocuments] = useState<APIDocument[]>([]);
+  const [previewDocument, setPreviewDocument] = useState<APIDocument | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [processingAction, setProcessingAction] = useState<string | null>(null);
   const [isRefuseDialogOpen, setIsRefuseDialogOpen] = useState(false);
@@ -199,15 +203,34 @@ const InternshipDetailsPage: React.FC = () => {
     return path.endsWith(".docx") || path.endsWith(".doc");
   };
 
+  const closeDocumentPreview = () => {
+    setPreviewDocument(null);
+    setPreviewUrl((prev) => {
+      if (prev && prev.startsWith("blob:")) window.URL.revokeObjectURL(prev);
+      return null;
+    });
+    setIsPreviewLoading(false);
+  };
+
+  // Affiche le document dans un modal (pas dans un nouvel onglet). On récupère le
+  // blob authentifié (JWT) puis on l'affiche via une URL blob dans une iframe/img.
   const handleViewDocument = async (doc: APIDocument) => {
     if (doc.statut !== 'viewed') await markDocumentAsViewed(doc.id);
+    setPreviewDocument(doc);
+    setPreviewUrl(null);
+    setIsPreviewLoading(true);
     try {
       const response = await apiClient.get(doc.url, { responseType: "blob" });
-      const blobUrl = window.URL.createObjectURL(response.data);
-      window.open(blobUrl, "_blank");
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60000);
+      const isPdf = (doc.url || "").split("?")[0].toLowerCase().endsWith(".pdf");
+      const blob = isPdf && response.data.type !== "application/pdf"
+        ? new Blob([response.data], { type: "application/pdf" })
+        : response.data;
+      const blobUrl = window.URL.createObjectURL(blob);
+      setPreviewUrl(blobUrl);
     } catch {
       toast({ title: "Erreur", description: "Impossible d'ouvrir le document", variant: "destructive" });
+    } finally {
+      setIsPreviewLoading(false);
     }
   };
 
@@ -874,6 +897,58 @@ const InternshipDetailsPage: React.FC = () => {
         </div>
 
         {/* Modals */}
+        {/* Aperçu d'un document dans un modal (au lieu d'un nouvel onglet) */}
+        <Dialog open={!!previewDocument} onOpenChange={(open) => { if (!open) closeDocumentPreview(); }}>
+          <DialogContent className="max-w-4xl max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle className="text-sm sm:text-base text-gray-900">{previewDocument?.nom}</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm text-gray-600">
+                Visualisation du document
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-center p-3 sm:p-4 bg-gray-50/30 rounded-lg">
+              {isPreviewLoading ? (
+                <div className="flex flex-col items-center justify-center h-[60vh] sm:h-[70vh] w-full text-gray-500">
+                  <Loader2 className="h-8 w-8 animate-spin mb-2" />
+                  <span className="text-xs sm:text-sm">Chargement du document…</span>
+                </div>
+              ) : !previewUrl ? (
+                <div className="flex items-center justify-center h-[60vh] sm:h-[70vh] w-full text-gray-500 text-xs sm:text-sm">
+                  Impossible d'afficher ce document.
+                </div>
+              ) : (previewDocument?.url || "").split("?")[0].toLowerCase().endsWith(".pdf") ? (
+                <iframe
+                  src={previewUrl}
+                  className="w-full h-[60vh] sm:h-[70vh] border border-gray-300 rounded-md"
+                  title={previewDocument?.nom}
+                />
+              ) : (
+                <img
+                  src={previewUrl}
+                  alt={previewDocument?.nom}
+                  className="max-w-full max-h-[60vh] sm:max-h-[70vh] object-contain border border-gray-300 rounded-md"
+                />
+              )}
+            </div>
+            <div className="flex justify-end gap-1.5 sm:gap-2">
+              <Button
+                variant="outline"
+                onClick={closeDocumentPreview}
+                className="text-xs sm:text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
+              >
+                Fermer
+              </Button>
+              <Button
+                onClick={() => previewDocument && handleDownloadDocument(previewDocument)}
+                className="gap-1.5 sm:gap-2 text-xs sm:text-sm bg-primary hover:bg-primary/90 text-white"
+              >
+                <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                Télécharger
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {demande && (
           <AcceptInternshipModal
             open={isAcceptModalOpen}
