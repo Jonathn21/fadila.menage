@@ -95,8 +95,8 @@ export const usePermissions = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Valeur immédiate depuis localStorage (évite un flash au montage)
-    const storedRole = normalizeRole(localStorage.getItem('userRole'));
+    // Valeur immédiate depuis sessionStorage (évite un flash au montage)
+    const storedRole = normalizeRole(sessionStorage.getItem('userRole'));
     setUserRole(storedRole);
     setPermissions(ROLE_PERMISSIONS[storedRole]);
 
@@ -112,10 +112,10 @@ export const usePermissions = () => {
           : ROLE_PERMISSIONS[role];
         setUserRole(role);
         setPermissions(perms);
-        localStorage.setItem('userRole', role);
+        sessionStorage.setItem('userRole', role);
       })
       .catch(() => {
-        // Échec réseau/401 : on conserve la valeur issue de localStorage
+        // Échec réseau/401 : on conserve la valeur issue de sessionStorage
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

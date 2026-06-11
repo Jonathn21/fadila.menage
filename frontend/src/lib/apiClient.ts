@@ -24,7 +24,7 @@ const apiClient = axios.create({
 
 // 🔹 Ajouter token à chaque requête
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access");
+  const token = sessionStorage.getItem("access");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -57,10 +57,10 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refresh = localStorage.getItem("refresh");
+      const refresh = sessionStorage.getItem("refresh");
       if (!refresh) {
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
+        sessionStorage.removeItem("access");
+        sessionStorage.removeItem("refresh");
         // ⚠️ Ne pas rediriger ici pour éviter les rechargements de page
         // window.location.href = "/";
         return Promise.reject(error);
@@ -72,7 +72,7 @@ apiClient.interceptors.response.use(
         const res = await axios.post(refreshURL, { refresh });
         const newToken = res.data.access;
 
-        localStorage.setItem("access", newToken);
+        sessionStorage.setItem("access", newToken);
         apiClient.defaults.headers.common["Authorization"] = "Bearer " + newToken;
         processQueue(null, newToken);
 
@@ -80,8 +80,8 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
+        sessionStorage.removeItem("access");
+        sessionStorage.removeItem("refresh");
         // ⚠️ Ne pas rediriger ici non plus
         // window.location.href = "/";
         

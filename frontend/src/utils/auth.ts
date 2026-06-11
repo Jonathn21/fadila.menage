@@ -13,7 +13,7 @@ export function isTokenExpired(token: string): boolean {
 
 // Tente de rafraîchir le token d’accès
 export async function refreshAccessToken(): Promise<string | null> {
-  const refresh = localStorage.getItem("refresh");
+  const refresh = sessionStorage.getItem("refresh");
   if (!refresh) return null;
 
   try {
@@ -25,15 +25,15 @@ export async function refreshAccessToken(): Promise<string | null> {
 
     if (!res.ok) {
       // Refresh invalide → nettoyage + redirection
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
+      sessionStorage.removeItem("access");
+      sessionStorage.removeItem("refresh");
       window.location.href = "/connexion"; // 🔹 Redirection login
       return null;
     }
 
     const data = await res.json();
     if (data.access) {
-      localStorage.setItem("access", data.access);
+      sessionStorage.setItem("access", data.access);
       return data.access;
     }
     return null;
@@ -45,7 +45,7 @@ export async function refreshAccessToken(): Promise<string | null> {
 
 // Wrapper fetch qui gère l’expiration et le refresh automatiquement
 export async function authFetch(url: string, options: RequestInit = {}) {
-  let token = localStorage.getItem("access");
+  let token = sessionStorage.getItem("access");
 
   // Vérif expiration avant l’appel
   if (!token || isTokenExpired(token)) {

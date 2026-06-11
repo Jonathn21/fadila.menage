@@ -22,7 +22,7 @@ const ProtectedRoute = ({ children, permission, redirectTo = "/accueil" }: Prote
   const { hasPermission, loading } = usePermissions();
 
   // Pas de token => l'utilisateur n'est pas connecté
-  const isAuthenticated = !!localStorage.getItem("access");
+  const isAuthenticated = !!sessionStorage.getItem("access");
   if (!isAuthenticated) {
     return <Navigate to="/connexion" replace />;
   }

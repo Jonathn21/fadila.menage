@@ -44,7 +44,7 @@ export const useWebSocket = (onMessage: (data: WebSocketMessage) => void) => {
     isConnectingRef.current = true;
 
     try {
-      const token = localStorage.getItem('access');
+      const token = sessionStorage.getItem('access');
       
       if (!token) {
         console.warn('❌ Aucun token JWT trouvé pour WebSocket');

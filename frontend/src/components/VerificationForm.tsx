@@ -17,8 +17,8 @@ const VerificationForm = () => {
   const [timer, setTimer] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const email = localStorage.getItem("masked_email") || "****@example.com";
-  const user_id = localStorage.getItem("user_id");
+  const email = sessionStorage.getItem("masked_email") || "****@example.com";
+  const user_id = sessionStorage.getItem("user_id");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const VerificationForm = () => {
   const configureApiClient = (accessToken: string) => {
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     // Même clé que celle lue par apiClient
-    localStorage.setItem("access", accessToken);
+    sessionStorage.setItem("access", accessToken);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -97,20 +97,20 @@ const VerificationForm = () => {
           configureApiClient(response.data.tokens.access);
         }
         if (response.data.tokens?.refresh) {
-          localStorage.setItem("refresh", response.data.tokens.refresh);
+          sessionStorage.setItem("refresh", response.data.tokens.refresh);
         }
 
         // ✅ Stocker les infos utilisateur (rôle) renvoyées par le backend
         if (response.data.user) {
-          localStorage.setItem("user", JSON.stringify(response.data.user));
+          sessionStorage.setItem("user", JSON.stringify(response.data.user));
           if (response.data.user.role) {
-            localStorage.setItem("userRole", response.data.user.role);
+            sessionStorage.setItem("userRole", response.data.user.role);
           }
         }
 
         // ✅ Nettoyage des infos temporaires
-        localStorage.removeItem("user_id");
-        localStorage.removeItem("masked_email");
+        sessionStorage.removeItem("user_id");
+        sessionStorage.removeItem("masked_email");
 
         toast({
           title: "Vérification réussie",
@@ -188,8 +188,8 @@ const VerificationForm = () => {
   };
 
   const handleBackToLogin = () => {
-    localStorage.removeItem("user_id");
-    localStorage.removeItem("masked_email");
+    sessionStorage.removeItem("user_id");
+    sessionStorage.removeItem("masked_email");
     navigate("/");
   };
 

@@ -9,9 +9,11 @@ export const useLogout = () => {
   const handleLogout = async () => {
   try {
     await apiClient.post("/logout/");
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    localStorage.removeItem("sessionKey");
+    sessionStorage.removeItem("access");
+    sessionStorage.removeItem("refresh");
+    sessionStorage.removeItem("sessionKey");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("userRole");
 
     toast({ title: "Déconnecté", description: "Vous avez été déconnecté." });
     navigate("/connexion");

@@ -23,7 +23,7 @@ const LoginForm = () => {
 
   // Vérifier si l'utilisateur est déjà connecté
   useEffect(() => {
-    const accessToken = localStorage.getItem("access");
+    const accessToken = sessionStorage.getItem("access");
     if (accessToken) {
       navigate("/accueil");
     }
@@ -79,18 +79,18 @@ const LoginForm = () => {
         const { session } = data;
 
         // Stockage des tokens (mêmes clés que celles lues par apiClient)
-        localStorage.setItem("access", access);
-        localStorage.setItem("refresh", refresh);
+        sessionStorage.setItem("access", access);
+        sessionStorage.setItem("refresh", refresh);
 
         if (session?.key) {
-          localStorage.setItem("sessionKey", session.key);
+          sessionStorage.setItem("sessionKey", session.key);
         }
 
         // Stocker les infos utilisateur si disponibles
         if (data.user) {
-          localStorage.setItem("user", JSON.stringify(data.user));
+          sessionStorage.setItem("user", JSON.stringify(data.user));
           if (data.user.role) {
-            localStorage.setItem("userRole", data.user.role);
+            sessionStorage.setItem("userRole", data.user.role);
           }
         }
 
@@ -105,8 +105,8 @@ const LoginForm = () => {
         }, 1000);
 
       } else if (data.status === "2fa_required") {
-        localStorage.setItem("user_id", data.user_id);
-        localStorage.setItem("masked_email", data.masked_email);
+        sessionStorage.setItem("user_id", data.user_id);
+        sessionStorage.setItem("masked_email", data.masked_email);
 
         toast({
           title: "Vérification requise",
