@@ -73,7 +73,7 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
     if (!file) {
       toast({
         title: "Fichier manquant",
-        description: "Veuillez uploader la convention signée",
+        description: "Veuillez uploader la lettre de stage signée",
         variant: "destructive",
       });
       return;
@@ -164,7 +164,7 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
             Finaliser le renouvellement
           </DialogTitle>
           <DialogDescription>
-            Téléchargez la convention de renouvellement, faites-la signer, puis uploadez-la
+            Téléchargez la lettre de stage, faites-la signer, puis uploadez-la
           </DialogDescription>
         </DialogHeader>
 
@@ -179,7 +179,7 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                   <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
                     <span className="text-xs font-bold text-blue-600">2</span>
                   </div>
-                  <h3 className="font-medium">Uploader la convention signée</h3>
+                  <h3 className="font-medium">Uploader la lettre de stage signée</h3>
                 </div>
                 
                 <p className="text-sm text-muted-foreground">
@@ -236,9 +236,9 @@ const FinalizeRenewalModal: React.FC<FinalizeRenewalModalProps> = ({
                 Instructions importantes
               </h4>
               <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Téléchargez la convention de renouvellement générée</li>
+                <li>• Téléchargez la lettre de stage générée</li>
                 <li>• Imprimez-la et faites-la signer par les parties concernées</li>
-                <li>• Numérisez la convention signée au format PDF</li>
+                <li>• Numérisez la lettre de stage signée au format PDF</li>
                 <li>• Uploadez le PDF signé pour finaliser le renouvellement</li>
               </ul>
             </CardContent>

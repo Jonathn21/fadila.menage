@@ -523,7 +523,7 @@ const OngoingInternshipDetails: React.FC = () => {
       await apiClient.post(`/stagiaires/${stagiaire.id}/annuler-pre-renouvellement/`);
       toast({
         title: "Pré-renouvellement annulé",
-        description: "La convention temporaire a été supprimée.",
+        description: "La lettre de stage a été supprimée.",
       });
       setIsCancelRenewalOpen(false);
       setRenewalConventionData(null);
@@ -1730,7 +1730,7 @@ const OngoingInternshipDetails: React.FC = () => {
                         )}
                       </dl>
                     ) : (
-                      <p className="text-xs text-green-600">Une convention temporaire a été générée.</p>
+                      <p className="text-xs text-green-600">Une lettre de stage a été générée.</p>
                     )}
                   </div>
 
@@ -1768,12 +1768,12 @@ const OngoingInternshipDetails: React.FC = () => {
                       className="w-full gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
                       onClick={() => downloadConventionDocx(
                         stagiaire.convention_renouvellement_temporaire!.fichier_url!,
-                        `Convention_renouvellement_${stagiaire.nom}_${stagiaire.prenom}`,
-                        "Convention de renouvellement",
+                        `Lettre_de_stage_${stagiaire.nom}_${stagiaire.prenom}`,
+                        "Lettre de stage",
                       )}
                     >
                       <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                      Télécharger la convention
+                      Télécharger la lettre de stage
                     </Button>
                   )}
 
@@ -2247,12 +2247,12 @@ const OngoingInternshipDetails: React.FC = () => {
               fetchStagiaire();
               // Comme la lettre de stage : on télécharge le Word à faire signer
               if (pdfUrl) {
-                const baseName = `Convention_renouvellement_a_signer_${stagiaire.nom}_${stagiaire.prenom}`;
-                await downloadConventionDocx(pdfUrl, baseName, "Convention de renouvellement à signer");
+                const baseName = `Lettre_de_stage_a_signer_${stagiaire.nom}_${stagiaire.prenom}`;
+                await downloadConventionDocx(pdfUrl, baseName, "Lettre de stage à signer");
               }
               toast({
-                title: "Convention prête",
-                description: "La convention de renouvellement a été générée avec le signataire choisi.",
+                title: "Lettre de stage prête",
+                description: "La lettre de stage a été générée avec le signataire choisi.",
               });
             }}
           />
@@ -2264,7 +2264,7 @@ const OngoingInternshipDetails: React.FC = () => {
             <AlertDialogHeader>
               <AlertDialogTitle>Annuler le pré-renouvellement ?</AlertDialogTitle>
               <AlertDialogDescription>
-                Cette action supprimera la convention temporaire et remettra le stagiaire en état terminé.
+                Cette action supprimera la lettre de stage et remettra le stagiaire en état terminé.
                 Vous pourrez initier un nouveau renouvellement ensuite.
               </AlertDialogDescription>
             </AlertDialogHeader>

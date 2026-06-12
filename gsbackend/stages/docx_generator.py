@@ -192,6 +192,9 @@ def generer_lettre_renouvellement_docx(stagiaire, donnees, signataire_id="DG", h
     Returns:
         BytesIO buffer
     """
+    # La convention de renouvellement EST une lettre de stage : contenu identique
+    # à generer_lettre_stage_docx (même titre, même texte), seules les données
+    # proviennent du stagiaire au lieu de la demande.
     sig = SIGNATAIRES.get(signataire_id, SIGNATAIRES["DG"])
 
     date_debut_str = donnees.get("date_debut") or donnees.get("date_debut_iso", "")
@@ -203,14 +206,6 @@ def generer_lettre_renouvellement_docx(stagiaire, donnees, signataire_id="DG", h
     date_debut_format = helpers["date_format_francais"](date_debut_str)
     date_fin_format = helpers["date_format_francais"](date_fin_str)
 
-    # Dates du stage précédent
-    date_debut_precedent = helpers["date_format_francais"](
-        stagiaire.date_debut.strftime("%d/%m/%Y")
-    )
-    date_fin_precedent = helpers["date_format_francais"](
-        stagiaire.date_fin.strftime("%d/%m/%Y")
-    )
-
     direction_code = donnees.get("direction", "")
     direction_description = _get_direction_description(direction_code)
 
@@ -220,14 +215,13 @@ def generer_lettre_renouvellement_docx(stagiaire, donnees, signataire_id="DG", h
     _add_empty_lines(doc, 10)
 
     # Titre
-    _add_title(doc, "AUTORISATION DE RENOUVELLEMENT DE STAGE")
+    _add_title(doc, "AUTORISATION DE STAGE")
     _add_empty_lines(doc, 1)
 
     # Texte principal
     _add_justified_paragraph(
         doc,
-        f"Dans le cadre du renouvellement de son stage à la CEB, "
-        f"Monsieur <b>{stagiaire.nom.upper()} {stagiaire.prenom}</b> est autorisé à effectuer un nouveau stage "
+        f"Monsieur <b>{stagiaire.nom.upper()} {stagiaire.prenom}</b> est autorisé à effectuer un stage à la CEB "
         f"pour une durée de <b>{duree_formatee}</b> mois allant du <b>{date_debut_format}</b> "
         f"au <b>{date_fin_format}</b>."
     )
@@ -237,14 +231,6 @@ def generer_lettre_renouvellement_docx(stagiaire, donnees, signataire_id="DG", h
         doc,
         f"L'intéressé est mis à la disposition de la Direction <b>{direction_code} ({direction_description})</b>, "
         f"Service <b>{donnees.get('service', '')}</b>."
-    )
-    _add_empty_lines(doc, 1)
-
-    # Mention du stage précédent
-    _add_justified_paragraph(
-        doc,
-        f"Ce renouvellement fait suite au stage précédent effectué du "
-        f"<b>{date_debut_precedent}</b> au <b>{date_fin_precedent}</b>."
     )
     _add_empty_lines(doc, 1)
 
@@ -262,18 +248,6 @@ def generer_lettre_renouvellement_docx(stagiaire, donnees, signataire_id="DG", h
 
     # Signature
     _add_signature(doc, sig["titre"], sig["nom"])
-
-    # Pied de page
-    if convention_numero:
-        _add_empty_lines(doc, 2)
-        p = doc.add_paragraph()
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        run = p.add_run(f"CONVENTION DE RENOUVELLEMENT TEMPORAIRE - Réf: {convention_numero}")
-        run.italic = True
-        run.font.size = Pt(8)
-        run.font.name = 'Calibri'
-        from docx.shared import RGBColor
-        run.font.color.rgb = RGBColor(0x25, 0x63, 0xEB)
 
     buffer = BytesIO()
     doc.save(buffer)
