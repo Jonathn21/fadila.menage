@@ -236,9 +236,9 @@ const InternshipDetailsPage: React.FC = () => {
 
   // Récupère le blob authentifié et l'enregistre en préservant l'extension réelle
   // (Content-Disposition > URL > type MIME) pour ne pas forcer un .docx en .pdf.
-  const downloadFromUrl = async (url: string, baseName: string, displayName: string) => {
+  // `forceExt` impose l'extension/MIME (ex. la lettre Word qui doit s'ouvrir dans Word).
+  const downloadFromUrl = async (url: string, baseName: string, displayName: string, forceExt?: string) => {
     const response = await apiClient.get(url, { responseType: "blob" });
-    const blob = response.data;
 
     const mimeToExt: Record<string, string> = {
       "application/pdf": "pdf",
@@ -247,19 +247,30 @@ const InternshipDetailsPage: React.FC = () => {
       "image/jpeg": "jpg",
       "image/png": "png",
     };
-    const disposition = (response.headers?.["content-disposition"] as string) || "";
-    const dispMatch = /filename\*?=(?:UTF-8'')?["']?([^"';]+)/i.exec(disposition);
-    let ext = dispMatch?.[1]?.split(".").pop()?.toLowerCase() || "";
+    const extToMime = Object.fromEntries(Object.entries(mimeToExt).map(([m, e]) => [e, m]));
+
+    let ext = (forceExt || "").toLowerCase();
     if (!ext) {
-      const urlExt = url.split("?")[0].split(".").pop()?.toLowerCase() || "";
-      if (urlExt && urlExt.length <= 5 && !urlExt.includes("/")) ext = urlExt;
+      const disposition = (response.headers?.["content-disposition"] as string) || "";
+      const dispMatch = /filename\*?=(?:UTF-8'')?["']?([^"';]+)/i.exec(disposition);
+      ext = dispMatch?.[1]?.split(".").pop()?.toLowerCase() || "";
+      if (!ext) {
+        const urlExt = url.split("?")[0].split(".").pop()?.toLowerCase() || "";
+        if (urlExt && urlExt.length <= 5 && !urlExt.includes("/")) ext = urlExt;
+      }
+      if (!ext && response.data.type && mimeToExt[response.data.type]) ext = mimeToExt[response.data.type];
     }
-    if (!ext && blob.type && mimeToExt[blob.type]) ext = mimeToExt[blob.type];
     const fileName = ext ? `${baseName}.${ext}` : baseName;
+
+    // Quand l'extension est imposée, on retype le blob avec le bon MIME pour que
+    // l'OS associe le fichier à la bonne application (Word pour un .docx).
+    const blob = forceExt && extToMime[ext]
+      ? new Blob([response.data], { type: extToMime[ext] })
+      : response.data;
 
     if (window.showSaveFilePicker) {
       const mime = blob.type
-        || Object.keys(mimeToExt).find((k) => mimeToExt[k] === ext)
+        || extToMime[ext]
         || "application/octet-stream";
       const pickerOptions: Parameters<typeof window.showSaveFilePicker>[0] = { suggestedName: fileName };
       if (ext) pickerOptions.types = [{ description: "Document", accept: { [mime]: [`.${ext}`] } }];
@@ -1018,7 +1029,8 @@ const InternshipDetailsPage: React.FC = () => {
               if (pdfUrl && demande) {
                 const baseName = `Lettre_de_stage_a_signer_${demande.etudiant.nom}_${demande.etudiant.prenom}`;
                 try {
-                  await downloadFromUrl(pdfUrl, baseName, "Lettre de stage à signer");
+                  // La lettre d'acceptation est un Word : on force le .docx pour qu'elle s'ouvre dans Word
+                  await downloadFromUrl(pdfUrl, baseName, "Lettre de stage à signer", "docx");
                 } catch {
                   toast({ title: "Erreur", description: "Lettre générée mais téléchargement impossible", variant: "destructive" });
                 }
