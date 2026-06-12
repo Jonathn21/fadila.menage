@@ -1458,7 +1458,39 @@ class DemandeDetailAPI(APIView):
     def has_edit_permission(self, user, demande):
         """Vérifie si l'utilisateur peut modifier la demande"""
         return user.is_authenticated
-    
+
+
+class RegenererResumeCVAPIView(APIView):
+    """Régénère (force) le résumé du CV d'une demande.
+
+    Utile pour réparer un résumé cassé (ex. souci avec la clé API Gemini).
+    """
+    permission_classes = [IsAuthenticated, HasPermission(PERM_DEMANDES_VIEW)]
+
+    def post(self, request, pk):
+        demande = get_object_or_404(Demande, pk=pk)
+        try:
+            resume_html, source = ResumeGeneratorService.regenerate_resume_sync(demande)
+            return Response({
+                "success": True,
+                "message": "Résumé régénéré avec succès." if source == "gemini"
+                           else "Résumé régénéré (mode dégradé : Gemini indisponible).",
+                "resume_cv": resume_html,
+                "source": source,
+            }, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response(
+                {"success": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Erreur régénération résumé demande {pk}: {e}")
+            return Response(
+                {"success": False, "message": "Erreur lors de la régénération du résumé."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
 @method_decorator([never_cache, ratelimit(key='user', rate='10/m', method='POST')], name='dispatch')
 class PreAccepterDemandeAPIView(APIView):
     """Étape 1: Pré-acceptation sans créer de stagiaire"""

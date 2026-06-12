@@ -31,7 +31,7 @@ from .demandes.demande_api import (
     SupprimerDemandeView, PreAccepterDemandeAPIView, FinaliserAcceptationAPIView,
     TelechargerConventionTemporaireAPIView, AnnulerPreAcceptationSimpleAPIView,
     DemandesEnAcceptationAPI, DemandeModificationAPIView,
-    RegenererConventionAPIView,
+    RegenererConventionAPIView, RegenererResumeCVAPIView,
     # === Demande d'attestation : désactivée ===
     # DemandeAttestationAPIView,
     # DemandesAttestationAPI, DemandeAttestationDetailAPI, ApprouverDemandeAttestationAPI,
@@ -351,6 +351,7 @@ urlpatterns = [
           views.ExportStatsAPIView.as_view(), 
           name='generer-rapport'),
      path('demandes/<int:demande_id>/regenerer-convention/', RegenererConventionAPIView.as_view()),
+     path('demandes/<int:pk>/regenerer-resume/', RegenererResumeCVAPIView.as_view()),
     path('stagiaires/<int:stagiaire_id>/regenerer-convention-renouvellement/', RegenererConventionRenouvellementAPIView.as_view()),
 path('export-rapport/', views.ExportRapportAPIView.as_view(), name='export_rapport'),
 path('stagiaires/<int:stagiaire_id>/supprimer/',

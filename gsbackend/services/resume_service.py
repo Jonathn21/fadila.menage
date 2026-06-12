@@ -193,6 +193,39 @@ class ResumeGeneratorService:
         thread.start()
 
     @staticmethod
+    def regenerate_resume_sync(demande):
+        """Régénère le résumé CV de façon SYNCHRONE et FORCÉE.
+
+        Contrairement à generate_resume_async, on régénère toujours (même si un
+        résumé existe déjà), ce qui permet de réparer un résumé cassé suite à un
+        souci avec la clé API Gemini. Retourne (resume_html, source) où source
+        vaut "gemini" ou "fallback". Lève une exception si le CV est absent ou
+        illisible.
+        """
+        if not demande.cv:
+            raise ValueError("Aucun CV n'est associé à cette demande.")
+
+        cv_path = demande.cv.path
+        resume_text = ResumeGeneratorService.extract_text(cv_path)
+
+        if not resume_text or len(resume_text.strip()) <= 50:
+            raise ValueError("Le contenu du CV est insuffisant ou illisible.")
+
+        source = "gemini"
+        resume = ResumeGeneratorService.generate_resume_with_gemini(resume_text)
+        is_valid, missing = ResumeGeneratorService.validate_resume_structure(resume)
+        if not is_valid:
+            logger.warning(f"⚠️ Résumé régénéré incomplet (sections: {missing}), fallback appliqué")
+            resume = ResumeGeneratorService.generate_fallback_resume(resume_text)
+            source = "fallback"
+
+        resume_html = ResumeGeneratorService.format_sections_to_html(resume)
+        demande.resume_cv = resume_html
+        demande.save(update_fields=["resume_cv"])
+        logger.info(f"💾 Résumé régénéré ({source}) et sauvegardé pour demande {demande.id}")
+        return resume_html, source
+
+    @staticmethod
     def extract_text(file_path):
         """Extrait le texte d'un PDF ou image"""
         logger.info(f"📄 Extraction de texte depuis : {file_path}")

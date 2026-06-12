@@ -146,6 +146,7 @@ const InternshipDetailsPage: React.FC = () => {
   const [conventionTemporaireUrl, setConventionTemporaireUrl] = useState<string | null>(null);
   const [isRequestInfoModalOpen, setIsRequestInfoModalOpen] = useState(false);
   const [isPrintingResume, setIsPrintingResume] = useState(false);
+  const [isRegeneratingResume, setIsRegeneratingResume] = useState(false);
   const [isSignatoryModalOpen, setIsSignatoryModalOpen] = useState(false);
 
   // ---- Fetch ----
@@ -429,6 +430,29 @@ const InternshipDetailsPage: React.FC = () => {
     }
   };
 
+  // Régénère le résumé du CV (utile pour réparer un résumé cassé suite à un
+  // souci avec la clé API Gemini).
+  const handleRegenerateResume = async () => {
+    if (!demande) return;
+    setIsRegeneratingResume(true);
+    try {
+      const response = await apiClient.post(`/demandes/${demande.id}/regenerer-resume/`);
+      await refreshData(false);
+      toast({
+        title: "Résumé régénéré",
+        description: response.data?.message || "Le résumé du CV a été régénéré.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.message || "Impossible de régénérer le résumé.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRegeneratingResume(false);
+    }
+  };
+
   // ---- Helpers ----
   const student = useMemo(() => {
     if (!demande) return null;
@@ -685,6 +709,10 @@ const InternshipDetailsPage: React.FC = () => {
                           {isPrintingResume ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
                         </Button>
                       )}
+                      <Button variant="ghost" size="sm" onClick={handleRegenerateResume} disabled={isRegeneratingResume}
+                        className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700" title="Régénérer le résumé du CV">
+                        {isRegeneratingResume ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
+                      </Button>
                     </CardTitle>
                     <div className="flex items-center gap-3">
                       <Badge variant="outline" className="gap-1 text-xs bg-gray-100 text-gray-700">
