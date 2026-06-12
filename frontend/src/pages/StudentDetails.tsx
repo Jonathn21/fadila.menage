@@ -799,6 +799,41 @@ const OngoingInternshipDetails: React.FC = () => {
     }
   };
 
+  // Télécharge une lettre/convention Word (.docx) authentifiée en forçant
+  // l'extension et le type MIME pour qu'elle s'ouvre dans Word. La convention de
+  // renouvellement est une lettre de stage : elle se comporte comme cette dernière.
+  const downloadConventionDocx = async (url: string, baseName: string, displayName: string) => {
+    const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    try {
+      const response = await apiClient.get(url, { responseType: "blob" });
+      const blob = new Blob([response.data], { type: DOCX_MIME });
+      const fileName = `${baseName}.docx`;
+
+      if (window.showSaveFilePicker) {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: fileName,
+          types: [{ description: "Document Word", accept: { [DOCX_MIME]: [".docx"] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      } else {
+        const objectUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(objectUrl);
+      }
+      toast({ title: "Téléchargement réussi", description: `"${displayName}" téléchargé` });
+    } catch (err: any) {
+      if (err?.name === "AbortError") return; // l'utilisateur a annulé la fenêtre d'enregistrement
+      toast({ title: "Erreur", description: "Impossible de télécharger la convention.", variant: "destructive" });
+    }
+  };
+
   // Fonction pour clôturer un stage
   const handleEndEarly = async () => {
     if (!stagiaire) return;
@@ -1723,15 +1758,19 @@ const OngoingInternshipDetails: React.FC = () => {
                     onClick={() => setIsSignatoryModalOpen(true)}
                   >
                     <PenLine className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Faire signer
+                    Télécharger et faire signer
                   </Button>
 
-                  {/* Lien pour télécharger la convention si disponible */}
+                  {/* Téléchargement direct de la convention Word si déjà générée */}
                   {stagiaire.convention_renouvellement_temporaire?.fichier_url && (
                     <Button
                       variant="outline"
                       className="w-full gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => window.open(stagiaire.convention_renouvellement_temporaire?.fichier_url || '', '_blank')}
+                      onClick={() => downloadConventionDocx(
+                        stagiaire.convention_renouvellement_temporaire!.fichier_url!,
+                        `Convention_renouvellement_${stagiaire.nom}_${stagiaire.prenom}`,
+                        "Convention de renouvellement",
+                      )}
                     >
                       <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                       Télécharger la convention
@@ -2203,9 +2242,14 @@ const OngoingInternshipDetails: React.FC = () => {
               stagiaire.convention_renouvellement_temporaire?.fichier_url
             }
             endpoint={`/stagiaires/${stagiaire.id}/regenerer-convention-renouvellement/`}
-            onSuccess={(pdfUrl) => {
+            onSuccess={async (pdfUrl) => {
               setRenewalConventionData(prev => ({ ...prev, url: pdfUrl }));
               fetchStagiaire();
+              // Comme la lettre de stage : on télécharge le Word à faire signer
+              if (pdfUrl) {
+                const baseName = `Convention_renouvellement_a_signer_${stagiaire.nom}_${stagiaire.prenom}`;
+                await downloadConventionDocx(pdfUrl, baseName, "Convention de renouvellement à signer");
+              }
               toast({
                 title: "Convention prête",
                 description: "La convention de renouvellement a été générée avec le signataire choisi.",
