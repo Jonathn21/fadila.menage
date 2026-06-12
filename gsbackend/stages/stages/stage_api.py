@@ -121,17 +121,30 @@ class FinAnticipeeStagiaireAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Motif obligatoire (choisi ou saisi côté frontend)
+        motif = (request.data.get("motif") or "").strip()
+        if not motif:
+            return Response(
+                {"success": False, "message": "Le motif de la fin anticipée est obligatoire."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         # Sauvegarde de l'ancien statut pour l'email
         ancien_statut = stagiaire.statut
 
         stagiaire.statut = "Terminé"
         stagiaire.date_fin = now().date()
+        # Fin anticipée => clôture définitive immédiate du dossier
+        stagiaire.fin_anticipee = True
+        stagiaire.motif_fin_anticipee = motif
+        stagiaire.date_cloture = now()
+        stagiaire.cloture_par = request.user
         stagiaire.save()
 
         # 🔹 Enregistrer l'action dans l'historique
         UserAction.objects.create(
             user=request.user,
-            action=f"Fin anticipée du stage de {stagiaire.prenom} {stagiaire.nom}",
+            action=f"Fin anticipée du stage de {stagiaire.prenom} {stagiaire.nom} (motif : {motif})",
             performed_by=request.user
         )
 
@@ -172,13 +185,17 @@ class FinAnticipeeStagiaireAPIView(APIView):
 
         return Response({
             "success": True,
-            "message": f"Il a été mis fin au stage de {stagiaire.prenom} {stagiaire.nom} avec succès.",
+            "message": f"Il a été mis fin au stage de {stagiaire.prenom} {stagiaire.nom}. Le dossier a été clôturé.",
             "email_envoye": email_envoye,
             "stagiaire": {
                 "id": stagiaire.id,
                 "nom_complet": f"{stagiaire.prenom} {stagiaire.nom}",
                 "statut": stagiaire.statut,
-                "date_fin": stagiaire.date_fin.strftime('%d/%m/%Y')
+                "date_fin": stagiaire.date_fin.strftime('%d/%m/%Y'),
+                "fin_anticipee": True,
+                "motif_fin_anticipee": stagiaire.motif_fin_anticipee,
+                "est_cloture": True,
+                "date_cloture": stagiaire.date_cloture.isoformat(),
             }
         }, status=status.HTTP_200_OK)
 
@@ -237,6 +254,13 @@ class ClotureStageAPIView(APIView):
         if not stagiaire.est_cloture:
             return Response(
                 {"success": False, "message": "Ce dossier n'est pas clôturé."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Une clôture issue d'une fin anticipée est définitive : pas de réouverture.
+        if stagiaire.fin_anticipee:
+            return Response(
+                {"success": False, "message": "Ce stage a été interrompu (fin anticipée) : le dossier ne peut pas être rouvert."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -623,6 +647,8 @@ class StagiaireDetailAPI(APIView):
             "statut": stagiaire.statut,
             "est_cloture": stagiaire.est_cloture,
             "date_cloture": stagiaire.date_cloture.isoformat() if stagiaire.date_cloture else None,
+            "fin_anticipee": getattr(stagiaire, 'fin_anticipee', False),
+            "motif_fin_anticipee": getattr(stagiaire, 'motif_fin_anticipee', None),
             "resume": stagiaire.resume_cv,
             "date_debut": stagiaire.date_debut.isoformat() if stagiaire.date_debut else None,
             "date_fin": stagiaire.date_fin.isoformat() if stagiaire.date_fin else None,
@@ -786,6 +812,13 @@ class PreRenouvelerStageAPIView(APIView):
                     Stagiaire.objects.select_related('etablissement'),
                     id=stagiaire_id
                 )
+
+                # Stage interrompu (fin anticipée) => jamais renouvelable
+                if stagiaire.fin_anticipee:
+                    return Response({
+                        "success": False,
+                        "message": "Un stage interrompu (fin anticipée) ne peut pas être renouvelé."
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
                 # Dossier clôturé => verrouillé
                 if stagiaire.est_cloture:

@@ -681,6 +681,18 @@ class Stagiaire(models.Model):
         help_text="Utilisateur ayant clôturé le dossier."
     )
 
+    # Fin anticipée : un stage interrompu avant terme est clôturé définitivement
+    # (non renouvelable, dossier non réouvrable).
+    fin_anticipee = models.BooleanField(
+        default=False,
+        help_text="Indique que le stage a été interrompu avant son terme (fin anticipée)."
+    )
+    motif_fin_anticipee = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Motif renseigné lors de la fin anticipée du stage."
+    )
+
     class Meta:
         ordering = ['-date_debut']
         indexes = [
@@ -910,10 +922,14 @@ class Stagiaire(models.Model):
         Vérifie si le stage peut être renouvelé (pour le bouton)
         Retourne (bool, message)
         """
+        # Vérification 0 : Stage interrompu (fin anticipée) => jamais renouvelable
+        if self.fin_anticipee:
+            return False, "Un stage interrompu (fin anticipée) ne peut pas être renouvelé"
+
         # Vérification 1 : Déjà renouvelé
         if self.a_ete_renouvele:
             return False, "Ce stage a déjà été renouvelé"
-        
+
         # Vérification 2 : Pas déjà en pré-renouvellement
         if self.est_en_pre_renouvellement:
             # Vérifier si le pré-renouvellement a expiré

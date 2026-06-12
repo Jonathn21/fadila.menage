@@ -28,6 +28,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { format, differenceInDays, isBefore, isAfter } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Import des composants shadcn/ui pour les dates
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -119,6 +126,9 @@ type APIStagiaire = {
   // Clôture du dossier (verrouillage)
   est_cloture?: boolean;
   date_cloture?: string | null;
+  // Fin anticipée (clôture définitive, non renouvelable, non réouvrable)
+  fin_anticipee?: boolean;
+  motif_fin_anticipee?: string | null;
   // ✅ Nouveaux champs pour le renouvellement
   pre_renouvellement_en_cours?: boolean;
   convention_renouvellement_temporaire?: ConventionRenouvellement | null;
@@ -283,6 +293,12 @@ const OngoingInternshipDetails: React.FC = () => {
   const [isSignatoryModalOpen, setIsSignatoryModalOpen] = useState(false);
   const [isCancelRenewalOpen, setIsCancelRenewalOpen] = useState(false);
   const [isCancellingRenewal, setIsCancellingRenewal] = useState(false);
+
+  // Fin anticipée : modal de confirmation avec choix/saisie du motif
+  const [isEndEarlyOpen, setIsEndEarlyOpen] = useState(false);
+  const [endEarlyMotifChoice, setEndEarlyMotifChoice] = useState("");
+  const [endEarlyMotifText, setEndEarlyMotifText] = useState("");
+  const [isEndingEarly, setIsEndingEarly] = useState(false);
 
 
   // Fonction pour charger les données du stagiaire
@@ -841,24 +857,62 @@ const OngoingInternshipDetails: React.FC = () => {
     }
   };
 
-  // Fonction pour clôturer un stage
-  const handleEndEarly = async () => {
-    if (!stagiaire) return;
+  // Motifs prédéfinis proposés lors d'une fin anticipée
+  const MOTIFS_FIN_ANTICIPEE = [
+    "Abandon du stagiaire",
+    "Manquement disciplinaire",
+    "Demande du stagiaire",
+    "Raisons de santé",
+    "Décision de l'établissement d'accueil",
+    "Autre",
+  ];
 
+  // Motif final envoyé au backend (obligatoire). Pour « Autre », on exige une saisie.
+  const computedEndEarlyMotif =
+    endEarlyMotifChoice === "Autre"
+      ? endEarlyMotifText.trim()
+      : endEarlyMotifChoice && endEarlyMotifText.trim()
+      ? `${endEarlyMotifChoice} — ${endEarlyMotifText.trim()}`
+      : endEarlyMotifChoice;
+
+  // Met fin au stage de manière anticipée : clôture définitive du dossier
+  // (non renouvelable, non réouvrable). Le motif est obligatoire.
+  const handleEndEarly = async () => {
+    if (!stagiaire || !computedEndEarlyMotif) return;
+
+    setIsEndingEarly(true);
     try {
-      await apiClient.post(`/stagiaires/${stagiaire.id}/fin-anticipee/`);
+      const res = await apiClient.post(
+        `/stagiaires/${stagiaire.id}/fin-anticipee/`,
+        { motif: computedEndEarlyMotif }
+      );
       toast({
-        title: "Stage clôturé",
-        description: `Le stage de ${stagiaire.prenom} ${stagiaire.nom} a été clôturé avec succès.`,
+        title: "Stage interrompu",
+        description: `Le stage de ${stagiaire.prenom} ${stagiaire.nom} a été clôturé définitivement.`,
       });
-      setStagiaire({ ...stagiaire, statut: "Terminé", date_fin: new Date().toISOString() });
+      setStagiaire({
+        ...stagiaire,
+        statut: "Terminé",
+        date_fin: new Date().toISOString(),
+        fin_anticipee: true,
+        motif_fin_anticipee: computedEndEarlyMotif,
+        est_cloture: true,
+        date_cloture:
+          res.data?.stagiaire?.date_cloture ?? new Date().toISOString(),
+      });
+      setIsEndEarlyOpen(false);
+      setEndEarlyMotifChoice("");
+      setEndEarlyMotifText("");
     } catch (err: any) {
       console.error("Erreur fin anticipée :", err);
       toast({
         title: "Erreur",
-        description: "Impossible de clôturer le stage",
+        description:
+          err.response?.data?.message || "Impossible de mettre fin au stage",
         variant: "destructive",
       });
+    } finally {
+      setIsEndingEarly(false);
     }
   };
 
@@ -1673,13 +1727,23 @@ const OngoingInternshipDetails: React.FC = () => {
                   <div className="p-2.5 sm:p-3 border border-amber-200 bg-amber-50 rounded-lg">
                     <div className="flex items-center gap-1.5 mb-1">
                       <Lock className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                      <p className="text-xs sm:text-sm font-medium text-amber-700">Dossier clôturé</p>
+                      <p className="text-xs sm:text-sm font-medium text-amber-700">
+                        {stagiaire.fin_anticipee ? "Stage interrompu (fin anticipée)" : "Dossier clôturé"}
+                      </p>
                     </div>
                     <p className="text-xs text-amber-600">
-                      Le dossier est verrouillé{stagiaire.date_cloture ? ` depuis le ${format(new Date(stagiaire.date_cloture), "dd/MM/yyyy")}` : ""}. Renouvellement et modifications désactivés.
+                      {stagiaire.fin_anticipee
+                        ? `Le stage a été interrompu avant son terme${stagiaire.date_cloture ? ` le ${format(new Date(stagiaire.date_cloture), "dd/MM/yyyy")}` : ""}. Le dossier est clôturé définitivement : renouvellement et réouverture impossibles.`
+                        : `Le dossier est verrouillé${stagiaire.date_cloture ? ` depuis le ${format(new Date(stagiaire.date_cloture), "dd/MM/yyyy")}` : ""}. Renouvellement et modifications désactivés.`}
                     </p>
+                    {stagiaire.fin_anticipee && stagiaire.motif_fin_anticipee && (
+                      <p className="text-xs text-amber-700 mt-1.5">
+                        <span className="font-medium">Motif :</span> {stagiaire.motif_fin_anticipee}
+                      </p>
+                    )}
                   </div>
-                  {hasPermission("stages.close") && (
+                  {/* Réouverture impossible pour une fin anticipée (clôture définitive) */}
+                  {!stagiaire.fin_anticipee && hasPermission("stages.close") && (
                     <Button
                       variant="outline"
                       className="w-full gap-1.5 sm:gap-2 justify-center text-xs sm:text-sm text-amber-700 hover:bg-amber-50 hover:text-amber-800 border-amber-200"
@@ -1692,8 +1756,8 @@ const OngoingInternshipDetails: React.FC = () => {
                 </div>
               ) : (
                 <>
-              {/* CAS 1: Stage terminé ET pas en pré-renouvellement ET pas déjà renouvelé => Renouveler */}
-              {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && !stagiaire.a_ete_renouvele && hasPermission("stages.renew") && (
+              {/* CAS 1: Stage terminé ET pas en pré-renouvellement ET pas déjà renouvelé ET pas interrompu => Renouveler */}
+              {stagiaire.statut === "Terminé" && !stagiaire.pre_renouvellement_en_cours && !stagiaire.a_ete_renouvele && !stagiaire.fin_anticipee && hasPermission("stages.renew") && (
                 <Button
                   variant="default"
                   className="w-full gap-1.5 sm:gap-2 text-xs sm:text-sm bg-primary hover:bg-red-800 text-white"
@@ -1808,7 +1872,11 @@ const OngoingInternshipDetails: React.FC = () => {
                     <Button
                       variant="outline"
                       className="w-full gap-1.5 sm:gap-2 justify-start text-xs sm:text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
-                      onClick={handleEndEarly}
+                      onClick={() => {
+                        setEndEarlyMotifChoice("");
+                        setEndEarlyMotifText("");
+                        setIsEndEarlyOpen(true);
+                      }}
                     >
                       <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                       Mettre fin au stage
@@ -2287,6 +2355,77 @@ const OngoingInternshipDetails: React.FC = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Modal : confirmation de la fin anticipée avec motif */}
+        <Dialog open={isEndEarlyOpen} onOpenChange={(open) => !isEndingEarly && setIsEndEarlyOpen(open)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-red-600" />
+                Mettre fin au stage
+              </DialogTitle>
+              <DialogDescription>
+                Cette action interrompt le stage avant son terme et <span className="font-medium">clôture définitivement</span> le dossier.
+                Il ne pourra ni être renouvelé, ni être rouvert.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="motif-fin">Motif de la fin anticipée <span className="text-red-600">*</span></Label>
+                <Select value={endEarlyMotifChoice} onValueChange={setEndEarlyMotifChoice}>
+                  <SelectTrigger id="motif-fin">
+                    <SelectValue placeholder="Sélectionnez un motif" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MOTIFS_FIN_ANTICIPEE.map((m) => (
+                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {endEarlyMotifChoice && (
+                <div className="space-y-2">
+                  <Label htmlFor="motif-fin-detail">
+                    {endEarlyMotifChoice === "Autre" ? "Précisez le motif" : "Précisions (facultatif)"}
+                    {endEarlyMotifChoice === "Autre" && <span className="text-red-600"> *</span>}
+                  </Label>
+                  <Textarea
+                    id="motif-fin-detail"
+                    rows={3}
+                    placeholder={endEarlyMotifChoice === "Autre" ? "Décrivez le motif…" : "Ajoutez un complément si nécessaire…"}
+                    value={endEarlyMotifText}
+                    onChange={(e) => setEndEarlyMotifText(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsEndEarlyOpen(false)} disabled={isEndingEarly}>
+                Annuler
+              </Button>
+              <Button
+                onClick={handleEndEarly}
+                disabled={isEndingEarly || !computedEndEarlyMotif}
+                className="gap-2 bg-red-600 hover:bg-red-700 text-white"
+              >
+                {isEndingEarly ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Traitement…
+                  </>
+                ) : (
+                  <>
+                    <Clock className="h-4 w-4" />
+                    Confirmer la fin du stage
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
