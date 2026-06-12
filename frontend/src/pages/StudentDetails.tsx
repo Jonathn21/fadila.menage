@@ -715,6 +715,13 @@ const OngoingInternshipDetails: React.FC = () => {
     setIsPreviewLoading(false);
   };
 
+  // Un document Word (.docx/.doc) est une lettre de stage à signer : on n'affiche
+  // pas Voir/Télécharger mais un unique bouton « Télécharger et faire signer ».
+  const isWordDocument = (doc: APIDocument) => {
+    const path = (doc.url || "").split("?")[0].toLowerCase();
+    return path.endsWith(".docx") || path.endsWith(".doc");
+  };
+
   // Visualisation d'un document : on récupère le fichier authentifié (JWT) sous
   // forme de blob pour l'afficher dans le modal. Charger l'URL brute dans l'iframe
   // échoue (401/403) car le navigateur n'envoie pas le token → « erreur d'affichage du PDF ».
@@ -1461,7 +1468,18 @@ const OngoingInternshipDetails: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex gap-1.5 sm:gap-2 self-end sm:self-center">
-                          {doc.type === "convention_renouvellement_temp" ? (
+                          {!isWordDocument(doc) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleViewDocument(doc)}
+                              className="h-7 sm:h-8 gap-0.5 sm:gap-1 hover:bg-gray-50 text-gray-700 hover:text-gray-800"
+                            >
+                              <Eye className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+                              <span className="hidden sm:inline">Voir</span>
+                            </Button>
+                          )}
+                          {isWordDocument(doc) ? (
                             <Button
                               variant="outline"
                               size="sm"
@@ -1472,26 +1490,15 @@ const OngoingInternshipDetails: React.FC = () => {
                               <span>Télécharger et faire signer</span>
                             </Button>
                           ) : (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleViewDocument(doc)}
-                                className="h-7 sm:h-8 gap-0.5 sm:gap-1 hover:bg-gray-50 text-gray-700 hover:text-gray-800"
-                              >
-                                <Eye className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
-                                <span className="hidden sm:inline">Voir</span>
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDownloadDocument(doc)}
-                                className="h-7 sm:h-8 gap-0.5 sm:gap-1 text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
-                              >
-                                <Download className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
-                                <span className="hidden sm:inline">Télécharger</span>
-                              </Button>
-                            </>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDownloadDocument(doc)}
+                              className="h-7 sm:h-8 gap-0.5 sm:gap-1 text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
+                            >
+                              <Download className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+                              <span className="hidden sm:inline">Télécharger</span>
+                            </Button>
                           )}
                         </div>
                       </div>
