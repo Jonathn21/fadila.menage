@@ -858,7 +858,7 @@ class Stagiaire(models.Model):
                 if hasattr(self, 'conventionstage') and self.conventionstage \
                         and self.conventionstage.fichier \
                         and self.conventionstage.fichier.name:
-                    nom_convention = "Convention de renouvellement" \
+                    nom_convention = "Lettre de stage" \
                         if self.est_renouvellement else "Convention de stage"
                     documents.append({
                         'nom': nom_convention,
@@ -884,7 +884,7 @@ class Stagiaire(models.Model):
                     and self.convention_renouvellement_temporaire.fichier \
                     and self.convention_renouvellement_temporaire.fichier.name:
                 documents.append({
-                    'nom': 'Convention de renouvellement (à signer)',
+                    'nom': 'Lettre de stage (à signer)',
                     'url': self.convention_renouvellement_temporaire.fichier.url,
                     'type': 'convention_renouvellement_temp',
                     'est_temporaire': True

@@ -1461,24 +1461,38 @@ const OngoingInternshipDetails: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex gap-1.5 sm:gap-2 self-end sm:self-center">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewDocument(doc)}
-                            className="h-7 sm:h-8 gap-0.5 sm:gap-1 hover:bg-gray-50 text-gray-700 hover:text-gray-800"
-                          >
-                            <Eye className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
-                            <span className="hidden sm:inline">Voir</span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownloadDocument(doc)}
-                            className="h-7 sm:h-8 gap-0.5 sm:gap-1 text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
-                          >
-                            <Download className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
-                            <span className="hidden sm:inline">Télécharger</span>
-                          </Button>
+                          {doc.type === "convention_renouvellement_temp" ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setIsSignatoryModalOpen(true)}
+                              className="h-7 sm:h-8 gap-0.5 sm:gap-1 text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
+                            >
+                              <PenLine className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+                              <span>Télécharger et faire signer</span>
+                            </Button>
+                          ) : (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleViewDocument(doc)}
+                                className="h-7 sm:h-8 gap-0.5 sm:gap-1 hover:bg-gray-50 text-gray-700 hover:text-gray-800"
+                              >
+                                <Eye className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+                                <span className="hidden sm:inline">Voir</span>
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDownloadDocument(doc)}
+                                className="h-7 sm:h-8 gap-0.5 sm:gap-1 text-gray-700 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
+                              >
+                                <Download className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+                                <span className="hidden sm:inline">Télécharger</span>
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))
@@ -1752,30 +1766,6 @@ const OngoingInternshipDetails: React.FC = () => {
                     <FileCheck className="h-3 w-3 sm:h-4 sm:w-4" />
                     Finaliser le renouvellement
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
-                    onClick={() => setIsSignatoryModalOpen(true)}
-                  >
-                    <PenLine className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Télécharger et faire signer
-                  </Button>
-
-                  {/* Téléchargement direct de la convention Word si déjà générée */}
-                  {stagiaire.convention_renouvellement_temporaire?.fichier_url && (
-                    <Button
-                      variant="outline"
-                      className="w-full gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => downloadConventionDocx(
-                        stagiaire.convention_renouvellement_temporaire!.fichier_url!,
-                        `Lettre_de_stage_${stagiaire.nom}_${stagiaire.prenom}`,
-                        "Lettre de stage",
-                      )}
-                    >
-                      <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                      Télécharger la lettre de stage
-                    </Button>
-                  )}
 
                   {/* Annuler le pré-renouvellement */}
                   <Button
