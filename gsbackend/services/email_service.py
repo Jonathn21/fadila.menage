@@ -49,21 +49,28 @@ class EmailTemplateService:
         """Retourne les styles CSS de base pour tous les emails"""
         return """
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+            body, table, td, p, h1, h2, h3, h5, a, div, span, li {
+                font-family: 'Inter', Arial, Helvetica, sans-serif;
+            }
+
             body {
-                background-color: #EBF5FE !important;
+                background-color: #F4F5F7 !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 width: 100% !important;
                 min-width: 100% !important;
-                font-family: Arial, Helvetica, sans-serif;
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
             }
-            
+
             table {
                 border-collapse: collapse;
                 mso-table-lspace: 0pt;
                 mso-table-rspace: 0pt;
             }
-            
+
             img {
                 border: 0;
                 height: auto;
@@ -72,117 +79,146 @@ class EmailTemplateService:
                 text-decoration: none;
                 -ms-interpolation-mode: bicubic;
             }
-            
+
+            h1 { font-size: 30px; font-weight: 700; color: #1F2933; margin: 0; line-height: 1.25; }
+            h2 { font-size: 22px; font-weight: 700; color: #1F2933; margin: 0; line-height: 1.3; }
+            h5 { font-size: 16px; font-weight: 700; color: #2B2F33; margin: 0; line-height: 1.45; }
+            p  { font-size: 16px; font-weight: 400; color: #6B7280; margin: 0; line-height: 1.7; }
+
             .container {
                 width: 100%;
                 max-width: 600px;
                 margin: 0 auto;
             }
-            
+
             .header-container {
                 background-color: #FFFFFF;
-                padding: 20px;
+                padding: 25px 35px;
             }
-            
+
             .content-container {
                 background-color: #FFFFFF;
-                padding: 20px 30px;
-                color: #383838;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-            
-            .greeting {
-                color: #0D652D;
+                padding: 45px 35px;
+                color: #6B7280;
                 font-size: 16px;
-                font-weight: bold;
-                margin-bottom: 20px;
+                line-height: 1.7;
             }
-            
+
+            .greeting {
+                color: #1F2933;
+                font-size: 26px;
+                font-weight: 700;
+                line-height: 1.3;
+                margin-bottom: 18px;
+            }
+
+            /* Bouton rectangulaire charcoal */
+            .es-button-border {
+                display: inline-block;
+                background: #2B2F33;
+            }
+            .es-button {
+                display: inline-block;
+                background: #2B2F33;
+                color: #FFFFFF !important;
+                font-size: 18px;
+                font-weight: 600;
+                text-decoration: none;
+                padding: 15px 40px;
+                mso-padding-alt: 0;
+                line-height: 1.2;
+            }
+
+            /* Carte d'étapes / encadré (sans bords arrondis) */
+            .es-steps-card {
+                background-color: #FFFFFF;
+                border: 1px solid #ECECEE;
+            }
+            .es-step {
+                font-size: 18px;
+                font-weight: 500;
+                color: #2B2F33;
+                text-decoration: none;
+            }
+            .es-step-index {
+                display: inline-block;
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                background: #F0F1F3;
+                color: #2B2F33;
+                font-size: 15px;
+                font-weight: 700;
+                margin-right: 14px;
+            }
+
             .content-box {
                 margin: 25px 0;
-                padding: 20px;
-                background-color: #F8F9FA;
-                border-left: 4px solid #0D652D;
-                border-radius: 4px;
+                padding: 20px 22px;
+                background-color: #F7F8FA;
+                border: 1px solid #ECECEE;
+                color: #6B7280;
             }
-            
+
             .data-table {
                 width: 100%;
                 border-collapse: collapse;
                 margin: 20px 0;
             }
-            
+
             .data-table td, .data-table th {
                 padding: 12px 8px;
-                border-bottom: 1px solid #E8EAED;
+                border-bottom: 1px solid #ECECEE;
                 text-align: left;
             }
-            
+
             .data-table th {
-                background-color: #F8F9FA;
+                background-color: #F7F8FA;
                 font-weight: 600;
-                color: #3C4043;
+                color: #2B2F33;
             }
-            
+
             .tracking-box {
-                background: #F8F9FA;
-                border: 1px solid #E8EAED;
-                border-radius: 6px;
-                padding: 20px;
+                background: #F7F8FA;
+                border: 1px solid #ECECEE;
+                padding: 24px;
                 text-align: center;
                 margin: 25px 0;
             }
-            
+
             .tracking-label {
                 font-size: 12px;
-                color: #666666;
+                color: #9AA1A9;
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 margin-bottom: 8px;
             }
-            
+
             .tracking-id {
-                font-size: 18px;
-                font-weight: 600;
-                color: #0D652D;
+                font-size: 20px;
+                font-weight: 700;
+                color: #1F2933;
                 font-family: 'Courier New', monospace;
             }
-            
-            .footer-container {
-                background-color: #E3E3E3;
-                padding: 30px 20px;
-                color: #666666;
-                font-size: 11px;
-                line-height: 1.4;
+
+            /* Pied de page (modèle : menu de liens séparés + mentions) */
+            .es-footer-menu a {
+                color: #6B7280;
+                text-decoration: none;
+                font-size: 14px;
             }
-            
-            .footer-links {
-                text-align: center;
-                margin: 20px 0;
+            .es-footer-sep {
+                border-left: 1px solid #D9DCE0;
             }
-            
-            .footer-links a {
-                color: #000000;
-                text-decoration: underline;
-                margin: 0 10px;
-            }
-            
-            .footer-info {
-                text-align: center;
-                margin-top: 20px;
-                color: #666666;
-                font-size: 11px;
-            }
-            
-            @media only screen and (max-width: 480px) {
-                .container {
-                    width: 95% !important;
-                }
-                
-                .content-container {
-                    padding: 15px 20px !important;
-                }
+
+            @media only screen and (max-width: 600px) {
+                .container { width: 100% !important; }
+                .content-container { padding: 32px 24px !important; }
+                .header-container { padding: 22px 24px !important; }
+                .es-px { padding-left: 24px !important; padding-right: 24px !important; }
+                h1 { font-size: 24px !important; }
+                .greeting { font-size: 22px !important; }
             }
         </style>
         """
@@ -209,82 +245,103 @@ class EmailTemplateService:
         current_year = datetime.now().year
 
         email_html = f"""
-<!DOCTYPE html>
-<html lang="fr">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html dir="ltr" lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta name="x-apple-disable-message-reformatting">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="telephone=no" name="format-detection">
     <title>{APP_NAME}</title>
+    <!--[if (mso 16)]><style type="text/css">a {{text-decoration: none;}}</style><![endif]-->
+    <!--[if gte mso 9]><style>sup {{ font-size: 100% !important; }}</style><![endif]-->
+    <!--[if gte mso 9]>
+    <noscript><xml><o:OfficeDocumentSettings>
+        <o:AllowPNG></o:AllowPNG><o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings></xml></noscript>
+    <![endif]-->
+    <!--[if !mso]><!-- -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <!--<![endif]-->
     {cls.get_base_styles()}
 </head>
-<body topmargin="0" leftmargin="0" style="background-color: #EBF5FE; margin: 0; padding: 0; width: 100% !important; min-width: 100%;">
+<body topmargin="0" leftmargin="0" style="background-color: #F4F5F7; margin: 0; padding: 0; width: 100% !important; min-width: 100%;">
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#EBF5FE">
+<!--[if gte mso 9]>
+<v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
+    <v:fill type="tile" color="#F4F5F7"></v:fill>
+</v:background>
+<![endif]-->
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#F4F5F7" role="presentation">
     <tr>
-        <td align="center" valign="top" style="padding: 24px 12px;">
-            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#FFFFFF; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <td align="center" valign="top" style="padding: 26px 12px;">
 
-                <!-- Bandeau supérieur -->
+            <!-- ============ EN-TÊTE (logo + identité) ============ -->
+            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" bgcolor="#FFFFFF" role="presentation" style="background-color:#FFFFFF;">
                 <tr>
-                    <td style="height:5px; background-color:#0D652D; line-height:5px; font-size:5px;">&nbsp;</td>
-                </tr>
-
-                <!-- En-tête : logo + identité -->
-                <tr>
-                    <td class="header-container" align="center" style="padding: 28px 24px 22px 24px; border-bottom:1px solid #EEF1F4;">
-                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                    <td class="header-container es-px" align="left" style="padding: 25px 35px;">
+                        <table border="0" cellpadding="0" cellspacing="0" align="left" role="presentation">
                             <tr>
-                                <td align="center" valign="middle" style="padding-right: 14px;">
-                                    <img src="cid:{LOGO_CID}"
-                                        alt="{ORG_SHORT}"
-                                        width="54" height="57"
-                                        style="display:block; width:54px; height:auto; border:0;">
+                                <td valign="middle" style="padding-right: 16px;">
+                                    <img src="cid:{LOGO_CID}" alt="{ORG_SHORT}" width="60" height="64"
+                                        style="display:block; width:60px; height:auto; border:0;">
                                 </td>
-                                <td align="left" valign="middle" style="border-left:1px solid #E2E8F0; padding-left: 14px;">
-                                    <div style="font-family: Arial, Helvetica, sans-serif; font-size:18px; font-weight:bold; color:#0D652D; line-height:1.2;">
-                                        {ORG_SHORT}
-                                    </div>
-                                    <div style="font-family: Arial, Helvetica, sans-serif; font-size:13px; color:#4A5568; padding-top:3px;">
-                                        {subtitle}
-                                    </div>
+                                <td valign="middle" align="left">
+                                    <div style="font-size:17px; font-weight:700; color:#1F2933; line-height:1.25;">{ORG_NAME}</div>
+                                    <div style="font-size:13px; color:#9AA1A9; padding-top:3px;">Service des Stages</div>
                                 </td>
                             </tr>
                         </table>
                     </td>
                 </tr>
+            </table>
 
-                <!-- Contenu -->
+            <!-- ============ CONTENU ============ -->
+            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" bgcolor="#FFFFFF" role="presentation" style="background-color:#FFFFFF;">
                 <tr>
-                    <td class="content-container" style="padding: 28px 32px;">
-                        <div class="greeting">
-                            {greeting}
-                        </div>
+                    <td class="content-container es-px" align="center" valign="top">
+                        <div class="greeting" style="text-align:center;">{greeting}</div>
                         {content_html}
                     </td>
                 </tr>
+            </table>
 
-                <!-- Pied de page -->
+            <!-- ============ PIED DE PAGE ============ -->
+            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" bgcolor="#FFFFFF" role="presentation" style="background-color:#FFFFFF;">
                 <tr>
-                    <td style="background-color:#F4F6F8; padding: 24px 32px; border-top:1px solid #EEF1F4;">
-                        <div style="font-family: Arial, Helvetica, sans-serif; font-size:13px; font-weight:bold; color:#2D3748; margin-bottom:6px;">
-                            {ORG_NAME}
-                        </div>
-                        <div style="font-family: Arial, Helvetica, sans-serif; font-size:12px; color:#718096; line-height:1.6;">
-                            {APP_NAME}<br>
-                            <a href="mailto:{CONTACT_EMAIL}" style="color:#0D652D; text-decoration:none;">{CONTACT_EMAIL}</a>
+                    <td class="es-px" align="center" style="padding: 35px;">
+
+                        <div style="font-size:15px; font-weight:700; color:#1F2933; margin-bottom:4px;">{ORG_NAME}</div>
+                        <div style="font-size:13px; color:#9AA1A9; line-height:1.7; margin-bottom:18px;">{APP_NAME}</div>
+
+                        <!-- Menu de liens (modèle) -->
+                        <table cellpadding="0" cellspacing="0" align="center" role="presentation" class="es-footer-menu">
+                            <tr>
+                                <td align="center" style="padding: 0 16px;">
+                                    <a href="{SITE_URL}" target="_blank">Plateforme</a>
+                                </td>
+                                <td align="center" class="es-footer-sep" style="padding: 0 16px;">
+                                    <a href="mailto:{CONTACT_EMAIL}">Contact</a>
+                                </td>
+                                <td align="center" class="es-footer-sep" style="padding: 0 16px;">
+                                    <a href="{SITE_URL}" target="_blank">Aide</a>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div style="margin-top:20px; padding-top:18px; border-top:1px solid #ECECEE; font-size:12px; color:#9AA1A9; line-height:1.7;">
+                            <a href="mailto:{CONTACT_EMAIL}" style="color:#9AA1A9; text-decoration:underline;">{CONTACT_EMAIL}</a>
                             &nbsp;&bull;&nbsp; {CONTACT_PHONE}<br>
-                            <a href="{SITE_URL}" style="color:#0D652D; text-decoration:none;">{SITE_URL}</a>
-                        </div>
-                        <div style="font-family: Arial, Helvetica, sans-serif; font-size:11px; color:#A0AEC0; margin-top:16px; line-height:1.5;">
-                            Cet email vous est adressé dans le cadre de votre dossier auprès de la {ORG_SHORT}.
-                            Merci de ne pas répondre directement à ce message automatique.<br>
+                            Message automatique &mdash; merci de ne pas y répondre directement.<br>
                             &copy; {current_year} {ORG_NAME}. Tous droits réservés.
                         </div>
+
                     </td>
                 </tr>
-
             </table>
+
         </td>
     </tr>
 </table>
