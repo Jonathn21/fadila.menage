@@ -173,7 +173,7 @@ Si vous n'avez pas demandé ce code, sécurisez immédiatement votre compte.
 ---
 Service d'Authentification Sécurisée
 Communauté Électrique du Bénin
-Email: securite@ceb.bj"""
+Email: securite@cebnet.org"""
         }
     
     @staticmethod
@@ -273,7 +273,7 @@ Si ce n'était pas vous :
 ---
 Service de Sécurité et Authentification
 Communauté Électrique du Bénin
-Email: securite@ceb.bj
+Email: securite@cebnet.org
 Téléphone: +229 21 30 05 06"""
         }
     
@@ -374,7 +374,7 @@ RECOMMANDATIONS :
 ---
 Service de Sécurité
 Communauté Électrique du Bénin
-Email: securite@ceb.bj"""
+Email: securite@cebnet.org"""
         }
     
     @staticmethod
@@ -562,7 +562,7 @@ CONSEILS DE SÉCURITÉ :
 
 ---
 Service de Sécurité - GES STAGE
-Email: securite@ceb.bj
+Email: securite@cebnet.org
 Téléphone: +229 21 30 05 06"""
         }
 
@@ -654,7 +654,7 @@ PROCHAINES ÉTAPES :
 ---
 Service des Stages
 Communauté Électrique du Bénin
-Email: stages@ceb.bj"""
+Email: stages@cebnet.org"""
         }
     
     @staticmethod
@@ -752,7 +752,7 @@ DÉTAILS :
 ---
 Service des Stages
 Communauté Électrique du Bénin
-Email: stages@ceb.bj"""
+Email: stages@cebnet.org"""
         }
     
     @staticmethod
@@ -933,7 +933,7 @@ INFORMATIONS PRATIQUES :
 ---
 Service des Stages
 Communauté Électrique du Bénin
-Email: stages@ceb.bj
+Email: stages@cebnet.org
 Téléphone: +229 21 30 05 06"""
         }
 
@@ -1208,7 +1208,7 @@ Nous vous remercions de l'intérêt manifesté pour la Communauté Électrique d
 ---
 Direction des Ressources Humaines
 Communauté Électrique du Bénin
-Email: drh@ceb.bj
+Email: drh@cebnet.org
 Téléphone: +229 21 30 05 06"""
         }
     
@@ -1314,7 +1314,7 @@ Nous vous remercions encore pour votre candidature et vous souhaitons plein succ
 ---
 Service des Stages
 Communauté Électrique du Bénin
-Email: stages@ceb.bj
+Email: stages@cebnet.org
 Téléphone: +229 21 30 05 06"""
         }
 
@@ -1570,7 +1570,7 @@ class AttestationEmailTemplates:
             <li style="margin-bottom: 10px;">Présentez-vous au service des stages de la CEB</li>
             <li style="margin-bottom: 10px;">Munissez-vous d'une pièce d'identité valide</li>
             <li style="margin-bottom: 10px;">Horaires : Lundi à Vendredi, 7h00 - 16h00</li>
-            <li>Contact : stages@ceb.bj / +229 21 30 05 06</li>
+            <li>Contact : stages@cebnet.org / +229 21 30 05 06</li>
         </ul>
     </div>
     

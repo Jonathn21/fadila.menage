@@ -1,5 +1,7 @@
 import logging
+import os
 import threading
+from email.mime.image import MIMEImage
 from typing import Dict, List, Optional
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
@@ -8,6 +10,35 @@ from django.utils import timezone
 from services.email_templates_extended import BenchmarkEmailTemplateService, SecurityEmailTemplates, PreferenceEmailTemplates
 
 logger = logging.getLogger(__name__)
+
+# Identité de marque centralisée (alignée sur le domaine d'envoi cebnet.org)
+ORG_NAME = "Communauté Électrique du Bénin"
+ORG_SHORT = "CEB"
+APP_NAME = "Plateforme Stages & Emploi"
+SITE_URL = "https://stageemploi.cebnet.org"
+CONTACT_EMAIL = "stages@cebnet.org"
+CONTACT_PHONE = "+229 21 30 05 06"
+
+# Identifiant CID du logo embarqué dans les emails (référencé via src="cid:ceb_logo")
+LOGO_CID = "ceb_logo"
+LOGO_PATH = os.path.join(os.path.dirname(__file__), "assets", "ceb-logo.png")
+
+
+def attach_inline_logo(email: EmailMultiAlternatives) -> None:
+    """Embarque le logo CEB en image inline (CID) pour qu'il s'affiche sans
+    dépendre d'un hébergeur externe ni du déblocage des images distantes."""
+    try:
+        with open(LOGO_PATH, "rb") as f:
+            logo = MIMEImage(f.read(), _subtype="png")
+        logo.add_header("Content-ID", f"<{LOGO_CID}>")
+        logo.add_header("Content-Disposition", "inline", filename="ceb-logo.png")
+        # Le conteneur racine devient multipart/related pour lier le HTML au logo
+        email.mixed_subtype = "related"
+        email.attach(logo)
+    except FileNotFoundError:
+        logger.warning(f"⚠️ Logo email introuvable : {LOGO_PATH}")
+    except Exception as e:
+        logger.warning(f"⚠️ Impossible d'embarquer le logo email : {e}")
 
 
 class EmailTemplateService:
@@ -175,71 +206,84 @@ class EmailTemplateService:
             HTML complet de l'email
         """
         
+        current_year = datetime.now().year
+
         email_html = f"""
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEB Stages - Email</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{APP_NAME}</title>
     {cls.get_base_styles()}
 </head>
-<body topmargin="0" leftmargin="0" style="background-color: #EBF5FE; height: 100% !important; margin: 0; padding: 0; width: 100% !important; min-width: 100%;">
+<body topmargin="0" leftmargin="0" style="background-color: #EBF5FE; margin: 0; padding: 0; width: 100% !important; min-width: 100%;">
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#EBF5FE">
     <tr>
-        <td align="center" valign="top">
-            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600">
+        <td align="center" valign="top" style="padding: 24px 12px;">
+            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#FFFFFF; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+
+                <!-- Bandeau supérieur -->
                 <tr>
-                    <td height="20"></td>
+                    <td style="height:5px; background-color:#0D652D; line-height:5px; font-size:5px;">&nbsp;</td>
                 </tr>
-                
+
+                <!-- En-tête : logo + identité -->
                 <tr>
-                    <td class="header-container" align="center">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <td class="header-container" align="center" style="padding: 28px 24px 22px 24px; border-bottom:1px solid #EEF1F4;">
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
                             <tr>
-                                <td align="center" style="padding: 25px 20px;">
-                                    <table border="0" cellpadding="0" cellspacing="0" align="center">
-                                        <tr>
-                                            <td align="center" valign="middle" style="padding-right: 5px;">
-                                                <img src="https://i.postimg.cc/zf3NTMSK/ceb-logo.png" 
-                                                    alt="CEB" 
-                                                    width="50" 
-                                                    style="max-width: 80px; height: auto; display: block;">
-                                            </td>
-                                            <td align="left" valign="middle" style="padding-left: 5px;">
-                                                <div style="font-family: Arial, sans-serif;">
-                                                   
-                                                    <div style="font-size: 15px; color: #4A5568; padding-top: 8px; font-weight: 500;">
-                                                        {subtitle}
-                                                    </div>
-                                                    <div style="font-size: 12px; color: #718096; padding-top: 4px;">
-                                                        Communauté Électrique du Bénin
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <td align="center" valign="middle" style="padding-right: 14px;">
+                                    <img src="cid:{LOGO_CID}"
+                                        alt="{ORG_SHORT}"
+                                        width="54" height="57"
+                                        style="display:block; width:54px; height:auto; border:0;">
+                                </td>
+                                <td align="left" valign="middle" style="border-left:1px solid #E2E8F0; padding-left: 14px;">
+                                    <div style="font-family: Arial, Helvetica, sans-serif; font-size:18px; font-weight:bold; color:#0D652D; line-height:1.2;">
+                                        {ORG_SHORT}
+                                    </div>
+                                    <div style="font-family: Arial, Helvetica, sans-serif; font-size:13px; color:#4A5568; padding-top:3px;">
+                                        {subtitle}
+                                    </div>
                                 </td>
                             </tr>
                         </table>
                     </td>
                 </tr>
-                
+
+                <!-- Contenu -->
                 <tr>
-                    <td class="content-container">
+                    <td class="content-container" style="padding: 28px 32px;">
                         <div class="greeting">
                             {greeting}
                         </div>
                         {content_html}
                     </td>
                 </tr>
-                
-               
-                
+
+                <!-- Pied de page -->
                 <tr>
-                    <td height="20"></td>
+                    <td style="background-color:#F4F6F8; padding: 24px 32px; border-top:1px solid #EEF1F4;">
+                        <div style="font-family: Arial, Helvetica, sans-serif; font-size:13px; font-weight:bold; color:#2D3748; margin-bottom:6px;">
+                            {ORG_NAME}
+                        </div>
+                        <div style="font-family: Arial, Helvetica, sans-serif; font-size:12px; color:#718096; line-height:1.6;">
+                            {APP_NAME}<br>
+                            <a href="mailto:{CONTACT_EMAIL}" style="color:#0D652D; text-decoration:none;">{CONTACT_EMAIL}</a>
+                            &nbsp;&bull;&nbsp; {CONTACT_PHONE}<br>
+                            <a href="{SITE_URL}" style="color:#0D652D; text-decoration:none;">{SITE_URL}</a>
+                        </div>
+                        <div style="font-family: Arial, Helvetica, sans-serif; font-size:11px; color:#A0AEC0; margin-top:16px; line-height:1.5;">
+                            Cet email vous est adressé dans le cadre de votre dossier auprès de la {ORG_SHORT}.
+                            Merci de ne pas répondre directement à ce message automatique.<br>
+                            &copy; {current_year} {ORG_NAME}. Tous droits réservés.
+                        </div>
+                    </td>
                 </tr>
+
             </table>
         </td>
     </tr>
@@ -248,7 +292,7 @@ class EmailTemplateService:
 </body>
 </html>
         """
-        
+
         return email_html
 
 def get_gender_based_greeting(first_name: str, gender: str = None) -> str:
@@ -598,9 +642,9 @@ Nous vous remercions de l'intérêt manifesté pour la Communauté Électrique d
 ---
 Direction des Ressources Humaines
 Communauté Électrique du Bénin
-Email: drh@ceb.bj
+Email: drh@cebnet.org
 Téléphone: +229 21 30 05 06
-Site web: www.ceb.bj
+Site web: www.cebnet.org
 """
         }
     
@@ -876,7 +920,7 @@ Site web: www.ceb.bj
 
 ---
 Service des Stages - CEB
-Email: stages@ceb.bj
+Email: stages@cebnet.org
 Téléphone: +229 21 30 05 06
 
 © {current_year} Communauté Électrique du Bénin
@@ -906,21 +950,24 @@ class EmailSenderService:
         """
         
         if reply_to is None:
-            reply_to = ['stages@ceb.bj']
-        
+            reply_to = [CONTACT_EMAIL]
+
         def send_task():
             try:
                 email = EmailMultiAlternatives(
                     subject=subject,
                     body=text_content,
-                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@ceb.bj'),
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@cebnet.org'),
                     to=[to_email],
                     reply_to=reply_to,
                     cc=cc
                 )
-                
+
                 email.attach_alternative(html_content, "text/html")
-                
+
+                # Logo embarqué en inline (CID) — affichage fiable, sans hébergeur externe
+                attach_inline_logo(email)
+
                 # ✅ AJOUT : Gestion des pièces jointes
                 if attachments:
                     for attachment in attachments:
@@ -968,7 +1015,7 @@ class EmailSenderService:
             html_content=email_data['html'],
             text_content=email_data['text'],
             async_send=async_send,
-            reply_to=['stages@ceb.bj']
+            reply_to=['stages@cebnet.org']
         )
 
     @classmethod
@@ -1167,7 +1214,7 @@ class EmailSenderService:
             html_content=email_data['html'],
             text_content=email_data['text'],
             async_send=async_send,
-            reply_to=['stages@ceb.bj']
+            reply_to=['stages@cebnet.org']
         )
     
     @classmethod
@@ -1182,7 +1229,7 @@ class EmailSenderService:
             html_content=email_data['html'],
             text_content=email_data['text'],
             async_send=async_send,
-            reply_to=['support@ceb.bj']
+            reply_to=['support@cebnet.org']
         )
     
     @classmethod
@@ -1207,7 +1254,7 @@ class EmailSenderService:
             html_content=email_data['html'],
             text_content=email_data['text'],
             async_send=async_send,
-            reply_to=['securite@ceb.bj']
+            reply_to=['securite@cebnet.org']
         )
     
     @classmethod
@@ -1365,7 +1412,7 @@ class EmailSenderService:
                 text_content=email_data['text'],
                 async_send=async_send,
                 attachments=attachments,
-                reply_to=['attestations@ceb.bj']
+                reply_to=['attestations@cebnet.org']
             )
             
         except Exception as e:
