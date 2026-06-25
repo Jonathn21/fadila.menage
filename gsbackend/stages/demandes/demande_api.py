@@ -1133,28 +1133,31 @@ class CreerDemandeAPIView(APIView):
 
     def _notify_admins_new_demande(self, demande):
         """
-        ✅ Notifie les administrateurs de la nouvelle demande
-        Envoie un email groupé à tous les admins
+        ✅ Notifie de la nouvelle demande :
+        - Tous les utilisateurs actifs ayant un compte
+        - Les emails supplémentaires configurés dans les paramètres
         """
         from stages.models import EmailNotificationDemande
 
-        # 1) Emails configurés par les super-utilisateurs (source prioritaire)
-        emails_admins = list(
+        # 1) Tous les utilisateurs actifs ayant un email
+        emails_utilisateurs = set(
+            Utilisateur.objects.filter(
+                is_active=True,
+                email__isnull=False
+            ).exclude(email='')
+            .values_list('email', flat=True)
+        )
+
+        # 2) Emails supplémentaires configurés dans les paramètres
+        emails_parametres = set(
             EmailNotificationDemande.objects
             .filter(actif=True)
             .exclude(email='')
             .values_list('email', flat=True)
         )
 
-        # 2) Repli : administrateurs actifs si aucun email n'est configuré,
-        #    afin de ne jamais désactiver silencieusement les notifications.
-        if not emails_admins:
-            admins = Utilisateur.objects.filter(
-                role='Admin',
-                is_active=True,
-                email__isnull=False
-            ).exclude(email='')
-            emails_admins = [admin.email for admin in admins]
+        # 3) Fusion sans doublons
+        emails_admins = list(emails_utilisateurs | emails_parametres)
 
         if not emails_admins:
             logger.warning("⚠️ Aucun destinataire trouvé pour notification")
