@@ -1,7 +1,7 @@
 import logging
 import os
 import threading
-from email.mime.image import MIMEImage
+import base64
 from typing import Dict, List, Optional
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
@@ -16,29 +16,26 @@ ORG_NAME = "Communauté Électrique du Bénin"
 ORG_SHORT = "CEB"
 APP_NAME = "Plateforme Stages & Emploi"
 SITE_URL = "https://stageemploi.cebnet.org"
-CONTACT_EMAIL = "stages@cebnet.org"
-CONTACT_PHONE = "+229 21 30 05 06"
+CONTACT_EMAIL = "cbenintogo.stage@gmail.com"
+CONTACT_PHONE = "+228 22 21 61 32 / 22 21 51 95"
 
-# Identifiant CID du logo embarqué dans les emails (référencé via src="cid:ceb_logo")
-LOGO_CID = "ceb_logo"
+# Logo CEB encodé en base64 pour affichage inline dans tous les clients email
 LOGO_PATH = os.path.join(os.path.dirname(__file__), "assets", "ceb-logo.png")
 
-
-def attach_inline_logo(email: EmailMultiAlternatives) -> None:
-    """Embarque le logo CEB en image inline (CID) pour qu'il s'affiche sans
-    dépendre d'un hébergeur externe ni du déblocage des images distantes."""
+def _load_logo_base64() -> str:
+    """Charge le logo CEB et le retourne en data URI base64."""
     try:
         with open(LOGO_PATH, "rb") as f:
-            logo = MIMEImage(f.read(), _subtype="png")
-        logo.add_header("Content-ID", f"<{LOGO_CID}>")
-        logo.add_header("Content-Disposition", "inline", filename="ceb-logo.png")
-        # Le conteneur racine devient multipart/related pour lier le HTML au logo
-        email.mixed_subtype = "related"
-        email.attach(logo)
+            b64 = base64.b64encode(f.read()).decode()
+        return f"data:image/png;base64,{b64}"
     except FileNotFoundError:
         logger.warning(f"⚠️ Logo email introuvable : {LOGO_PATH}")
+        return ""
     except Exception as e:
-        logger.warning(f"⚠️ Impossible d'embarquer le logo email : {e}")
+        logger.warning(f"⚠️ Impossible de charger le logo email : {e}")
+        return ""
+
+LOGO_DATA_URI = _load_logo_base64()
 
 
 class EmailTemplateService:
@@ -285,7 +282,7 @@ class EmailTemplateService:
                         <table border="0" cellpadding="0" cellspacing="0" align="left" role="presentation">
                             <tr>
                                 <td valign="middle" style="padding-right: 16px;">
-                                    <img src="cid:{LOGO_CID}" alt="{ORG_SHORT}" width="60" height="64"
+                                    <img src="{LOGO_DATA_URI}" alt="{ORG_SHORT}" width="60" height="64"
                                         style="display:block; width:60px; height:auto; border:0;">
                                 </td>
                                 <td valign="middle" align="left">
@@ -1021,9 +1018,6 @@ class EmailSenderService:
                 )
 
                 email.attach_alternative(html_content, "text/html")
-
-                # Logo embarqué en inline (CID) — affichage fiable, sans hébergeur externe
-                attach_inline_logo(email)
 
                 # ✅ AJOUT : Gestion des pièces jointes
                 if attachments:

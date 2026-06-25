@@ -1570,7 +1570,7 @@ class AttestationEmailTemplates:
             <li style="margin-bottom: 10px;">Présentez-vous au service des stages de la CEB</li>
             <li style="margin-bottom: 10px;">Munissez-vous d'une pièce d'identité valide</li>
             <li style="margin-bottom: 10px;">Horaires : Lundi à Vendredi, 7h00 - 16h00</li>
-            <li>Contact : stages@cebnet.org / +229 21 30 05 06</li>
+            <li>Contact : cbenintogo.stage@gmail.com / +229 21 30 05 06</li>
         </ul>
     </div>
     
