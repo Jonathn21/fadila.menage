@@ -1,7 +1,6 @@
 import logging
 import os
 import threading
-import base64
 from typing import Dict, List, Optional
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
@@ -19,23 +18,8 @@ SITE_URL = "https://stageemploi.cebnet.org"
 CONTACT_EMAIL = "cbenintogo.stage@gmail.com"
 CONTACT_PHONE = "+228 22 21 61 32 / 22 21 51 95"
 
-# Logo CEB encodé en base64 pour affichage inline dans tous les clients email
-LOGO_PATH = os.path.join(os.path.dirname(__file__), "assets", "ceb-logo.png")
-
-def _load_logo_base64() -> str:
-    """Charge le logo CEB et le retourne en data URI base64."""
-    try:
-        with open(LOGO_PATH, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode()
-        return f"data:image/png;base64,{b64}"
-    except FileNotFoundError:
-        logger.warning(f"⚠️ Logo email introuvable : {LOGO_PATH}")
-        return ""
-    except Exception as e:
-        logger.warning(f"⚠️ Impossible de charger le logo email : {e}")
-        return ""
-
-LOGO_DATA_URI = _load_logo_base64()
+# Logo CEB hébergé sur le domaine API (compatible Gmail, Outlook, etc.)
+LOGO_URL = "https://api.cebnet.org/static/ceb-logo.png"
 
 
 class EmailTemplateService:
@@ -282,7 +266,7 @@ class EmailTemplateService:
                         <table border="0" cellpadding="0" cellspacing="0" align="left" role="presentation">
                             <tr>
                                 <td valign="middle" style="padding-right: 16px;">
-                                    <img src="{LOGO_DATA_URI}" alt="{ORG_SHORT}" width="60" height="64"
+                                    <img src="{LOGO_URL}" alt="{ORG_SHORT}" width="60" height="64"
                                         style="display:block; width:60px; height:auto; border:0;">
                                 </td>
                                 <td valign="middle" align="left">
@@ -329,7 +313,9 @@ class EmailTemplateService:
                         </table>
 
                         <div style="margin-top:20px; padding-top:18px; border-top:1px solid #ECECEE; font-size:12px; color:#9AA1A9; line-height:1.7;">
-                            <a href="mailto:{CONTACT_EMAIL}" style="color:#9AA1A9; text-decoration:underline;">{CONTACT_EMAIL}</a>
+                            <a href="mailto:{CONTACT_EMAIL}" style="color:#9AA1A9; text-decoration:underline;">{CONTACT_EMAIL}</a><br>
+                            
+                            
                             &nbsp;&bull;&nbsp; {CONTACT_PHONE}<br>
                             Message automatique &mdash; merci de ne pas y répondre directement.<br>
                             &copy; {current_year} {ORG_NAME}. Tous droits réservés.
