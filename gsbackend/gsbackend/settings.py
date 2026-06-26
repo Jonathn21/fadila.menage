@@ -16,7 +16,7 @@ load_dotenv()
 # DJANGO CONFIG
 # ======================
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-lo8@=+2uy^&!0ksxfx3*%4e4qg+gnx4kax-nxrw(ri(u9+rxbw')
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() == 'true'
 
 # ✅ CORRECTION BUG 2 : pas de schéma (http/https) dans ALLOWED_HOSTS
 ALLOWED_HOSTS = [
