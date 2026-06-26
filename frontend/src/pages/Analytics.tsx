@@ -498,7 +498,7 @@ const Analytics: React.FC = () => {
     const key = `${config.id}-${format}`;
     setGenerating(g => ({ ...g, [key]: "generating" }));
     setActiveFormats(f => ({ ...f, [config.id]: format }));
-    const qs = new URLSearchParams({ type: config.id, format, ...params }).toString();
+    const qs = new URLSearchParams({ type: config.id, format_doc: format, ...params }).toString();
     try {
       const res  = await apiClient.get(`/export-rapport/?${qs}`, { responseType: "blob" });
       const ext  = format === "pdf" ? "pdf" : "xlsx";

@@ -1219,7 +1219,7 @@ class ExportRapportAPIView(APIView):
 
     def get(self, request):
         type_rapport = request.query_params.get('type')
-        format_doc   = request.query_params.get('format', 'pdf')  # pdf | excel
+        format_doc   = request.query_params.get('format_doc', 'pdf')  # pdf | excel
 
         if not type_rapport or type_rapport not in self.RAPPORT_HANDLERS:
             return Response({'error': 'Type de rapport invalide.'}, status=400)
@@ -1230,7 +1230,7 @@ class ExportRapportAPIView(APIView):
         try:
             params = dict(request.query_params)
             params.pop('type', None)
-            params.pop('format', None)
+            params.pop('format_doc', None)
             # Aplatir les listes (QueryDict retourne des listes)
             params = {k: v[0] if isinstance(v, list) else v for k, v in params.items()}
 
