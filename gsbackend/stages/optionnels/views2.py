@@ -25,6 +25,7 @@ from reportlab.platypus import (
     Image, Table, TableStyle
 )
 from .email_service import EmailTemplateService, EmailContentService
+from services.email_service import get_gender_based_greeting
 
 import pandas as pd
 from django.conf import settings
@@ -295,6 +296,12 @@ class EntretienAPI(APIView):
         contact_rh = getattr(entretien, 'contact_rh', 'Service des Stages - 21 30 05 06')
         notes_entretien = getattr(entretien, 'notes', 'Présentez-vous 15 minutes avant l\'heure prévue avec votre CV et pièces d\'identité.')
         
+        # Salutation formelle selon le genre
+        salutation = get_gender_based_greeting(
+            entretien.demandeur.etudiant_nom,
+            getattr(entretien.demandeur, 'genre', None)
+        )
+
         # Template HTML professionnel pour la création
         html_message = f"""<!DOCTYPE html>
 <html lang="fr">
@@ -478,7 +485,7 @@ class EntretienAPI(APIView):
         <div class="content">
             <!-- Greeting -->
             <div class="greeting">
-                Cher(e) {entretien.demandeur.etudiant_prenom},
+                {salutation},
             </div>
             
             <!-- Message principal -->
@@ -567,7 +574,7 @@ class EntretienAPI(APIView):
         text_message = f"""
 CONVOCATION À UN ENTRETIEN
 
-Cher(e) {entretien.demandeur.etudiant_prenom},
+{salutation},
 
 Nous avons le plaisir de vous convier à un entretien au sein de la Communauté Électrique du Bénin dans le cadre de votre candidature pour un stage.
 
@@ -827,6 +834,12 @@ class AnnulerEntretienAPI(APIView):
         lieu = getattr(entretien, 'lieu', 'Non spécifié')
         contact_rh = getattr(entretien, 'contact_rh', 'Service des Stages - 21 30 05 06')
         
+        # Salutation formelle selon le genre
+        salutation = get_gender_based_greeting(
+            entretien.demandeur.etudiant_nom,
+            getattr(entretien.demandeur, 'genre', None)
+        )
+
         # Template HTML professionnel pour l'annulation (CORRIGÉ)
         html_message = f"""<!DOCTYPE html>
 <html lang="fr">
@@ -994,7 +1007,7 @@ class AnnulerEntretienAPI(APIView):
         <div class="content">
             <!-- Greeting -->
             <div class="greeting">
-                Cher(e) {entretien.demandeur.etudiant_prenom},
+                {salutation},
             </div>
             
             <!-- Message principal -->
@@ -1074,7 +1087,7 @@ class AnnulerEntretienAPI(APIView):
         text_message = f"""
 ANNULATION DE VOTRE ENTRETIEN
 
-Cher(e) {entretien.demandeur.etudiant_prenom},
+{salutation},
 
 Nous vous informons que votre entretien programmé à la Communauté Électrique du Bénin a dû être annulé.
 
@@ -1198,6 +1211,12 @@ class TerminerEntretienAPI(APIView):
         lieu = getattr(entretien, 'lieu', 'Non spécifié')
         contact_rh = getattr(entretien, 'contact_rh', 'Service des Stages - 21 30 05 06')
         
+        # Salutation formelle selon le genre
+        salutation = get_gender_based_greeting(
+            entretien.demandeur.etudiant_nom,
+            getattr(entretien.demandeur, 'genre', None)
+        )
+
         # Template HTML professionnel pour la terminaison (CORRIGÉ)
         html_message = f"""<!DOCTYPE html>
 <html lang="fr">
@@ -1375,7 +1394,7 @@ class TerminerEntretienAPI(APIView):
         <div class="content">
             <!-- Greeting -->
             <div class="greeting">
-                Cher(e) {entretien.demandeur.etudiant_prenom},
+                {salutation},
             </div>
             
             <!-- Message principal -->
@@ -1447,7 +1466,7 @@ class TerminerEntretienAPI(APIView):
         text_message = f"""
 ENTRETIEN TERMINÉ
 
-Cher(e) {entretien.demandeur.etudiant_prenom},
+{salutation},
 
 Nous vous confirmons que votre entretien à la Communauté Électrique du Bénin s'est déroulé comme prévu et est maintenant terminé.
 

@@ -491,7 +491,7 @@ class UpdateLoginAlertsAPIView(APIView):
                 
                 <div class="content">
                     <div class="section">
-                        <p>Cher(e) <strong>{user.get_full_name() or user.email}</strong>,</p>
+                        <p><strong>Madame, Monsieur {user.last_name or user.get_full_name() or user.email}</strong>,</p>
                         
                         <div class="{'success' if enabled else 'warning'}">
                             <h3>{'✅' if enabled else '⚠️'} Alertes de connexion {action_text}</h3>
@@ -544,7 +544,7 @@ class UpdateLoginAlertsAPIView(APIView):
             text_message = f"""
 GESTION DES ALERTES DE SÉCURITÉ
 
-Cher(e) {user.get_full_name() or user.email},
+Madame, Monsieur {user.last_name or user.get_full_name() or user.email},
 
 {changement_message}
 

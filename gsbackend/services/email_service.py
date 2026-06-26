@@ -316,7 +316,7 @@ class EmailTemplateService:
                             <a href="mailto:{CONTACT_EMAIL}" style="color:#9AA1A9; text-decoration:underline;">{CONTACT_EMAIL}</a><br>
                             
                             
-                            &nbsp;&bull;&nbsp; {CONTACT_PHONE}<br>
+                            {CONTACT_PHONE}<br>
                             Message automatique &mdash; merci de ne pas y répondre directement.<br>
                             &copy; {current_year} {ORG_NAME}. Tous droits réservés.
                         </div>
@@ -335,27 +335,26 @@ class EmailTemplateService:
 
         return email_html
 
-def get_gender_based_greeting(first_name: str, gender: str = None) -> str:
+def get_gender_based_greeting(last_name: str, gender: str = None) -> str:
     """
     Retourne la salutation appropriée selon le genre.
-    
+
     Args:
-        first_name: Le prénom de la personne
+        last_name: Le nom de famille de la personne
         gender: 'Masculin' ou 'Féminin' ou 'Autre'
-    
+
     Returns:
-        'Cher Prénom' ou 'Chère Prénom' ou 'Cher(e) Prénom' si genre inconnu
+        'Monsieur Nom' ou 'Madame Nom' ou 'Madame, Monsieur Nom' si genre inconnu
     """
-    if not first_name:
-        return "Bonjour,"
-    
+    if not last_name:
+        return "Madame, Monsieur,"
+
     if gender == 'Masculin':
-        return f"Cher {first_name}"
+        return f"Monsieur {last_name}"
     elif gender == 'Féminin':
-        return f"Chère {first_name}"
+        return f"Madame {last_name}"
     else:
-        # Pour 'Autre' ou genre non spécifié
-        return f"Cher(e) {first_name}"
+        return f"Madame, Monsieur {last_name}"
 
 
 def get_formal_greeting(last_name: str, gender: str = None) -> str:
@@ -385,7 +384,7 @@ class EmailContentService:
         from services.email_templates_extended import get_gender_based_greeting
         
         # Utilisation du genre du stagiaire pour la salutation
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
@@ -460,7 +459,7 @@ class EmailContentService:
         """
         
         subject = f"Nouvelle demande d'attestation - Réf: {getattr(demande_attestation, 'reference', None) or demande_attestation.id}"
-        greeting = "Mesdames, Messieurs les administrateurs,"
+        greeting = "Madame, Monsieur,"
         
         return {
             'subject': subject,
@@ -471,7 +470,7 @@ class EmailContentService:
     @staticmethod
     def attestation_signee(stagiaire, demande_attestation, attestation_path: str) -> Dict[str, str]:
         """Génère le contenu pour un email d'attestation signée envoyée"""
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
@@ -546,7 +545,7 @@ class EmailContentService:
             
             # Contenu texte simple
             text_content = f"""
-Bonjour {context['stagiaire_prenom']} {context['stagiaire_nom']},
+Madame, Monsieur {context['stagiaire_nom']},
 
 Votre attestation de stage signée est disponible.
 
@@ -581,7 +580,7 @@ Le Service des Stages
 <!DOCTYPE html>
 <html>
 <body>
-<p>Bonjour {context['stagiaire_prenom']} {context['stagiaire_nom']},</p>
+<p>Madame, Monsieur {context['stagiaire_nom']},</p>
 <p>Votre attestation de stage signée est jointe à cet email.</p>
 </body>
 </html>
@@ -613,7 +612,7 @@ Le Service des Stages
         """Email de confirmation de réception au candidat"""
         
         # Utilisation du genre du candidat pour la salutation
-        greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
+        greeting = get_gender_based_greeting(demande.etudiant_nom, demande.genre)
         
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
@@ -691,7 +690,7 @@ Site web: www.cebnet.org
     @staticmethod
     def demande_acceptee(stagiaire, demande, convention_pdf_path=None) -> Dict[str, str]:
         """Génère le contenu pour un email d'acceptation"""
-        greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
+        greeting = get_gender_based_greeting(demande.etudiant_nom, demande.genre)
         
         # ✅ AJOUT : Mention de la convention en pièce jointe
         piece_jointe_mention = ""
@@ -801,14 +800,14 @@ Site web: www.cebnet.org
         """
         
         subject = f"Mise en traitement - Demande n°{demande.tracking_id}"
-        greeting = f"Cher(e) {demande.etudiant_prenom},"
-        
+        greeting = get_gender_based_greeting(demande.etudiant_nom, demande.genre)
+
         return {
             'subject': subject,
             'html': EmailTemplateService.build_email(greeting, content),
             'text': EmailContentService._generate_text_version(subject, greeting, content)
         }
-    
+
     @staticmethod
     def demande_information(demande, message: str, suivi_url: str) -> Dict[str, str]:
         """Génère le contenu pour une demande d'information complémentaire"""
@@ -869,8 +868,8 @@ Site web: www.cebnet.org
         """
         
         subject = f"Demande d'élément complémentaire - Réf: {demande.tracking_id}"
-        greeting = f"Cher(e) {demande.etudiant_prenom},"
-        
+        greeting = get_gender_based_greeting(demande.etudiant_nom, demande.genre)
+
         return {
             'subject': subject,
             'html': EmailTemplateService.build_email(greeting, content),
@@ -880,7 +879,7 @@ Site web: www.cebnet.org
     @staticmethod
     def demande_refusee(demande) -> Dict[str, str]:
         """Génère le contenu pour un email de refus"""
-        greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
+        greeting = get_gender_based_greeting(demande.etudiant_nom, demande.genre)
         
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">

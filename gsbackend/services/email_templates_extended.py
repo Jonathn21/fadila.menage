@@ -29,27 +29,26 @@ def get_user_display_name(user) -> str:
     return user.email
 
 
-def get_gender_based_greeting(first_name: str, gender: str = None) -> str:
+def get_gender_based_greeting(last_name: str, gender: str = None) -> str:
     """
     Retourne la salutation appropriée selon le genre.
-    
+
     Args:
-        first_name: Le prénom de la personne
+        last_name: Le nom de famille de la personne
         gender: 'Masculin' ou 'Féminin' ou 'Autre'
-    
+
     Returns:
-        'Cher Prénom' ou 'Chère Prénom' ou 'Cher(e) Prénom' si genre inconnu
+        'Monsieur Nom' ou 'Madame Nom' ou 'Madame, Monsieur Nom' si genre inconnu
     """
-    if not first_name:
-        return "Bonjour,"
-    
+    if not last_name:
+        return "Madame, Monsieur,"
+
     if gender == 'Masculin':
-        return f"Cher {first_name}"
+        return f"Monsieur {last_name}"
     elif gender == 'Féminin':
-        return f"Chère {first_name}"
+        return f"Madame {last_name}"
     else:
-        # Pour 'Autre' ou genre non spécifié
-        return f"Cher(e) {first_name}"
+        return f"Madame, Monsieur {last_name}"
 
 
 def get_formal_greeting(last_name: str, gender: str = None) -> str:
@@ -145,7 +144,7 @@ class SecurityEmailTemplates:
 </div>
         """
         
-        greeting = f"Bonjour {user.first_name}," if user.first_name else "Bonjour,"
+        greeting = f"Madame, Monsieur {user.last_name}" if user.last_name else "Madame, Monsieur,"
         subject = "Code de vérification - GES STAGE"
         
         return {
@@ -242,7 +241,7 @@ Email: securite@cebnet.org"""
 </div>
         """
         
-        greeting = f"Bonjour {user.first_name}," if user.first_name else "Bonjour,"
+        greeting = f"Madame, Monsieur {user.last_name}" if user.last_name else "Madame, Monsieur,"
         subject = "Alerte de sécurité - Nouvelle connexion détectée"
         
         return {
@@ -339,7 +338,7 @@ Téléphone: +229 21 30 05 06"""
 </div>
         """
         
-        greeting = f"Bonjour {user.first_name}," if user.first_name else "Bonjour,"
+        greeting = f"Madame, Monsieur {user.last_name}" if user.last_name else "Madame, Monsieur,"
         subject = "Confirmation de modification de votre mot de passe"
         
         return {
@@ -448,7 +447,7 @@ Email: securite@cebnet.org"""
 </div>
         """
         
-        greeting = f"Bonjour {user.first_name}," if user.first_name else "Bonjour,"
+        greeting = f"Madame, Monsieur {user.last_name}" if user.last_name else "Madame, Monsieur,"
         subject = "Bienvenue sur GES STAGE - Communauté Électrique du Bénin"
         
         return {
@@ -533,7 +532,7 @@ Téléphone: +229 21 30 05 06"""
 </div>
         """
         
-        greeting = f"Bonjour {user.first_name}," if user.first_name else "Bonjour,"
+        greeting = f"Madame, Monsieur {user.last_name}" if user.last_name else "Madame, Monsieur,"
         subject = "Réinitialisation de votre mot de passe - GES STAGE"
         
         return {
@@ -624,7 +623,7 @@ class StageEmailTemplates:
 </div>
         """
         
-        greeting = get_gender_based_greeting(nouveau_stage.prenom, nouveau_stage.genre)
+        greeting = get_gender_based_greeting(nouveau_stage.nom, nouveau_stage.genre)
         subject = "Renouvellement de votre stage - Communauté Électrique du Bénin"
         
         return {
@@ -721,7 +720,7 @@ Email: stages@cebnet.org"""
 </div>
         """
         
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         subject = "Fin de stage - Communauté Électrique du Bénin"
         
         return {
@@ -805,7 +804,7 @@ Email: stages@cebnet.org"""
 </div>
         """
         
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         subject = "Modification de votre période de stage - CEB"
         
         return {
@@ -902,7 +901,7 @@ Communauté Électrique du Bénin"""
 </div>
         """
         
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         subject = "Bienvenue pour votre premier jour de stage - CEB"
         
         return {
@@ -984,7 +983,7 @@ class PreferenceEmailTemplates:
 </div>
         """
         
-        greeting = f"Bonjour {user_name}," if user_name else "Bonjour,"
+        greeting = f"Madame, Monsieur {user.last_name}" if hasattr(user, 'last_name') and user.last_name else "Madame, Monsieur,"
         subject = "Bienvenue dans les nouveautés CEB"
         
         return {
@@ -1095,7 +1094,7 @@ class DemandeEmailTemplates:
 </div>
         """
         
-        greeting = "Chers administrateurs,"
+        greeting = "Madame, Monsieur,"
         subject = f"Nouvelle demande de stage - {demande.etudiant_nom} {demande.etudiant_prenom}"
         
         return {
@@ -1138,7 +1137,7 @@ Communauté Électrique du Bénin"""
     def confirmation_reception_candidat(demande) -> dict:
         """Email de confirmation de réception au candidat"""
         
-        greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
+        greeting = get_gender_based_greeting(demande.etudiant_nom, demande.genre)
         
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
@@ -1216,7 +1215,7 @@ Téléphone: +229 21 30 05 06"""
     def rejection_notification(demande, raison_refus=None) -> dict:
         """Email de notification de refus au candidat"""
         
-        greeting = get_gender_based_greeting(demande.etudiant_prenom, demande.genre)
+        greeting = get_gender_based_greeting(demande.etudiant_nom, demande.genre)
         raison = raison_refus or demande.raison_refus or "Le nombre de places disponibles est limité."
         
         content = f"""
@@ -1327,7 +1326,7 @@ class AttestationEmailTemplates:
         """Email pour attestation approuvée"""
         from services.email_service import EmailTemplateService, EmailContentService
         
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
@@ -1418,7 +1417,7 @@ class AttestationEmailTemplates:
         """Email pour attestation refusée"""
         from services.email_service import EmailTemplateService, EmailContentService
         
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
@@ -1503,7 +1502,7 @@ class AttestationEmailTemplates:
         """Email pour attestation disponible au retrait ou téléchargement"""
         from services.email_service import EmailTemplateService, EmailContentService
         
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         
         # Section téléchargement si lien fourni
         section_telechargement = ""
@@ -1596,7 +1595,7 @@ class AttestationEmailTemplates:
         """Email pour attestation signée envoyée"""
         from services.email_service import EmailTemplateService, EmailContentService
         
-        greeting = get_gender_based_greeting(stagiaire.prenom, stagiaire.genre)
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
         
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
