@@ -889,7 +889,7 @@ class ModifierDemandeAPIView(APIView):
                             diplome.delete()
                             documents_supprimes.append(nom_diplome)
                     except Diplome.DoesNotExist:
-                        pass
+                        logger.debug("Diplome id=%s introuvable pour suppression", doc_id)
             
             # Sauvegarde de la demande
             demande.save()

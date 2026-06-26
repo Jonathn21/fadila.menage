@@ -1548,7 +1548,7 @@ class FinaliserRenouvellementAPIView(APIView):
                     convention_temp.delete()
                     logger.info(f"Convention temporaire {convention_temporaire_id} supprimée")
                 except ConventionStage.DoesNotExist:
-                    pass
+                    logger.debug("Convention temporaire id=%s déjà supprimée ou introuvable", convention_temporaire_id)
             
             # Supprimer la référence dans le stagiaire
             if stagiaire.convention_renouvellement_temporaire:

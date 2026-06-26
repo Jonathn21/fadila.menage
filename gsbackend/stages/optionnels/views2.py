@@ -67,7 +67,7 @@ from .serializers import (
 )
 from utilisateurs.models import Utilisateur, Profil
 from services.notification_service import NotificationService
-from gsbackend.stages.optionnels.service.scoring_service import ScoringService
+from stages.optionnels.service.scoring_service import ScoringService
 
 class CalculerScoreAPIView(APIView):
     """Calcule le score IA d'une demande spécifique"""

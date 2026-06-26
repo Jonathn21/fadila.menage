@@ -132,7 +132,7 @@ class ActiveSessionsAPIView(APIView):
                         elif s.last_activity and (timezone.now() - s.last_activity).seconds < 300:  # 5 minutes
                             is_current = True
                     except Session.DoesNotExist:
-                        pass
+                        logger.debug("Session Django introuvable pour la clé %s", current_django_session_key)
                 
                 user_sessions.append({
                     "id": s.id,  # Ajouter l'ID pour les opérations
@@ -199,8 +199,8 @@ class LogoutOtherSessionsAPIView(APIView):
                 if session.django_session_key:
                     try:
                         Session.objects.filter(session_key=session.django_session_key).delete()
-                    except:
-                        pass
+                    except Exception:
+                        logger.exception("Erreur suppression session Django %s", session.django_session_key)
 
             UserAction.objects.create(
                 user=request.user,
@@ -264,8 +264,8 @@ class LogoutSpecificSessionAPIView(APIView):
             if hasattr(session, 'django_session_key') and session.django_session_key:
                 try:
                     Session.objects.filter(session_key=session.django_session_key).delete()
-                except:
-                    pass
+                except Exception:
+                    logger.exception("Erreur suppression session Django %s", session.django_session_key)
 
             UserAction.objects.create(
                 user=request.user,

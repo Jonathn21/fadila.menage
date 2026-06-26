@@ -1,3 +1,4 @@
+import logging
 from django.db import models
 from datetime import datetime,date
 from django.utils import timezone
@@ -6,6 +7,8 @@ import uuid
 import os
 import time
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -129,8 +132,8 @@ class Demande(models.Model):
                 ancienne_demande = Demande.objects.get(pk=self.pk)
                 self.track_document_changes(ancienne_demande)
             except Demande.DoesNotExist:
-                pass
-        
+                logger.debug("Demande pk=%s introuvable pour tracker les modifications de documents", self.pk)
+
         super().save(*args, **kwargs)
         
         # ✅ CORRECTION APRÈS SAVE: Mettre à jour la convention temporaire si nécessaire
@@ -311,14 +314,14 @@ class Demande(models.Model):
                 )
                 return True
             except DocumentHistory.DoesNotExist:
-                pass
+                logger.debug("DocumentHistory id=%s introuvable pour demande %s", document_history_id, self.pk)
 
             # ✅ Ensuite essayer ConventionStage
             try:
                 ConventionStage.objects.get(id=document_history_id, est_temporaire=True)
                 return True  # Marqué comme vu (pas de tracking fin pour conventions)
             except ConventionStage.DoesNotExist:
-                pass
+                logger.debug("ConventionStage temporaire id=%s introuvable", document_history_id)
 
             return False
 
@@ -1169,8 +1172,8 @@ class Stagiaire(models.Model):
         try:
             if hasattr(self, 'attestation') and self.attestation and self.attestation.fichier:
                 return False, "Une attestation a déjà été générée"
-        except:
-            pass
+        except Exception:
+            logger.exception("Erreur lors de la vérification de l'attestation pour le stagiaire %s", self.pk)
         
         return True, "Demande possible"
 
