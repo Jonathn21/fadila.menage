@@ -41,8 +41,8 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
 
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6">
-      <Alert className="bg-orange-50 border-orange-200 dark:bg-orange-950 dark:border-orange-800">
-        <AlertDescription className="text-orange-800 dark:text-orange-200">
+      <Alert className="bg-orange-50 border-orange-200">
+        <AlertDescription className="text-orange-800">
           Ceci est un aperçu de votre envoi. Il n'a pas encore été envoyé ! 
           Veuillez prendre un moment pour vérifier vos informations. Vous pouvez également revenir en 
           arrière pour y apporter des modifications.
@@ -213,14 +213,14 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
       </Card>
 
       {/* Validation Summary */}
-      <Card className="bg-green-50  dark:bg-green-950 dark:border-green-800">
+      <Card className="bg-green-50">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
             <div>
-              <h3 className="font-medium text-green-800 dark:text-green-200">
+              <h3 className="font-medium text-green-800">
                 Votre demande est prête à être envoyée
               </h3>
-              <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+              <p className="text-sm text-green-700 mt-1">
                 Tous les documents obligatoires sont présents. Vous pouvez maintenant soumettre votre demande.
               </p>
             </div>

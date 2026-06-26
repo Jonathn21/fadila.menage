@@ -54,56 +54,6 @@
     --topbar-border: 214.3 20% 92%;
   }
 
-  .dark {
-    /* Fond sombre avec dégradé */
-    --background: 222.2 70% 6%;
-    --foreground: 210 40% 98%;
-    
-    /* Cards légèrement plus claires */
-    --card: 222.2 65% 8%;
-    --card-foreground: 210 40% 98%;
-    
-    --popover: 222.2 65% 8%;
-    --popover-foreground: 210 40% 98%;
-    
-    /* Rouge primary conservé */
-    --primary: 0 84% 48%;
-    --primary-foreground: 210 40% 98%;
-    
-    /* Dégradé sombre élégant */
-    --secondary: 217.2 25% 20%;
-    --secondary-foreground: 210 40% 98%;
-    
-    --muted: 217.2 25% 18%;
-    --muted-foreground: 215 20.2% 65.1%;
-    
-    --accent: 217.2 30% 22%;
-    --accent-foreground: 210 40% 98%;
-    
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    
-    /* Bordures plus subtiles */
-    --border: 217.2 25% 20%;
-    --input: 217.2 25% 16%;
-    --ring: 0 84% 48%;
-    --radius: 0.5rem;
-    --sidebar-hover: 0 60% 18%;
-
-    /* Sidebar sombre avec dégradé */
-    --sidebar-background: 222.2 70% 7%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 25% 18%;
-    --sidebar-primary: 0 84% 48%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 217.2 30% 20%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-ring: 0 84% 48%;
-
-    /* Topbar sombre élégant */
-    --topbar-background: 222.2 70% 7.5%;
-    --topbar-border: 217.2 25% 16%;
-  }
 }
 
 @layer base {

@@ -7,49 +7,25 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 const AppearanceSettings = () => {
-  const [theme, setTheme] = useState("system");
   const [fontSize, setFontSize] = useState("medium");
-  
+
   const { toast } = useToast();
-  
+
   const handleSave = () => {
-    // In a real app, you would apply these settings here
     toast({
       title: "Apparence mise à jour",
       description: "Vos préférences d'affichage ont été sauvegardées.",
     });
   };
-  
+
   return (
     <Card>
       <CardContent className="pt-6">
         <div className="space-y-3 sm:space-y-4 md:space-y-6">
           <div>
-            <h2 className="text-lg font-medium mb-4">Thème</h2>
-            <RadioGroup 
-              value={theme} 
-              onValueChange={setTheme}
-              className="grid grid-cols-1 gap-4 sm:grid-cols-3"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="light" id="light" />
-                <Label htmlFor="light">Clair</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="dark" id="dark" />
-                <Label htmlFor="dark">Sombre</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="system" id="system" />
-                <Label htmlFor="system">Système</Label>
-              </div>
-            </RadioGroup>
-          </div>
-          
-          <div className="pt-4 border-t border-gray-200">
             <h2 className="text-lg font-medium mb-4">Taille du texte</h2>
-            <RadioGroup 
-              value={fontSize} 
+            <RadioGroup
+              value={fontSize}
               onValueChange={setFontSize}
               className="grid grid-cols-1 gap-4 sm:grid-cols-3"
             >
@@ -67,9 +43,9 @@ const AppearanceSettings = () => {
               </div>
             </RadioGroup>
           </div>
-          
+
           <div className="flex justify-end pt-4">
-            <Button 
+            <Button
               onClick={handleSave}
               className="bg-red-500 hover:bg-red-600"
             >

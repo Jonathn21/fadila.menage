@@ -51,13 +51,13 @@ const StatCard: React.FC<StatCardProps> = ({
   const getTrendColor = () => {
     switch (trend) {
       case "up":
-        return "text-green-600 dark:text-green-400";
+        return "text-green-600";
       case "down":
-        return "text-red-600 dark:text-red-400";
+        return "text-red-600";
       case "neutral":
-        return "text-gray-600 dark:text-gray-400";
+        return "text-gray-600";
       default:
-        return "text-gray-600 dark:text-gray-400";
+        return "text-gray-600";
     }
   };
 
@@ -99,8 +99,8 @@ const StatCard: React.FC<StatCardProps> = ({
   className={cn(
     "overflow-hidden transition-all duration-300 cursor-pointer group",
     "h-full",
-    "border dark:border-gray-800",
-    "bg-white dark:bg-gray-900",
+    "border",
+    "bg-white",
     "hover:shadow-sm",
     compact ? "p-2 sm:p-3" : "p-0"
   )}
@@ -113,7 +113,7 @@ const StatCard: React.FC<StatCardProps> = ({
     {/* Header */}
     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">
       <h3 className={cn(
-        "text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400",
+        "text-xs sm:text-sm font-medium text-gray-600",
         "line-clamp-1 flex-1 pr-2"
       )}>
         {title}
@@ -143,7 +143,7 @@ const StatCard: React.FC<StatCardProps> = ({
     <div className="flex-grow">
       <div className="flex flex-col gap-1 sm:gap-1.5">
         <p className={cn(
-          "font-bold text-gray-900 dark:text-white",
+          "font-bold text-gray-900",
           "tracking-tight",
           compact ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"
         )}>
@@ -172,7 +172,7 @@ const StatCard: React.FC<StatCardProps> = ({
             
             {description && (
               <p className={cn(
-                "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                "text-xs sm:text-sm text-gray-600",
                 "line-clamp-2 flex-1 min-w-0",
                 compact && "text-xs"
               )}>
@@ -194,7 +194,7 @@ const StatCard: React.FC<StatCardProps> = ({
               </span>
             )}
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-1.5 sm:h-2">
+          <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2">
             <div
               className={cn(
                 "h-full rounded-full transition-all duration-700",
@@ -214,8 +214,8 @@ const StatCard: React.FC<StatCardProps> = ({
 
     {/* Hover Indicator - Only show on desktop if not compact */}
     {onClick && !compact && (
-      <div className="mt-3 sm:mt-4 pt-2 border-t border-gray-100 dark:border-gray-800 hidden sm:block">
-        <div className="text-xs text-primary/70 dark:text-primary/60 flex items-center justify-end gap-1 transition-colors group-hover:text-primary">
+      <div className="mt-3 sm:mt-4 pt-2 border-t border-gray-100 hidden sm:block">
+        <div className="text-xs text-primary/70 flex items-center justify-end gap-1 transition-colors group-hover:text-primary">
           <span>Cliquer pour détails</span>
           <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -237,7 +237,7 @@ const StatCard: React.FC<StatCardProps> = ({
               {trend && getTrendIcon()}
               <div>
                 <p className="text-sm font-medium">{title}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-sm text-gray-600 mt-1">
                   {description}
                 </p>
                 {trend && trendValue && (
