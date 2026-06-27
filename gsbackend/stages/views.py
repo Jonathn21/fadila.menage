@@ -9,10 +9,19 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
-from reportlab.lib.units import inch
+from reportlab.lib.units import inch, cm
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, 
-    Table, TableStyle
+    SimpleDocTemplate, Paragraph, Spacer,
+    Table, TableStyle, HRFlowable, Image as RLImage,
+)
+from services.rapport_service import (
+    pdf_header, pdf_section_title, pdf_kpi_table, pdf_table, pdf_footer_note,
+    make_pdf_doc, make_bar_chart, make_pie_chart, make_line_chart,
+    excel_title_block, excel_header_row, excel_data_row, excel_autofit,
+    excel_add_bar_chart, excel_add_pie_chart, excel_add_line_chart,
+    EXCEL_BORDER, ACCENT_COLOR, HEADER_COLOR, LIGHT_BG, BORDER_COLOR,
+    CLR_ACCENT, CLR_SUCCESS, CLR_DANGER, CLR_WARNING, CLR_INFO,
+    NOMS_MOIS_COURT,
 )
 from services.email_service import EmailSenderService
 
@@ -712,15 +721,14 @@ class ExportStatsAPIView(APIView):
         annee_debut = request.GET.get("annee_debut")
         annee_fin = request.GET.get("annee_fin")
         report_type = request.GET.get("type", "general")
-        
-        # Déterminer le type de rapport
+
         if annee_debut and annee_fin:
             stats_data = self.get_stats_intervalle_data(int(annee_debut), int(annee_fin))
             is_intervalle = True
         else:
             stats_data = self.get_stats_annuelle_data(annee_cible)
             is_intervalle = False
-        
+
         if format_type == 'excel':
             return self.export_excel(stats_data, annee_cible, report_type, is_intervalle)
         elif format_type == 'pdf':
@@ -729,123 +737,210 @@ class ExportStatsAPIView(APIView):
             return Response({"error": "Format non supporté"}, status=400)
 
     def get_stats_annuelle_data(self, annee_cible):
-        """Récupère les données statistiques pour une année"""
         view = StatistiquesAPIView()
         view.request = self.request
         response = view.get(self.request)
         return response.data
 
     def get_stats_intervalle_data(self, annee_debut, annee_fin):
-        """Récupère les données statistiques pour un intervalle d'années"""
         view = StatistiquesAPIView()
         view.request = self.request
         response = view.get(self.request)
         return response.data
 
     def export_excel(self, stats_data, annee, report_type, is_intervalle=False):
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.utils import get_column_letter
+        from openpyxl.chart import BarChart, PieChart, LineChart, Reference
+        from openpyxl.chart.label import DataLabelList
+        from openpyxl.chart.series import DataPoint
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+
+        if is_intervalle:
+            # ── Feuille Synthèse ──
+            ws.title = "Synthèse Intervalle"
+            ws.sheet_properties.tabColor = '6366F1'
+            start = excel_title_block(ws,
+                f"Rapport des Stages {stats_data['annee_debut']} - {stats_data['annee_fin']}",
+                f"Synthèse de la période", merge_cols=2)
+
+            excel_header_row(ws, ['Métrique', 'Valeur'], row=start)
+            kpis = [
+                ("Période analysée", f"{stats_data['annee_debut']} - {stats_data['annee_fin']}"),
+                ("Total des demandes", stats_data["total_intervalle"]),
+                ("Demandes acceptées", stats_data["total_acceptees_intervalle"]),
+                ("Demandes refusées", stats_data["total_refusees_intervalle"]),
+                ("Demandes en cours", stats_data["total_en_cours_intervalle"]),
+                ("Taux d'acceptation", f"{stats_data['taux_acceptation_intervalle']}%"),
+            ]
+            for i, (k, v) in enumerate(kpis, start + 1):
+                excel_data_row(ws, [k, v], i, even=(i % 2 == 0))
+            excel_autofit(ws)
+
+            # ── Feuille Détail par Année ──
+            ws2 = wb.create_sheet("Détail par Année")
+            ws2.sheet_properties.tabColor = '10B981'
+            headers = ["Année", "Total", "Acceptées", "Refusées", "En Cours", "Taux"]
+            start2 = excel_title_block(ws2, "Détail par année", merge_cols=6)
+            excel_header_row(ws2, headers, row=start2)
+            for i, stat in enumerate(stats_data["stats_par_annee"], start2 + 1):
+                excel_data_row(ws2, [
+                    stat["annee"], stat["total_demandes"], stat["demandes_acceptees"],
+                    stat["demandes_refusees"], stat["demandes_en_cours"],
+                    f"{stat['taux_acceptation']}%"
+                ], i, even=(i % 2 == 0))
+            excel_autofit(ws2)
+
+            # Graphique barres par année
+            n_annees = len(stats_data["stats_par_annee"])
+            if n_annees > 0:
+                chart = BarChart()
+                chart.type = "col"
+                chart.title = "Évolution par année"
+                chart.width = 20
+                chart.height = 12
+                d1 = Reference(ws2, min_col=3, min_row=start2, max_row=start2 + n_annees)
+                d2 = Reference(ws2, min_col=4, min_row=start2, max_row=start2 + n_annees)
+                d3 = Reference(ws2, min_col=5, min_row=start2, max_row=start2 + n_annees)
+                cats = Reference(ws2, min_col=1, min_row=start2 + 1, max_row=start2 + n_annees)
+                chart.add_data(d1, titles_from_data=True)
+                chart.add_data(d2, titles_from_data=True)
+                chart.add_data(d3, titles_from_data=True)
+                chart.set_categories(cats)
+                chart.series[0].graphicalProperties.solidFill = '10B981'
+                chart.series[1].graphicalProperties.solidFill = 'EF4444'
+                chart.series[2].graphicalProperties.solidFill = 'F59E0B'
+                ws2.add_chart(chart, f"H{start2}")
+
+            # ── Feuille Évolution Mensuelle ──
+            if "evolution_mensuelle" in stats_data and stats_data["evolution_mensuelle"]:
+                ws3 = wb.create_sheet("Évolution Mensuelle")
+                ws3.sheet_properties.tabColor = 'F59E0B'
+                months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"]
+                annee_cols = [str(e["annee"]) for e in stats_data["evolution_mensuelle"]]
+                all_headers = ["Mois"] + annee_cols
+                excel_header_row(ws3, all_headers, row=1)
+                for i, m in enumerate(months):
+                    row_vals = [m]
+                    for e in stats_data["evolution_mensuelle"]:
+                        row_vals.append(e["demandes_par_mois"][i])
+                    excel_data_row(ws3, row_vals, i + 2, even=(i % 2 == 0))
+                excel_autofit(ws3)
+
+                # Line chart évolution
+                chart_line = LineChart()
+                chart_line.title = "Évolution mensuelle par année"
+                chart_line.width = 20
+                chart_line.height = 12
+                cats = Reference(ws3, min_col=1, min_row=2, max_row=13)
+                line_colors = ['6366F1', '10B981', 'F59E0B', 'EF4444', '3B82F6']
+                for col_idx in range(2, len(annee_cols) + 2):
+                    data = Reference(ws3, min_col=col_idx, min_row=1, max_row=13)
+                    chart_line.add_data(data, titles_from_data=True)
+                chart_line.set_categories(cats)
+                for i, s in enumerate(chart_line.series):
+                    s.graphicalProperties.line.solidFill = line_colors[i % len(line_colors)]
+                    s.graphicalProperties.line.width = 25000
+                    s.smooth = True
+                ws3.add_chart(chart_line, "A16")
+
+        else:
+            # ── Année unique ──
+
+            # Feuille 1: Statistiques générales
+            ws.title = "Statistiques Générales"
+            ws.sheet_properties.tabColor = '6366F1'
+            start = excel_title_block(ws,
+                f"Rapport des Stages — {annee}",
+                f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}", merge_cols=2)
+
+            excel_header_row(ws, ['Métrique', 'Valeur'], row=start)
+            kpis = [
+                ("Année analysée", stats_data["annee_cible"]),
+                ("Total des demandes", stats_data["total_demandes"]),
+                ("Taux d'acceptation", f"{stats_data['taux_acceptation']}%"),
+                ("Délai moyen de traitement", f"{stats_data['delai_moyen']} jours"),
+                ("Durée moyenne de stage", f"{stats_data['duree_moyenne_stage']} jours"),
+                ("Stages en cours", stats_data["stages_en_cours"]),
+                ("Demandes en cours de traitement", stats_data["demandes_en_cours_traitement"]),
+            ]
+            for i, (k, v) in enumerate(kpis, start + 1):
+                excel_data_row(ws, [k, v], i, even=(i % 2 == 0))
+            excel_autofit(ws)
+
+            # Feuille 2: Demandes par mois + graphique
+            ws_mois = wb.create_sheet("Demandes par Mois")
+            ws_mois.sheet_properties.tabColor = '10B981'
+            months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                       "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+            excel_header_row(ws_mois, ['Mois', 'Nombre de demandes'], row=1)
+            for i, (m, v) in enumerate(zip(months, stats_data["demandes_par_mois"]), 2):
+                excel_data_row(ws_mois, [m, v], i, even=(i % 2 == 0))
+            excel_autofit(ws_mois)
+
+            excel_add_bar_chart(ws_mois, f"Demandes par mois — {annee}",
+                                {'min_col': 1, 'min_row': 2, 'max_row': 13},
+                                {'min_col': 2, 'min_row': 1, 'max_row': 13},
+                                anchor='D1', width=20)
+
+            # Feuille 3: Répartition par statut + pie chart
+            ws_statut = wb.create_sheet("Répartition Statuts")
+            ws_statut.sheet_properties.tabColor = 'F59E0B'
+            statuts = ["Acceptées", "Refusées", "En attente", "En cours de traitement"]
+            pourcentages = stats_data["repartition_statuts"]
+            total_demandes = stats_data["total_demandes"]
+
+            excel_header_row(ws_statut, ['Statut', 'Pourcentage', 'Nombre'], row=1)
+            for i, (s, p) in enumerate(zip(statuts, pourcentages), 2):
+                nombre = int(total_demandes * p / 100)
+                excel_data_row(ws_statut, [s, f"{p}%", nombre], i, even=(i % 2 == 0))
+            excel_autofit(ws_statut)
+
+            excel_add_pie_chart(ws_statut, f"Répartition par statut — {annee}",
+                                {'min_col': 1, 'min_row': 1, 'max_row': 5},
+                                {'min_col': 3, 'min_row': 1, 'max_row': 5},
+                                anchor='E1')
+
+            # Feuille 4: Performance hebdomadaire + graphique
+            ws_hebdo = wb.create_sheet("Performance Hebdo")
+            ws_hebdo.sheet_properties.tabColor = 'EF4444'
+            jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
+            excel_header_row(ws_hebdo, ['Jour', 'Nombre de demandes'], row=1)
+            for i, (j, v) in enumerate(zip(jours, stats_data["perf_hebdo"]), 2):
+                excel_data_row(ws_hebdo, [j, v], i, even=(i % 2 == 0))
+            excel_autofit(ws_hebdo)
+
+            excel_add_bar_chart(ws_hebdo, "Performance hebdomadaire",
+                                {'min_col': 1, 'min_row': 2, 'max_row': 8},
+                                {'min_col': 2, 'min_row': 1, 'max_row': 8},
+                                anchor='D1')
+
+            # Feuille 5: Comparaison annuelle + graphique
+            ws_comp = wb.create_sheet("Comparaison Annuelle")
+            ws_comp.sheet_properties.tabColor = '3B82F6'
+            excel_header_row(ws_comp, ['Année', 'Demandes acceptées'], row=1)
+            comp_labels = stats_data["comp_annee_labels"]
+            comp_vals = stats_data["comp_annee"]
+            for i, (a, v) in enumerate(zip(comp_labels, comp_vals), 2):
+                excel_data_row(ws_comp, [a, v], i, even=(i % 2 == 0))
+            excel_autofit(ws_comp)
+
+            n_comp = len(comp_labels)
+            if n_comp > 0:
+                excel_add_bar_chart(ws_comp, "Comparaison annuelle",
+                                    {'min_col': 1, 'min_row': 2, 'max_row': n_comp + 1},
+                                    {'min_col': 2, 'min_row': 1, 'max_row': n_comp + 1},
+                                    anchor='D1')
+
         output = BytesIO()
-        
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            if is_intervalle:
-                # Feuille pour intervalle d'années
-                df_intervalle = pd.DataFrame([
-                    ["Période analysée", f"{stats_data['annee_debut']} - {stats_data['annee_fin']}"],
-                    ["Total des demandes", stats_data["total_intervalle"]],
-                    ["Demandes acceptées", stats_data["total_acceptees_intervalle"]],
-                    ["Demandes refusées", stats_data["total_refusees_intervalle"]],
-                    ["Demandes en cours", stats_data["total_en_cours_intervalle"]],
-                    ["Taux d'acceptation", f"{stats_data['taux_acceptation_intervalle']}%"]
-                ], columns=["Métrique", "Valeur"])
-                df_intervalle.to_excel(writer, sheet_name="Synthèse Intervalle", index=False)
-
-                # Feuille détaillée par année
-                data_annees = []
-                for stat in stats_data["stats_par_annee"]:
-                    data_annees.append([
-                        stat["annee"],
-                        stat["total_demandes"],
-                        stat["demandes_acceptees"],
-                        stat["demandes_refusees"],
-                        stat["demandes_en_cours"],
-                        f"{stat['taux_acceptation']}%"
-                    ])
-                
-                df_annees = pd.DataFrame(data_annees, columns=[
-                    "Année", "Total Demandes", "Demandes Acceptées", 
-                    "Demandes Refusées", "Demandes en Cours", "Taux d'Acceptation"
-                ])
-                df_annees.to_excel(writer, sheet_name="Détail par Année", index=False)
-
-                # Feuille évolution mensuelle
-                months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", 
-                         "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
-                
-                data_mensuelle = {"Mois": months}
-                for evolution in stats_data["evolution_mensuelle"]:
-                    data_mensuelle[str(evolution["annee"])] = evolution["demandes_par_mois"]
-                
-                df_mensuel = pd.DataFrame(data_mensuelle)
-                df_mensuel.to_excel(writer, sheet_name="Évolution Mensuelle", index=False)
-
-            else:
-                # Feuille 1: Statistiques générales
-                df_general = pd.DataFrame([
-                    ["Année analysée", stats_data["annee_cible"]],
-                    ["Total des demandes", stats_data["total_demandes"]],
-                    ["Taux d'acceptation", f"{stats_data['taux_acceptation']}%"],
-                    ["Délai moyen de traitement", f"{stats_data['delai_moyen']} jours"],
-                    ["Durée moyenne de stage", f"{stats_data['duree_moyenne_stage']} jours"],
-                    ["Stages en cours", stats_data["stages_en_cours"]],
-                    ["Demandes en cours de traitement", stats_data["demandes_en_cours_traitement"]]
-                ], columns=["Métrique", "Valeur"])
-                
-                df_general.to_excel(writer, sheet_name="Statistiques Générales", index=False)
-
-                # Feuille 2: Demandes par mois
-                months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", 
-                         "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
-                df_mois = pd.DataFrame({
-                    "Mois": months,
-                    "Nombre de demandes": stats_data["demandes_par_mois"]
-                })
-                df_mois.to_excel(writer, sheet_name="Demandes par Mois", index=False)
-
-                # Feuille 3: Répartition par statut (avec "En cours de traitement")
-                statuts = ["Acceptées", "Refusées", "En attente", "En cours de traitement"]
-                pourcentages = stats_data["repartition_statuts"]
-                total_demandes = stats_data["total_demandes"]
-                
-                df_statuts = pd.DataFrame({
-                    "Statut": statuts,
-                    "Pourcentage": pourcentages,
-                    "Nombre": [
-                        int(total_demandes * pourcentages[0] / 100),
-                        int(total_demandes * pourcentages[1] / 100),
-                        int(total_demandes * pourcentages[2] / 100),
-                        int(total_demandes * pourcentages[3] / 100)
-                    ]
-                })
-                df_statuts.to_excel(writer, sheet_name="Répartition Statuts", index=False)
-
-                # Feuille 4: Performance hebdomadaire
-                jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
-                df_semaine = pd.DataFrame({
-                    "Jour": jours,
-                    "Nombre de demandes": stats_data["perf_hebdo"]
-                })
-                df_semaine.to_excel(writer, sheet_name="Performance Hebdo", index=False)
-
-                # Feuille 5: Comparaison annuelle
-                df_annees = pd.DataFrame({
-                    "Année": stats_data["comp_annee_labels"],
-                    "Demandes acceptées": stats_data["comp_annee"]
-                })
-                df_annees.to_excel(writer, sheet_name="Comparaison Annuelle", index=False)
-
+        wb.save(output)
         output.seek(0)
-        
+
         filename = f"rapport_stages_{stats_data['annee_debut']}_{stats_data['annee_fin']}.xlsx" if is_intervalle else f"rapport_stages_{annee}.xlsx"
-        
+
         response = HttpResponse(
             output.getvalue(),
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -855,185 +950,147 @@ class ExportStatsAPIView(APIView):
 
     def export_pdf(self, stats_data, annee, report_type, is_intervalle=False):
         buffer = BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=1*inch)
+        doc = make_pdf_doc(buffer, f"Rapport des Stages — {annee}")
         styles = getSampleStyleSheet()
-        
-        # Style personnalisé
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=16,
-            spaceAfter=30,
-            alignment=1,
-        )
-        
         story = []
 
         if is_intervalle:
-            # En-tête pour intervalle
-            title = Paragraph(f"RAPPORT DES STAGES {stats_data['annee_debut']} - {stats_data['annee_fin']}", title_style)
-            story.append(title)
-            
-            # Synthèse de l'intervalle
-            story.append(Paragraph("SYNTHÈSE DE LA PÉRIODE", styles['Heading2']))
-            story.append(Spacer(1, 12))
-            
-            data_synthese = [
-                ["MÉTRIQUE", "VALEUR"],
-                ["Période analysée", f"{stats_data['annee_debut']} - {stats_data['annee_fin']}"],
-                ["Total des demandes", str(stats_data["total_intervalle"])],
-                ["Demandes acceptées", str(stats_data["total_acceptees_intervalle"])],
-                ["Demandes refusées", str(stats_data["total_refusees_intervalle"])],
-                ["Demandes en cours", str(stats_data["total_en_cours_intervalle"])],
-                ["Taux d'acceptation", f"{stats_data['taux_acceptation_intervalle']}%"]
-            ]
+            story.extend(pdf_header(
+                f"Rapport des Stages {stats_data['annee_debut']} - {stats_data['annee_fin']}",
+                "Analyse comparative pluriannuelle", styles))
 
-            table_synthese = Table(data_synthese, colWidths=[3*inch, 2*inch])
-            table_synthese.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#ecf0f1")),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            # KPIs
+            story.extend(pdf_section_title("Synthèse de la période", styles))
+            story.append(pdf_kpi_table([
+                ('Période', f"{stats_data['annee_debut']} - {stats_data['annee_fin']}"),
+                ('Total des demandes', stats_data["total_intervalle"]),
+                ('Demandes acceptées', stats_data["total_acceptees_intervalle"], CLR_SUCCESS),
+                ('Demandes refusées', stats_data["total_refusees_intervalle"], CLR_DANGER),
+                ('Demandes en cours', stats_data["total_en_cours_intervalle"], CLR_WARNING),
+                ("Taux d'acceptation", f"{stats_data['taux_acceptation_intervalle']}%"),
             ]))
-            story.append(table_synthese)
-            story.append(Spacer(1, 30))
+            story.append(Spacer(1, 16))
 
-            # Détail par année
-            story.append(Paragraph("DÉTAIL PAR ANNÉE", styles['Heading2']))
-            story.append(Spacer(1, 12))
-            
-            data_annees = [["ANNÉE", "TOTAL", "ACCEPTÉES", "REFUSÉES", "EN COURS", "TAUX"]]
+            # Tableau détail par année
+            story.extend(pdf_section_title("Détail par année", styles))
+            data_annees = [['Année', 'Total', 'Acceptées', 'Refusées', 'En cours', 'Taux']]
+            annee_labels = []
+            annee_totals = []
+            annee_acc = []
             for stat in stats_data["stats_par_annee"]:
                 data_annees.append([
-                    str(stat["annee"]),
-                    str(stat["total_demandes"]),
-                    str(stat["demandes_acceptees"]),
-                    str(stat["demandes_refusees"]),
-                    str(stat["demandes_en_cours"]),
-                    f"{stat['taux_acceptation']}%"
+                    str(stat["annee"]), str(stat["total_demandes"]),
+                    str(stat["demandes_acceptees"]), str(stat["demandes_refusees"]),
+                    str(stat["demandes_en_cours"]), f"{stat['taux_acceptation']}%"
                 ])
+                annee_labels.append(str(stat["annee"]))
+                annee_totals.append(stat["total_demandes"])
+                annee_acc.append(stat["demandes_acceptees"])
+            story.append(pdf_table(data_annees,
+                                   [2*cm, 2.5*cm, 2.5*cm, 2.5*cm, 2.5*cm, 2.5*cm]))
+            story.append(Spacer(1, 16))
 
-            table_annees = Table(data_annees, colWidths=[0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch])
-            table_annees.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#34495e")),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#f8f9fa")),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                ('FONTSIZE', (0, 1), (-1, -1), 7),
-            ]))
-            story.append(table_annees)
+            # Graphique barres par année
+            if annee_labels:
+                story.extend(pdf_section_title("Évolution par année", styles))
+                story.append(make_bar_chart(
+                    annee_labels, annee_totals,
+                    "Total des demandes par année"
+                ))
+                story.append(Spacer(1, 16))
+
+            # Graphique évolution mensuelle multi-année
+            if "evolution_mensuelle" in stats_data and stats_data["evolution_mensuelle"]:
+                story.extend(pdf_section_title("Évolution mensuelle", styles))
+                datasets = []
+                for e in stats_data["evolution_mensuelle"]:
+                    datasets.append((str(e["annee"]), e["demandes_par_mois"]))
+                story.append(make_line_chart(
+                    NOMS_MOIS_COURT, datasets,
+                    "Tendance mensuelle par année"
+                ))
 
         else:
-            # Code PDF pour année unique
-            title = Paragraph(f"RAPPORT DES STAGES - {annee}", title_style)
-            story.append(title)
-            story.append(Spacer(1, 20))
+            # ── Année unique ──
+            story.extend(pdf_header(
+                f"Rapport des Stages — {annee}",
+                f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}", styles))
 
-            # Date de génération
-            date_style = ParagraphStyle(
-                'DateStyle',
-                parent=styles['Normal'],
-                fontSize=10,
-                textColor=colors.gray,
-                alignment=1,
-            )
-            date_text = Paragraph(f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}", date_style)
-            story.append(date_text)
-            story.append(Spacer(1, 30))
-
-            # Section 1: Statistiques générales
-            story.append(Paragraph("STATISTIQUES GÉNÉRALES", styles['Heading2']))
-            story.append(Spacer(1, 12))
-            
-            data_general = [
-                ["MÉTRIQUE", "VALEUR"],
-                ["Année analysée", str(stats_data["annee_cible"])],
-                ["Total des demandes", str(stats_data["total_demandes"])],
-                ["Taux d'acceptation", f"{stats_data['taux_acceptation']}%"],
-                ["Délai moyen de traitement", f"{stats_data['delai_moyen']} jours"],
-                ["Durée moyenne de stage", f"{stats_data['duree_moyenne_stage']} jours"],
-                ["Stages en cours", str(stats_data["stages_en_cours"])],
-                ["Demandes en cours de traitement", str(stats_data["demandes_en_cours_traitement"])]
-            ]
-
-            table_general = Table(data_general, colWidths=[3*inch, 2*inch])
-            table_general.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#ecf0f1")),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 10),
+            # KPIs
+            story.extend(pdf_section_title("Statistiques générales", styles))
+            story.append(pdf_kpi_table([
+                ('Année analysée', stats_data["annee_cible"]),
+                ('Total des demandes', stats_data["total_demandes"]),
+                ("Taux d'acceptation", f"{stats_data['taux_acceptation']}%", CLR_SUCCESS),
+                ('Délai moyen de traitement', f"{stats_data['delai_moyen']} jours"),
+                ('Durée moyenne de stage', f"{stats_data['duree_moyenne_stage']} jours"),
+                ('Stages en cours', stats_data["stages_en_cours"]),
+                ('Demandes en cours', stats_data["demandes_en_cours_traitement"]),
             ]))
-            story.append(table_general)
-            story.append(Spacer(1, 30))
+            story.append(Spacer(1, 16))
 
-            # Section 2: Répartition par statut (avec "En cours de traitement")
-            story.append(Paragraph("RÉPARTITION PAR STATUT", styles['Heading2']))
-            story.append(Spacer(1, 12))
-            
+            # Répartition par statut — tableau + pie chart
             statuts = ["Acceptées", "Refusées", "En attente", "En cours de traitement"]
-            couleurs = ["#27ae60", "#e74c3c", "#f39c12", "#3498db"]
-            data_statuts = [["STATUT", "POURCENTAGE", "NOMBRE"]]
-            
-            for i, statut in enumerate(statuts):
-                pourcentage = stats_data["repartition_statuts"][i]
-                nombre = int(stats_data["total_demandes"] * pourcentage / 100)
-                data_statuts.append([statut, f"{pourcentage}%", str(nombre)])
+            pourcentages = stats_data["repartition_statuts"]
+            total_demandes = stats_data["total_demandes"]
+            nombres = [int(total_demandes * p / 100) for p in pourcentages]
 
-            table_statuts = Table(data_statuts, colWidths=[2*inch, 1.5*inch, 1.5*inch])
-            table_statuts.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#34495e")),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 11),
-                ('BACKGROUND', (0, 1), (0, 1), colors.HexColor("#27ae60")),
-                ('BACKGROUND', (0, 2), (0, 2), colors.HexColor("#e74c3c")),
-                ('BACKGROUND', (0, 3), (0, 3), colors.HexColor("#f39c12")),
-                ('BACKGROUND', (0, 4), (0, 4), colors.HexColor("#3498db")),
-                ('TEXTCOLOR', (0, 1), (0, 4), colors.white),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ]))
-            story.append(table_statuts)
-            story.append(Spacer(1, 30))
+            story.extend(pdf_section_title("Répartition par statut", styles))
+            data_statuts = [['Statut', 'Pourcentage', 'Nombre']]
+            for s, p, n in zip(statuts, pourcentages, nombres):
+                data_statuts.append([s, f"{p}%", str(n)])
+            story.append(pdf_table(data_statuts, [5*cm, 4*cm, 4*cm]))
+            story.append(Spacer(1, 10))
 
-            # Section 3: Demandes par mois
-            story.append(Paragraph("DEMANDES PAR MOIS", styles['Heading2']))
-            story.append(Spacer(1, 12))
-            
-            months_fr = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc"]
-            data_mois = [["MOIS", "NOMBRE DE DEMANDES"]]
-            for i, mois in enumerate(months_fr):
-                data_mois.append([mois, str(stats_data["demandes_par_mois"][i])])
+            story.append(make_pie_chart(statuts, nombres,
+                                        f"Répartition par statut — {annee}"))
+            story.append(Spacer(1, 16))
 
-            table_mois = Table(data_mois, colWidths=[1*inch, 2*inch])
-            table_mois.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#27ae60")),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#d5f4e6")),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ]))
-            story.append(table_mois)
+            # Demandes par mois — tableau + line chart
+            months_fr = NOMS_MOIS_COURT
+            demandes_mois = stats_data["demandes_par_mois"]
+
+            story.extend(pdf_section_title("Demandes par mois", styles))
+            story.append(make_line_chart(
+                months_fr, [('Demandes', demandes_mois)],
+                f"Évolution mensuelle — {annee}"
+            ))
+            story.append(Spacer(1, 8))
+
+            data_mois = [['Mois', 'Demandes']]
+            for m, v in zip(months_fr, demandes_mois):
+                data_mois.append([m, str(v)])
+            story.append(pdf_table(data_mois, [5*cm, 5*cm],
+                                   header_color=colors.HexColor('#10b981')))
+            story.append(Spacer(1, 16))
+
+            # Performance hebdomadaire — bar chart
+            jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
+            perf = stats_data["perf_hebdo"]
+
+            story.extend(pdf_section_title("Performance hebdomadaire", styles))
+            story.append(make_bar_chart(jours, perf,
+                                        "Demandes par jour de la semaine"))
+            story.append(Spacer(1, 16))
+
+            # Comparaison annuelle — bar chart
+            comp_labels = stats_data["comp_annee_labels"]
+            comp_vals = stats_data["comp_annee"]
+            if comp_labels:
+                story.extend(pdf_section_title("Comparaison annuelle", styles))
+                story.append(make_bar_chart(
+                    [str(a) for a in comp_labels], comp_vals,
+                    "Demandes acceptées par année"
+                ))
+
+        story.append(pdf_footer_note(
+            f"Rapport généré automatiquement — CEB Gestion des Stages — {datetime.now().strftime('%d/%m/%Y')}"))
 
         doc.build(story)
         buffer.seek(0)
 
         filename = f"rapport_stages_{stats_data['annee_debut']}_{stats_data['annee_fin']}.pdf" if is_intervalle else f"rapport_stages_{annee}.pdf"
-        
+
         response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
