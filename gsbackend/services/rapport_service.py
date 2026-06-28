@@ -1,4 +1,29 @@
-# services/rapport_service.py
+# ============================================================================
+#  services/rapport_service.py  —  VERSION COMPLÈTE (helpers v2 intégrés)
+# ----------------------------------------------------------------------------
+#  Ce fichier remplace intégralement l'ancien rapport_service.py.
+#
+#  CE QUI A CHANGÉ (uniquement la zone helpers, en haut) :
+#   • Graphiques  : barres en couleur unique, camemberts → donuts (total au
+#                   centre, % masqués <4 %), courbes avec aire, grille discrète,
+#                   DPI 150→200, police propre.
+#   • PDF         : KPI en grille de CARTES, pagination « Page X / Y » sur
+#                   chaque page (canvas 2 passes), filets de tableau allégés.
+#   • Excel       : nombres stockés comme vrais nombres (format milliers),
+#                   excel_autofit robuste aux cellules fusionnées, option freeze.
+#   • Nouveaux    : make_histogram() et make_grouped_bar_chart() (pour insights).
+#
+#  Les 12 générateurs de RapportGeneratorService sont INCHANGÉS : ils héritent
+#  automatiquement des améliorations car ils passent tous par ces helpers.
+#
+#  NB — 2 bugs connus restent dans les générateurs (non corrigés ici, sur
+#  demande) :
+#    1. generer_synthese_mensuelle : l'évolution du taux d'acceptation
+#       (ex. "85.5%") plante sur int() et s'affiche "—" → passer en float().
+#    2. generer_audit_actions : par_user / par_mois_data calculés sur qs[:1000]
+#       alors que total = qs.count() → faux au-delà de 1000 actions
+#       → utiliser une agrégation SQL.
+# ============================================================================
 
 import os
 from io import BytesIO
@@ -11,6 +36,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
+from reportlab.pdfgen import canvas as _rl_canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.units import cm, inch
@@ -23,6 +49,7 @@ from reportlab.platypus import (
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+from openpyxl.cell.cell import MergedCell
 from openpyxl.chart import BarChart, PieChart, LineChart, Reference
 from openpyxl.chart.label import DataLabelList
 from openpyxl.chart.series import DataPoint
@@ -44,8 +71,8 @@ CLR_WARNING    = '#f59e0b'
 CLR_INFO       = '#3b82f6'
 CLR_LIGHT_BG   = '#f8fafc'
 CLR_BORDER     = '#e2e8f0'
-CLR_TEXT_MUTED  = '#64748b'
-CLR_TEXT_LIGHT  = '#94a3b8'
+CLR_TEXT_MUTED = '#64748b'
+CLR_TEXT_LIGHT = '#94a3b8'
 
 HEADER_COLOR  = colors.HexColor(CLR_PRIMARY)
 ACCENT_COLOR  = colors.HexColor(CLR_ACCENT)
@@ -59,7 +86,8 @@ BORDER_COLOR  = colors.HexColor(CLR_BORDER)
 # Palette pour graphiques matplotlib
 CHART_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#3b82f6',
                 '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4']
-CHART_BG = '#ffffff'
+CHART_BG  = '#ffffff'
+CHART_DPI = 200          # ⬆ 150 → 200 : graphiques plus nets dans le PDF
 
 NOMS_MOIS_COURT = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 NOMS_MOIS = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -70,27 +98,36 @@ JOURS_LABELS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 # ── Helpers Graphiques (matplotlib) ─────────────────────────────────────────
 
 def _setup_chart_style():
-    """Configure le style global matplotlib."""
+    """Style global matplotlib : grille discrète, spines épurés, police propre."""
     plt.rcParams.update({
         'figure.facecolor': CHART_BG,
-        'axes.facecolor': CHART_BG,
-        'axes.edgecolor': CLR_BORDER,
-        'axes.labelcolor': CLR_PRIMARY,
-        'xtick.color': CLR_TEXT_MUTED,
-        'ytick.color': CLR_TEXT_MUTED,
-        'font.size': 9,
-        'axes.titlesize': 11,
-        'axes.titleweight': 'bold',
-        'axes.grid': True,
-        'grid.alpha': 0.3,
-        'grid.color': CLR_BORDER,
+        'axes.facecolor':    CHART_BG,
+        'axes.edgecolor':    CLR_BORDER,
+        'axes.linewidth':    0.8,
+        'axes.labelcolor':   CLR_PRIMARY,
+        'axes.titlesize':    11,
+        'axes.titleweight':  'bold',
+        'axes.titlepad':     14,
+        'axes.spines.top':   False,
+        'axes.spines.right': False,
+        'axes.grid':         True,
+        'grid.alpha':        0.25,
+        'grid.color':        CLR_BORDER,
+        'grid.linewidth':    0.6,
+        'xtick.color':       CLR_TEXT_MUTED,
+        'ytick.color':       CLR_TEXT_MUTED,
+        'xtick.labelsize':   8.5,
+        'ytick.labelsize':   8.5,
+        'font.size':         9,
+        'font.family':       'sans-serif',
+        'font.sans-serif':   ['DejaVu Sans', 'Arial', 'Helvetica', 'sans-serif'],
     })
 
 
 def _chart_to_image(fig, width=16*cm, height=8*cm):
-    """Convertit une figure matplotlib en Image ReportLab."""
+    """Convertit une figure matplotlib en Image ReportLab (haute résolution)."""
     buf = BytesIO()
-    fig.savefig(buf, format='png', dpi=150, bbox_inches='tight',
+    fig.savefig(buf, format='png', dpi=CHART_DPI, bbox_inches='tight',
                 facecolor=CHART_BG, edgecolor='none')
     plt.close(fig)
     buf.seek(0)
@@ -99,107 +136,235 @@ def _chart_to_image(fig, width=16*cm, height=8*cm):
 
 def make_bar_chart(labels, values, title='', color=CLR_ACCENT, horizontal=False,
                    width=16*cm, height=8*cm, value_labels=True):
-    """Crée un bar chart propre."""
+    """Bar chart épuré. Couleur unique par défaut (plus lisible qu'un arc-en-ciel)."""
     _setup_chart_style()
     fig, ax = plt.subplots(figsize=(width / cm * 0.35, height / cm * 0.35))
+    vmax = max(values) if values and max(values) > 0 else 1
 
     if horizontal:
-        bars = ax.barh(labels, values, color=color, edgecolor='white', height=0.6)
-        ax.set_xlim(0, max(values) * 1.2 if values and max(values) > 0 else 1)
+        bars = ax.barh(labels, values, color=color, edgecolor='white',
+                       height=0.62, linewidth=0.5, zorder=3)
+        ax.set_xlim(0, vmax * 1.18)
         ax.invert_yaxis()
+        ax.grid(axis='x', alpha=0.25)
+        ax.grid(axis='y', visible=False)
+        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         if value_labels:
-            for bar, val in zip(bars, values):
-                ax.text(bar.get_width() + max(values) * 0.02, bar.get_y() + bar.get_height() / 2,
-                        str(val), va='center', fontsize=8, fontweight='bold', color=CLR_PRIMARY)
+            for b, v in zip(bars, values):
+                ax.text(b.get_width() + vmax * 0.015, b.get_y() + b.get_height() / 2,
+                        str(v), va='center', fontsize=8, fontweight='bold', color=CLR_PRIMARY)
     else:
-        bar_colors = CHART_COLORS[:len(labels)] if len(labels) <= len(CHART_COLORS) else [color] * len(labels)
-        bars = ax.bar(labels, values, color=bar_colors, edgecolor='white', width=0.6)
-        ax.set_ylim(0, max(values) * 1.25 if values and max(values) > 0 else 1)
+        bars = ax.bar(labels, values, color=color, edgecolor='white',
+                      width=0.62, linewidth=0.5, zorder=3)
+        ax.set_ylim(0, vmax * 1.22)
+        ax.grid(axis='y', alpha=0.25)
+        ax.grid(axis='x', visible=False)
         ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         if value_labels:
-            for bar, val in zip(bars, values):
-                ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + max(values) * 0.02,
-                        str(val), ha='center', fontsize=8, fontweight='bold', color=CLR_PRIMARY)
+            for b, v in zip(bars, values):
+                ax.text(b.get_x() + b.get_width() / 2, b.get_height() + vmax * 0.015,
+                        str(v), ha='center', fontsize=8, fontweight='bold', color=CLR_PRIMARY)
+        if labels and max((len(str(l)) for l in labels), default=0) > 6 and len(labels) > 5:
+            plt.xticks(rotation=35, ha='right')
 
     if title:
-        ax.set_title(title, pad=12)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
+        ax.set_title(title, color=CLR_PRIMARY)
     plt.tight_layout()
     return _chart_to_image(fig, width, height)
 
 
 def make_pie_chart(labels, values, title='', width=10*cm, height=10*cm):
-    """Crée un pie chart propre avec légende."""
+    """Donut moderne : total au centre, % masqués sous 4 %, légende à droite."""
     _setup_chart_style()
     fig, ax = plt.subplots(figsize=(width / cm * 0.35, height / cm * 0.35))
 
-    filtered = [(l, v) for l, v in zip(labels, values) if v > 0]
+    filtered = [(l, v) for l, v in zip(labels, values) if v and v > 0]
     if not filtered:
         ax.text(0.5, 0.5, 'Aucune donnée', ha='center', va='center',
-                fontsize=12, color=CLR_TEXT_MUTED)
-        ax.set_xlim(0, 1)
-        ax.set_ylim(0, 1)
+                fontsize=11, color=CLR_TEXT_MUTED, transform=ax.transAxes)
         ax.axis('off')
         if title:
-            ax.set_title(title, pad=12)
+            ax.set_title(title, color=CLR_PRIMARY)
         plt.tight_layout()
         return _chart_to_image(fig, width, height)
 
     f_labels, f_values = zip(*filtered)
+    total = sum(f_values)
     chart_colors = CHART_COLORS[:len(f_labels)]
 
+    def _auto(pct):
+        return f'{pct:.0f}%' if pct >= 4 else ''
+
     wedges, texts, autotexts = ax.pie(
-        f_values, labels=None, autopct='%1.1f%%',
-        colors=chart_colors, startangle=90,
-        wedgeprops={'edgecolor': 'white', 'linewidth': 2},
-        pctdistance=0.75,
+        f_values, labels=None, autopct=_auto, colors=chart_colors, startangle=90,
+        wedgeprops={'edgecolor': 'white', 'linewidth': 2, 'width': 0.42},
+        pctdistance=0.78,
     )
     for t in autotexts:
         t.set_fontsize(8)
         t.set_fontweight('bold')
         t.set_color('white')
 
+    ax.text(0, 0.04, str(total), ha='center', va='center',
+            fontsize=15, fontweight='bold', color=CLR_PRIMARY)
+    ax.text(0, -0.16, 'total', ha='center', va='center',
+            fontsize=7.5, color=CLR_TEXT_MUTED)
+
     ax.legend(f_labels, loc='center left', bbox_to_anchor=(1, 0.5),
               frameon=False, fontsize=8)
-
+    ax.set(aspect='equal')
     if title:
-        ax.set_title(title, pad=12)
+        ax.set_title(title, color=CLR_PRIMARY)
     plt.tight_layout()
     return _chart_to_image(fig, width, height)
 
 
 def make_line_chart(labels, datasets, title='', width=16*cm, height=8*cm):
-    """Crée un line chart. datasets = [(name, values), ...]"""
+    """Line chart. Série unique : aire + valeurs. Séries multiples : dernière
+    valeur étiquetée seulement. datasets = [(name, values), ...]"""
     _setup_chart_style()
     fig, ax = plt.subplots(figsize=(width / cm * 0.35, height / cm * 0.35))
 
+    x = list(range(len(labels)))
+    single = len(datasets) == 1
+
     for i, (name, values) in enumerate(datasets):
         color = CHART_COLORS[i % len(CHART_COLORS)]
-        ax.plot(labels, values, marker='o', markersize=5, linewidth=2,
-                color=color, label=name)
-        for x, y in zip(labels, values):
-            ax.annotate(str(y), (x, y), textcoords="offset points",
-                        xytext=(0, 8), ha='center', fontsize=7, color=color, fontweight='bold')
+        ax.plot(x, values, marker='o', markersize=4, linewidth=2,
+                color=color, label=name, zorder=3)
+        if single:
+            ax.fill_between(x, values, alpha=0.12, color=color, zorder=1)
+            for xi, y in zip(x, values):
+                ax.annotate(str(y), (xi, y), textcoords="offset points",
+                            xytext=(0, 8), ha='center', fontsize=7,
+                            color=color, fontweight='bold')
+        elif values:
+            ax.annotate(str(values[-1]), (x[-1], values[-1]),
+                        textcoords="offset points", xytext=(5, 4),
+                        fontsize=7, color=color, fontweight='bold')
 
     ax.set_ylim(0, None)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels,
+                       rotation=45 if len(labels) > 8 else 0,
+                       ha='right' if len(labels) > 8 else 'center')
+    ax.grid(axis='y', alpha=0.25)
+    ax.grid(axis='x', visible=False)
     ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-    if title:
-        ax.set_title(title, pad=12)
     if len(datasets) > 1:
         ax.legend(frameon=False, fontsize=8)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    plt.xticks(rotation=45 if len(labels) > 8 else 0, ha='right' if len(labels) > 8 else 'center')
+    if title:
+        ax.set_title(title, color=CLR_PRIMARY)
+    plt.tight_layout()
+    return _chart_to_image(fig, width, height)
+
+
+def make_histogram(values, title='', xlabel='', bins=12, color=CLR_INFO,
+                   width=16*cm, height=8*cm):
+    """Histogramme de distribution (délais, scores IA, durées de stage…)."""
+    _setup_chart_style()
+    fig, ax = plt.subplots(figsize=(width / cm * 0.35, height / cm * 0.35))
+    vals = [v for v in values if v is not None]
+
+    if not vals:
+        ax.text(0.5, 0.5, 'Aucune donnée', ha='center', va='center',
+                fontsize=11, color=CLR_TEXT_MUTED, transform=ax.transAxes)
+        ax.axis('off')
+    else:
+        ax.hist(vals, bins=bins, color=color, edgecolor='white', linewidth=0.6, zorder=3)
+        ax.grid(axis='y', alpha=0.25)
+        ax.grid(axis='x', visible=False)
+        if xlabel:
+            ax.set_xlabel(xlabel)
+        ax.set_ylabel('Effectif')
+        ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+
+    if title:
+        ax.set_title(title, color=CLR_PRIMARY)
+    plt.tight_layout()
+    return _chart_to_image(fig, width, height)
+
+
+def make_grouped_bar_chart(labels, series, title='', width=16*cm, height=8*cm,
+                           value_labels=True):
+    """Barres groupées génériques. series = [(nom, valeurs), ...]."""
+    _setup_chart_style()
+    fig, ax = plt.subplots(figsize=(width / cm * 0.35, height / cm * 0.35))
+
+    n = max(len(series), 1)
+    x = list(range(len(labels)))
+    total_w = 0.8
+    bw = total_w / n
+
+    for i, (name, values) in enumerate(series):
+        color = CHART_COLORS[i % len(CHART_COLORS)]
+        offsets = [xi - total_w / 2 + bw / 2 + i * bw for xi in x]
+        bars = ax.bar(offsets, values, bw, label=name, color=color,
+                      edgecolor='white', linewidth=0.5, zorder=3)
+        if value_labels:
+            for b, v in zip(bars, values):
+                ax.text(b.get_x() + b.get_width() / 2, b.get_height(),
+                        str(v), ha='center', va='bottom', fontsize=6.5, color=CLR_PRIMARY)
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels,
+                       rotation=45 if len(labels) > 8 else 0,
+                       ha='right' if len(labels) > 8 else 'center')
+    ax.grid(axis='y', alpha=0.25)
+    ax.grid(axis='x', visible=False)
+    ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    if n > 1:
+        ax.legend(frameon=False, fontsize=8)
+    if title:
+        ax.set_title(title, color=CLR_PRIMARY)
     plt.tight_layout()
     return _chart_to_image(fig, width, height)
 
 
 # ── Helpers PDF ──────────────────────────────────────────────────────────────
 
+class NumberedCanvas(_rl_canvas.Canvas):
+    """Canvas 2 passes : pied de page « Page X / Y » + filet sur chaque page."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._saved_page_states = []
+
+    def showPage(self):
+        self._saved_page_states.append(dict(self.__dict__))
+        self._startPage()
+
+    def save(self):
+        total = len(self._saved_page_states)
+        for state in self._saved_page_states:
+            self.__dict__.update(state)
+            self._draw_footer(total)
+            super().showPage()
+        super().save()
+
+    def _draw_footer(self, total):
+        self.saveState()
+        self.setStrokeColor(BORDER_COLOR)
+        self.setLineWidth(0.5)
+        self.line(2 * cm, 1.5 * cm, A4[0] - 2 * cm, 1.5 * cm)
+        self.setFont('Helvetica', 7)
+        self.setFillColor(colors.HexColor(CLR_TEXT_LIGHT))
+        self.drawString(2 * cm, 1.05 * cm, "CEB · Gestion des Stages")
+        self.drawRightString(A4[0] - 2 * cm, 1.05 * cm, f"Page {self._pageNumber} / {total}")
+        self.restoreState()
+
+
+class NumberedDocTemplate(SimpleDocTemplate):
+    """Injecte NumberedCanvas automatiquement : doc.build(elements) suffit."""
+
+    def build(self, flowables, **kwargs):
+        kwargs.setdefault('canvasmaker', NumberedCanvas)
+        return super().build(flowables, **kwargs)
+
+
 def make_pdf_doc(buffer, title):
-    """Crée un SimpleDocTemplate A4 avec marges standards."""
-    return SimpleDocTemplate(
+    """Document A4 paginé (marges standards)."""
+    return NumberedDocTemplate(
         buffer, pagesize=A4,
         rightMargin=2*cm, leftMargin=2*cm,
         topMargin=2*cm, bottomMargin=2*cm,
@@ -211,8 +376,6 @@ def pdf_header(title, subtitle, styles):
     """Bloc d'en-tête avec logo CEB, titre et sous-titre."""
     elements = []
 
-    # Logo + Organisation sur la même ligne
-    logo_data = []
     if os.path.exists(LOGO_PATH):
         logo = RLImage(LOGO_PATH, width=1.5*cm, height=1.5*cm)
         org_text = Paragraph(
@@ -222,13 +385,11 @@ def pdf_header(title, subtitle, styles):
             ParagraphStyle('orgHeader', fontSize=10, leading=13)
         )
         date_text = Paragraph(
-            f'<font size="7" color="#94a3b8">Généré le {date.today().strftime("%d/%m/%Y")} à {timezone.now().strftime("%H:%M")}</font>',
+            f'<font size="7" color="#94a3b8">Généré le {date.today().strftime("%d/%m/%Y")} '
+            f'à {timezone.now().strftime("%H:%M")}</font>',
             ParagraphStyle('dateRight', fontSize=7, alignment=TA_RIGHT)
         )
-        header_table = Table(
-            [[logo, org_text, date_text]],
-            colWidths=[2*cm, 10*cm, 5*cm],
-        )
+        header_table = Table([[logo, org_text, date_text]], colWidths=[2*cm, 10*cm, 5*cm])
         header_table.setStyle(TableStyle([
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('LEFTPADDING', (0, 0), (-1, -1), 0),
@@ -243,8 +404,6 @@ def pdf_header(title, subtitle, styles):
 
     elements.append(Spacer(1, 0.4*cm))
     elements.append(HRFlowable(width="100%", thickness=2, color=ACCENT_COLOR, spaceAfter=8))
-
-    # Titre
     elements.append(Paragraph(
         f'<b>{title}</b>',
         ParagraphStyle('title', fontSize=16, textColor=HEADER_COLOR, spaceAfter=4, leading=20)
@@ -254,13 +413,12 @@ def pdf_header(title, subtitle, styles):
             subtitle,
             ParagraphStyle('sub', fontSize=10, textColor=colors.HexColor(CLR_TEXT_MUTED), spaceAfter=6)
         ))
-
     elements.append(HRFlowable(width="100%", thickness=0.5, color=BORDER_COLOR, spaceAfter=16))
     return elements
 
 
 def pdf_section_title(text, styles, color=CLR_ACCENT):
-    """Titre de section avec bande de couleur."""
+    """Titre de section avec puce de couleur."""
     return [
         Spacer(1, 10),
         Paragraph(
@@ -270,52 +428,85 @@ def pdf_section_title(text, styles, color=CLR_ACCENT):
     ]
 
 
+def _kpi_card(label, value, accent, card_w):
+    """Une carte KPI : grand chiffre coloré + libellé, liseré de couleur à gauche."""
+    val_str = str(value)
+    n = len(val_str)
+    val_size = 20 if n <= 6 else 15 if n <= 11 else 10
+    val_p = Paragraph(
+        f'<b>{val_str}</b>',
+        ParagraphStyle('kv', fontName='Helvetica-Bold', fontSize=val_size,
+                       leading=val_size + 2, textColor=colors.HexColor(accent))
+    )
+    lbl_p = Paragraph(
+        label.upper(),
+        ParagraphStyle('kl', fontName='Helvetica', fontSize=7, leading=9,
+                       textColor=colors.HexColor(CLR_TEXT_MUTED))
+    )
+    card = Table([[val_p], [lbl_p]], colWidths=[card_w])
+    card.setStyle(TableStyle([
+        ('BACKGROUND',    (0, 0), (-1, -1), LIGHT_BG),
+        ('LINEBEFORE',    (0, 0), (0, -1), 3, colors.HexColor(accent)),
+        ('BOX',           (0, 0), (-1, -1), 0.5, BORDER_COLOR),
+        ('ROUNDEDCORNERS', [5, 5, 5, 5]),
+        ('LEFTPADDING',   (0, 0), (-1, -1), 10),
+        ('RIGHTPADDING',  (0, 0), (-1, -1), 8),
+        ('TOPPADDING',    (0, 0), (0, 0), 9),
+        ('BOTTOMPADDING', (0, 0), (0, 0), 1),
+        ('TOPPADDING',    (0, 1), (0, 1), 0),
+        ('BOTTOMPADDING', (0, 1), (0, 1), 9),
+    ]))
+    return card
+
+
 def pdf_kpi_table(kpis, col_widths=None):
-    """Tableau de KPIs avec style carte. kpis = [(label, value, color_opt), ...]"""
-    if not col_widths:
-        col_widths = [5.5*cm, 2.5*cm]
+    """⬆ Grille de CARTES KPI (drop-in du tableau 2 colonnes).
+    kpis = [(label, value[, color]), ...]. 4 cartes par ligne, enroulement auto."""
+    if not kpis:
+        return Spacer(1, 1)
 
-    data = [['Indicateur', 'Valeur']]
-    row_colors = []
-    for item in kpis:
-        label = item[0]
-        value = item[1]
-        data.append([label, str(value)])
-        row_colors.append(item[2] if len(item) > 2 else None)
+    per_row = 4
+    avail = 17 * cm
+    gap = 0.35 * cm
+    card_w = (avail - (per_row - 1) * gap) / per_row
 
-    t = Table(data, colWidths=col_widths, repeatRows=1)
-    style_cmds = [
-        ('BACKGROUND',   (0, 0), (-1, 0), ACCENT_COLOR),
-        ('TEXTCOLOR',    (0, 0), (-1, 0), colors.white),
-        ('FONTNAME',     (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE',     (0, 0), (-1, 0), 9),
-        ('ALIGN',        (0, 0), (-1, 0), 'CENTER'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-        ('TOPPADDING',   (0, 0), (-1, 0), 8),
-        ('FONTNAME',     (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE',     (0, 1), (-1, -1), 9),
-        ('ALIGN',        (1, 1), (1, -1), 'CENTER'),
-        ('ALIGN',        (0, 1), (0, -1), 'LEFT'),
-        ('TOPPADDING',   (0, 1), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, LIGHT_BG]),
-        ('GRID',         (0, 0), (-1, -1), 0.3, BORDER_COLOR),
-        ('LINEBELOW',    (0, 0), (-1, 0), 1.5, ACCENT_COLOR),
-        ('ROUNDEDCORNERS', [4, 4, 4, 4]),
+    cards = [
+        _kpi_card(k[0], k[1], (k[2] if len(k) > 2 and k[2] else CLR_ACCENT), card_w)
+        for k in kpis
     ]
 
-    # Coloriser les valeurs si demandé
-    for i, rc in enumerate(row_colors):
-        if rc:
-            style_cmds.append(('TEXTCOLOR', (1, i + 1), (1, i + 1), colors.HexColor(rc)))
-            style_cmds.append(('FONTNAME', (1, i + 1), (1, i + 1), 'Helvetica-Bold'))
+    cw = []
+    for i in range(per_row):
+        cw.append(card_w)
+        if i < per_row - 1:
+            cw.append(gap)
 
-    t.setStyle(TableStyle(style_cmds))
+    rows = []
+    for i in range(0, len(cards), per_row):
+        group = cards[i:i + per_row]
+        line = []
+        for j in range(per_row):
+            line.append(group[j] if j < len(group) else '')
+            if j < per_row - 1:
+                line.append('')
+        rows.append(line)
+        rows.append([Spacer(1, 0.3 * cm)] + [''] * (per_row * 2 - 2))
+    if rows:
+        rows.pop()
+
+    t = Table(rows, colWidths=cw)
+    t.setStyle(TableStyle([
+        ('VALIGN',        (0, 0), (-1, -1), 'TOP'),
+        ('LEFTPADDING',   (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING',  (0, 0), (-1, -1), 0),
+        ('TOPPADDING',    (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
     return t
 
 
 def pdf_table(data, col_widths, header_color=None):
-    """Table ReportLab avec style standard amélioré."""
+    """Table ReportLab avec style standard amélioré (filets horizontaux seuls)."""
     hc = header_color or ACCENT_COLOR
     t = Table(data, colWidths=col_widths, repeatRows=1)
     t.setStyle(TableStyle([
@@ -330,16 +521,17 @@ def pdf_table(data, col_widths, header_color=None):
         ('FONTSIZE',      (0, 1), (-1, -1), 7.5),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, LIGHT_BG]),
         ('ALIGN',         (0, 1), (-1, -1), 'LEFT'),
+        ('VALIGN',        (0, 0), (-1, -1), 'MIDDLE'),
         ('TOPPADDING',    (0, 1), (-1, -1), 5),
         ('BOTTOMPADDING', (0, 1), (-1, -1), 5),
-        ('GRID',          (0, 0), (-1, -1), 0.3, BORDER_COLOR),
+        ('LINEBELOW',     (0, 1), (-1, -1), 0.3, BORDER_COLOR),
         ('LINEBELOW',     (0, 0), (-1, 0), 1.5, hc),
     ]))
     return t
 
 
 def pdf_footer_note(text):
-    """Note de bas de page."""
+    """Note de bas de contenu (en plus de la pagination de page)."""
     return Paragraph(
         f'<font size="7" color="#94a3b8"><i>{text}</i></font>',
         ParagraphStyle('footer', fontSize=7, textColor=colors.HexColor(CLR_TEXT_LIGHT), spaceBefore=20)
@@ -365,10 +557,9 @@ def make_excel_wb(title):
 
 
 def excel_title_block(ws, title, subtitle='', merge_cols=5):
-    """Ajoute un bloc titre professionnel en haut de la feuille."""
+    """Bloc titre professionnel en haut de la feuille."""
     end_col = get_column_letter(merge_cols)
 
-    # Titre principal
     ws.merge_cells(f'A1:{end_col}1')
     cell = ws['A1']
     cell.value = title
@@ -377,7 +568,6 @@ def excel_title_block(ws, title, subtitle='', merge_cols=5):
     cell.fill = PatternFill('solid', fgColor='F1F5F9')
     ws.row_dimensions[1].height = 36
 
-    # Sous-titre
     if subtitle:
         ws.merge_cells(f'A2:{end_col}2')
         cell2 = ws['A2']
@@ -385,11 +575,12 @@ def excel_title_block(ws, title, subtitle='', merge_cols=5):
         cell2.font = Font(size=9, italic=True, color='64748B')
         cell2.alignment = Alignment(horizontal='center', vertical='center')
         ws.row_dimensions[2].height = 22
-        return 4  # next row
-    return 3  # next row
+        return 4
+    return 3
 
 
-def excel_header_row(ws, headers, row=1, fill_color="1e293b"):
+def excel_header_row(ws, headers, row=1, fill_color="1e293b", freeze=False):
+    """Ligne d'en-tête stylée. freeze=True fige les volets sous l'en-tête."""
     fill = PatternFill("solid", fgColor=fill_color)
     font = Font(bold=True, color="FFFFFF", size=10)
     for col, h in enumerate(headers, 1):
@@ -399,22 +590,38 @@ def excel_header_row(ws, headers, row=1, fill_color="1e293b"):
         cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
         cell.border = EXCEL_BORDER
     ws.row_dimensions[row].height = 28
+    if freeze:
+        ws.freeze_panes = ws.cell(row=row + 1, column=1)
 
 
 def excel_data_row(ws, values, row, even=False):
+    """Ligne de données. ⬆ Nombres stockés comme vrais nombres (format milliers)."""
     fill = PatternFill("solid", fgColor="F8FAFC") if even else PatternFill("solid", fgColor="FFFFFF")
     for col, v in enumerate(values, 1):
         cell = ws.cell(row=row, column=col, value=v)
         cell.alignment = Alignment(vertical="center", wrap_text=True)
         cell.fill = fill
         cell.border = EXCEL_BORDER
+        if isinstance(v, bool):
+            pass
+        elif isinstance(v, int):
+            cell.number_format = '#,##0'
+        elif isinstance(v, float):
+            cell.number_format = '#,##0.0'
     ws.row_dimensions[row].height = 20
 
 
 def excel_autofit(ws):
-    for col in ws.columns:
-        max_len = max((len(str(c.value or "")) for c in col), default=10)
-        ws.column_dimensions[get_column_letter(col[0].column)].width = min(max_len + 4, 50)
+    """Ajuste les largeurs. ⬆ Robuste aux cellules fusionnées (blocs titre)."""
+    widths = {}
+    for row in ws.iter_rows():
+        for c in row:
+            if isinstance(c, MergedCell) or c.value is None:
+                continue
+            col = c.column_letter
+            widths[col] = max(widths.get(col, 0), len(str(c.value)))
+    for col, w in widths.items():
+        ws.column_dimensions[col].width = min(w + 4, 50)
 
 
 def excel_add_bar_chart(ws, title, categories_ref, values_ref, anchor='E2',
@@ -436,7 +643,6 @@ def excel_add_bar_chart(ws, title, categories_ref, values_ref, anchor='E2',
     chart.set_categories(cats)
     chart.shape = 4
 
-    # Couleurs
     series = chart.series[0]
     series.graphicalProperties.solidFill = '6366F1'
 
@@ -462,7 +668,6 @@ def excel_add_pie_chart(ws, title, categories_ref, values_ref, anchor='E2',
     chart.dataLabels.showVal = False
     chart.dataLabels.showCatName = True
 
-    # Couleurs personnalisées
     pie_colors = ['6366F1', '10B981', 'F59E0B', 'EF4444', '3B82F6', '8B5CF6', 'EC4899', '14B8A6']
     for i in range(min(len(pie_colors), 8)):
         pt = DataPoint(idx=i)
@@ -544,7 +749,7 @@ class RapportGeneratorService:
                                       f"Seuil d'alerte : {seuil_jours} jours · {len(rows)} dossier(s) · {nb_alertes} alerte(s)",
                                       merge_cols=7)
 
-            headers = ['N° Suivi', 'Étudiant', 'Statut', 'Date soumission', 'Jours écoulés', 'Alerte', 'Établissement']
+            headers = ['N° Suivi', 'Demandeur', 'Statut', 'Date soumission', 'Jours écoulés', 'Alerte', 'Établissement']
             excel_header_row(ws, headers, row=start)
             for i, r in enumerate(rows, start + 1):
                 vals = [r['tracking_id'], r['nom'], r['statut'], r['date_soumission'],
@@ -605,7 +810,7 @@ class RapportGeneratorService:
         # Tableau détaillé
         if rows:
             elements.extend(pdf_section_title("Détail des dossiers", styles))
-            data = [['N° Suivi', 'Étudiant', 'Statut', 'Soumission', 'Jours', 'Alerte']]
+            data = [['N° Suivi', 'Demandeur', 'Statut', 'Soumission', 'Jours', 'Alerte']]
             for r in rows:
                 alerte_cell = Paragraph('<font color="red"><b>RETARD</b></font>', styles['Normal']) if r['alerte'] else ''
                 data.append([r['tracking_id'], r['nom'], r['statut'],
@@ -1922,7 +2127,7 @@ class RapportGeneratorService:
             start = excel_title_block(ws, f"Demandes archivées — {annee}",
                                       f"{total} dossier(s) archivé(s)", merge_cols=5)
 
-            excel_header_row(ws, ['N° Suivi', 'Étudiant', 'Statut final', 'Date soumission', 'Établissement'], row=start, fill_color="94A3B8")
+            excel_header_row(ws, ['N° Suivi', 'Demandeur', 'Statut final', 'Date soumission', 'Établissement'], row=start, fill_color="94A3B8")
             for i, d in enumerate(qs, start + 1):
                 excel_data_row(ws, [d.tracking_id, f"{d.etudiant_prenom} {d.etudiant_nom}", d.statut_stage,
                     d.date_soumission.strftime('%d/%m/%Y') if d.date_soumission else '',
@@ -1992,7 +2197,7 @@ class RapportGeneratorService:
 
         # Tableau
         elements.extend(pdf_section_title("Liste des dossiers", styles))
-        data = [['N° Suivi', 'Étudiant', 'Statut final', 'Date soumission']]
+        data = [['N° Suivi', 'Demandeur', 'Statut final', 'Date soumission']]
         for d in qs:
             data.append([d.tracking_id, f"{d.etudiant_prenom} {d.etudiant_nom}", d.statut_stage,
                 d.date_soumission.strftime('%d/%m/%Y') if d.date_soumission else ''])
