@@ -61,10 +61,10 @@ class EmailTemplateService:
                 -ms-interpolation-mode: bicubic;
             }
 
-            h1 { font-size: 30px; font-weight: 700; color: #1F2933; margin: 0; line-height: 1.25; }
-            h2 { font-size: 22px; font-weight: 700; color: #1F2933; margin: 0; line-height: 1.3; }
-            h5 { font-size: 16px; font-weight: 700; color: #2B2F33; margin: 0; line-height: 1.45; }
-            p  { font-size: 16px; font-weight: 400; color: #6B7280; margin: 0; line-height: 1.7; }
+            h1 { font-size: 30px; font-weight: 700; color: #1F2933; margin: 0 0 14px; line-height: 1.25; }
+            h2 { font-size: 22px; font-weight: 700; color: #1F2933; margin: 0 0 12px; line-height: 1.3; }
+            h5 { font-size: 16px; font-weight: 700; color: #2B2F33; margin: 0 0 8px; line-height: 1.45; }
+            p  { font-size: 16px; font-weight: 400; color: #6B7280; margin: 0 0 18px; line-height: 1.75; }
 
             .container {
                 width: 100%;
@@ -79,10 +79,10 @@ class EmailTemplateService:
 
             .content-container {
                 background-color: #FFFFFF;
-                padding: 45px 35px;
+                padding: 52px 44px;
                 color: #6B7280;
                 font-size: 16px;
-                line-height: 1.7;
+                line-height: 1.75;
             }
 
             .greeting {
@@ -90,7 +90,7 @@ class EmailTemplateService:
                 font-size: 26px;
                 font-weight: 700;
                 line-height: 1.3;
-                margin-bottom: 18px;
+                margin-bottom: 26px;
             }
 
             /* Bouton rectangulaire charcoal */
@@ -135,8 +135,8 @@ class EmailTemplateService:
             }
 
             .content-box {
-                margin: 25px 0;
-                padding: 20px 22px;
+                margin: 30px 0;
+                padding: 26px 28px;
                 background-color: #F7F8FA;
                 border: 1px solid #ECECEE;
                 color: #6B7280;
@@ -145,11 +145,11 @@ class EmailTemplateService:
             .data-table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 20px 0;
+                margin: 28px 0;
             }
 
             .data-table td, .data-table th {
-                padding: 12px 8px;
+                padding: 14px 14px;
                 border-bottom: 1px solid #ECECEE;
                 text-align: left;
             }
@@ -163,9 +163,9 @@ class EmailTemplateService:
             .tracking-box {
                 background: #F7F8FA;
                 border: 1px solid #ECECEE;
-                padding: 24px;
+                padding: 30px;
                 text-align: center;
-                margin: 25px 0;
+                margin: 30px 0;
             }
 
             .tracking-label {
@@ -187,7 +187,7 @@ class EmailTemplateService:
             .es-footer-menu a {
                 color: #6B7280;
                 text-decoration: none;
-                font-size: 14px;
+                font-size: 15px;
             }
             .es-footer-sep {
                 border-left: 1px solid #D9DCE0;
@@ -195,7 +195,7 @@ class EmailTemplateService:
 
             @media only screen and (max-width: 600px) {
                 .container { width: 100% !important; }
-                .content-container { padding: 32px 24px !important; }
+                .content-container { padding: 40px 26px !important; }
                 .header-container { padding: 22px 24px !important; }
                 .es-px { padding-left: 24px !important; padding-right: 24px !important; }
                 h1 { font-size: 24px !important; }
@@ -390,12 +390,12 @@ class EmailContentService:
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous accusons réception de votre demande d'attestation de stage. 
             Cette dernière a été enregistrée dans notre système de traitement.
         </p>
 
-        <p style="color: #6B7280; font-size: 14px; line-height: 1.6;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75;">
             Votre demande sera instruite selon la procédure en vigueur. 
             Vous serez informé(e) de l'avancement du traitement dans les délais établis.
         </p>
@@ -426,7 +426,7 @@ class EmailContentService:
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Une nouvelle demande d'attestation de stage nécessite votre attention.
             Les éléments de la demande ont été systématisés dans notre application de gestion.
         </p>
@@ -434,7 +434,7 @@ class EmailContentService:
     
     <!-- Avertissement -->
     <div style="background-color: #F7F8FA; border-left: 4px solid #9AA1A9; padding: 20px; margin: 25px 0; border-radius: 0;">
-        <p style="color: #6B7280; font-size: 14px; margin: 0;">
+        <p style="color: #6B7280; font-size: 15px; margin: 0;">
             ⚠️ <strong>Instruction requise :</strong> Veuillez procéder à l'examen de ce dossier.
         </p>
     </div>
@@ -451,7 +451,7 @@ class EmailContentService:
     
     <!-- Note -->
     <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
-        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.7;">
             Veuillez vous connecter à la plateforme administrative pour accéder au dossier complet.
         </p>
     </div>
@@ -476,12 +476,12 @@ class EmailContentService:
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous avons le plaisir de vous informer que votre attestation de stage a été signée 
             et est désormais disponible en téléchargement.
         </p>
         
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Votre attestation signée est jointe à cet email au format PDF. 
             Conservez précieusement ce document qui pourra vous être demandé pour vos démarches administratives.
         </p>
@@ -489,7 +489,7 @@ class EmailContentService:
 
     <!-- Pièce jointe -->
     <div style="background-color: #F7F8FA; border-left: 4px solid #2B2F33; padding: 15px; margin: 20px 0; border-radius: 0;">
-        <p style="color: #1F2933; font-size: 14px; margin: 0;">
+        <p style="color: #1F2933; font-size: 15px; margin: 0;">
             📎 <strong>Pièce jointe :</strong> Votre attestation de stage signée est jointe à cet email.
         </p>
     </div>
@@ -500,7 +500,7 @@ class EmailContentService:
             Conseils importants
         </h3>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 8px;">Conservez précieusement ce document</li>
             <li style="margin-bottom: 8px;">Faites des copies pour vos dossiers personnels</li>
             <li style="margin-bottom: 8px;">L'attestation originale peut vous être demandée pour vos démarches</li>
@@ -618,7 +618,7 @@ Le Service des Stages
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous vous confirmons la prise en compte de votre candidature 
             auprès de la Communauté Électrique du Bénin.
         </p>
@@ -640,7 +640,7 @@ Le Service des Stages
             Instruction administrative
         </h3>
         
-        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+        <p style="color: #666; font-size: 15px; line-height: 1.75;">
             Votre dossier sera examiné conformément à notre procédure de sélection. 
             Vous serez informé(e) de l'avancement du traitement dans les délais réglementaires.
         </p>
@@ -697,7 +697,7 @@ Site web: www.cebnet.org
         if convention_pdf_path:
             piece_jointe_mention = """
     <div style="background-color: #F7F8FA; border-left: 4px solid #2B2F33; padding: 15px; margin: 20px 0; border-radius: 0;">
-        <p style="color: #1F2933; font-size: 14px; margin: 0;">
+        <p style="color: #1F2933; font-size: 15px; margin: 0;">
             📎 <strong>Pièce jointe :</strong> Votre convention de stage signée est jointe à cet email.
         </p>
     </div>
@@ -707,7 +707,7 @@ Site web: www.cebnet.org
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous avons le plaisir de vous informer que votre candidature pour un stage 
             au sein de la Communauté Électrique du Bénin a été retenue.
         </p>
@@ -731,7 +731,7 @@ Site web: www.cebnet.org
             Information relative au stage
         </h3>
         
-        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+        <p style="color: #666; font-size: 15px; line-height: 1.75;">
             Vous trouverez ci-joint votre convention de stage signée. 
             Veuillez la conserver précieusement pour vos démarches administratives.
         </p>
@@ -762,7 +762,7 @@ Site web: www.cebnet.org
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous vous informons que votre demande de stage a été prise en compte 
             et est désormais en cours d'examen par nos services compétents.
         </p>
@@ -784,7 +784,7 @@ Site web: www.cebnet.org
             Information sur le traitement
         </h3>
         
-        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+        <p style="color: #666; font-size: 15px; line-height: 1.75;">
             Votre dossier suivra la procédure d'instruction établie. 
             Vous serez informé(e) des évolutions dans les délais impartis.
         </p>
@@ -816,7 +816,7 @@ Site web: www.cebnet.org
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Dans le cadre de l'instruction de votre dossier, il nous est nécessaire 
             de solliciter des informations ou documents supplémentaires.
         </p>
@@ -849,7 +849,7 @@ Site web: www.cebnet.org
             Délai de réponse
         </h3>
         
-        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.6;">
+        <p style="color: #666; font-size: 15px; margin: 0; line-height: 1.75;">
             Nous vous prions de bien vouloir nous transmettre ces éléments dans les meilleurs délais 
             afin de ne pas interrompre le traitement de votre dossier.
         </p>
@@ -857,7 +857,7 @@ Site web: www.cebnet.org
 
     <!-- Lien de suivi -->
     <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
-        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.6;">
+        <p style="color: #666; font-size: 15px; margin: 0; line-height: 1.75;">
             Vous pouvez accéder à votre espace de suivi à l'adresse suivante :<br>
             <a href="{suivi_url}" style="color: #1F2933; text-decoration: none;">
                 {suivi_url}
@@ -885,7 +885,7 @@ Site web: www.cebnet.org
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous vous remercions de l'intérêt que vous avez porté à la Communauté Électrique du Bénin.
         </p>
     </div>
@@ -896,12 +896,12 @@ Site web: www.cebnet.org
             Décision
         </h3>
         
-        <p style="color: #6B7280; font-size: 14px; margin-bottom: 15px; line-height: 1.6;">
+        <p style="color: #6B7280; font-size: 15px; margin-bottom: 15px; line-height: 1.75;">
             Après un examen attentif de votre dossier, nous regrettons de vous informer que votre candidature n'a pas été retenue pour cette session.
         </p>
         
         <div style="background-color: #F7F8FA; padding: 15px; border-radius: 0; margin: 15px 0;">
-            <p style="color: #1F2933; font-size: 14px; margin: 0; line-height: 1.6;">
+            <p style="color: #1F2933; font-size: 15px; margin: 0; line-height: 1.75;">
                 <strong>Motif :</strong> {demande.raison_refus or "Le nombre de places disponibles est limité."}
             </p>
         </div>

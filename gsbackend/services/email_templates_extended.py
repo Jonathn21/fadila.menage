@@ -105,7 +105,7 @@ class SecurityEmailTemplates:
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Un code de vérification à deux facteurs vous a été envoyé pour sécuriser votre accès.
         </p>
     </div>
@@ -126,7 +126,7 @@ class SecurityEmailTemplates:
             Informations importantes
         </h3>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 10px;">Ce code expire dans 5 minutes</li>
             <li style="margin-bottom: 10px;">Ne partagez jamais ce code avec qui que ce soit</li>
             <li style="margin-bottom: 10px;">5 tentatives maximum autorisées</li>
@@ -136,7 +136,7 @@ class SecurityEmailTemplates:
     
     <!-- Pied de page -->
     <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
-        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.7;">
             Si vous n'avez pas demandé ce code, veuillez sécuriser votre compte.<br>
             Cet email a été envoyé automatiquement. Veuillez ne pas y répondre.
         </p>
@@ -185,7 +185,7 @@ Email: securite@cebnet.org"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Une nouvelle connexion à votre compte a été détectée depuis un appareil non reconnu.
         </p>
     </div>
@@ -196,7 +196,7 @@ Email: securite@cebnet.org"""
             Détails de la connexion
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 180px; color: #666; font-weight: 600;">Date et heure :</td>
                 <td style="padding: 10px 0; color: #333;">{user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'N/A'}</td>
@@ -222,7 +222,7 @@ Email: securite@cebnet.org"""
             Si ce n'était pas vous
         </h3>
         
-        <ol style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ol style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 10px;">Changez immédiatement votre mot de passe</li>
             <li style="margin-bottom: 10px;">Contactez l'administrateur système</li>
             <li>Activez l'authentification à deux facteurs pour plus de sécurité</li>
@@ -231,10 +231,10 @@ Email: securite@cebnet.org"""
     
     <!-- Recommandation -->
     <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
-        <p style="color: #1F2933; font-size: 14px; margin: 0; font-weight: bold;">
+        <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Recommandation de sécurité
         </p>
-        <p style="color: #666; font-size: 14px; margin: 10px 0 0 0; line-height: 1.5;">
+        <p style="color: #666; font-size: 15px; margin: 10px 0 0 0; line-height: 1.7;">
             Nous recommandons de maintenir l'authentification à deux facteurs activée pour une meilleure protection.
         </p>
     </div>
@@ -286,15 +286,15 @@ Téléphone: +229 21 30 05 06"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Votre mot de passe a été modifié avec succès.
         </p>
         
         <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 15px;">
-            <p style="margin: 0; color: #1F2933; font-size: 14px; font-weight: bold; margin-bottom: 10px;">
+            <p style="margin: 0; color: #1F2933; font-size: 15px; font-weight: bold; margin-bottom: 10px;">
                 Détails de l'opération
             </p>
-            <table style="width: 100%; font-size: 14px;">
+            <table style="width: 100%; font-size: 15px;">
                 <tr>
                     <td style="padding: 8px 0; width: 160px; color: #666; font-weight: 600;">Date et heure :</td>
                     <td style="padding: 8px 0; color: #333;">{user.last_login.strftime('%d/%m/%Y à %H:%M') if user.last_login else 'Maintenant'}</td>
@@ -313,11 +313,11 @@ Téléphone: +229 21 30 05 06"""
             Important : vérification de sécurité
         </h3>
         
-        <p style="color: #666; font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
+        <p style="color: #666; font-size: 15px; margin-bottom: 15px; line-height: 1.7;">
             Si vous n'avez pas initié ce changement de mot de passe, veuillez :
         </p>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 8px;">Contacter immédiatement l'administrateur système</li>
             <li style="margin-bottom: 8px;">Réinitialiser votre mot de passe via la procédure de récupération</li>
             <li>Activer l'authentification à deux facteurs pour renforcer la sécurité</li>
@@ -329,7 +329,7 @@ Téléphone: +229 21 30 05 06"""
         <h4 style="color: #1F2933; margin: 0 0 10px 0; font-size: 15px; font-weight: bold;">
             Recommandations de sécurité
         </h4>
-        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.5;">
+        <p style="color: #666; font-size: 15px; margin: 0; line-height: 1.7;">
             Pour protéger votre compte, utilisez un mot de passe unique et complexe, 
             différent de ceux utilisés sur d'autres services. L'authentification à deux 
             facteurs est fortement recommandée pour une sécurité optimale.
@@ -388,7 +388,7 @@ Email: securite@cebnet.org"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Votre compte a été créé avec succès. Vous avez maintenant accès à la plateforme de gestion des stages.
         </p>
     </div>
@@ -399,7 +399,7 @@ Email: securite@cebnet.org"""
             Vos identifiants de connexion
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 180px; color: #666; font-weight: 600;">Adresse email :</td>
                 <td style="padding: 10px 0; color: #333;">{user.email}</td>
@@ -425,7 +425,7 @@ Email: securite@cebnet.org"""
             Consignes de sécurité importantes
         </h3>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 10px;">Changez votre mot de passe dès votre première connexion</li>
             <li style="margin-bottom: 10px;">Utilisez un mot de passe fort et unique</li>
             <li style="margin-bottom: 10px;">Ne partagez jamais vos identifiants</li>
@@ -438,7 +438,7 @@ Email: securite@cebnet.org"""
         <p style="color: #1F2933; font-size: 15px; margin: 0 0 10px 0; font-weight: bold;">
             Accédez à la plateforme
         </p>
-        <p style="color: #666; font-size: 14px; margin: 0;">
+        <p style="color: #666; font-size: 15px; margin: 0;">
             <a href="stageemploi@cebnet.org" style="color: #1F2933; text-decoration: underline;">
                 stageemploi@cebnet.org/
             </a>
@@ -492,7 +492,7 @@ Téléphone: +229 21 30 05 06"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Vous avez demandé la réinitialisation de votre mot de passe GES STAGE.
         </p>
     </div>
@@ -502,7 +502,7 @@ Téléphone: +229 21 30 05 06"""
         <p style="color: #1F2933; font-size: 15px; margin: 0 0 15px 0; font-weight: bold;">
             Lien de réinitialisation
         </p>
-        <p style="color: #666; font-size: 14px; margin: 0; word-break: break-all;">
+        <p style="color: #666; font-size: 15px; margin: 0; word-break: break-all;">
             <a href="{reset_link}" style="color: #1F2933; text-decoration: underline;">
                 {reset_link}
             </a>
@@ -515,7 +515,7 @@ Téléphone: +229 21 30 05 06"""
             Informations importantes
         </h3>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 10px;">Ce lien est valable pendant 24 heures</li>
             <li style="margin-bottom: 10px;">Le lien ne peut être utilisé qu'une seule fois</li>
             <li>Si vous n'avez pas fait cette demande, ignorez cet email</li>
@@ -524,7 +524,7 @@ Téléphone: +229 21 30 05 06"""
     
     <!-- Note de sécurité -->
     <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
-        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.7;">
             Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement le support.<br>
             Cet email a été envoyé automatiquement. Veuillez ne pas y répondre.
         </p>
@@ -579,7 +579,7 @@ class StageEmailTemplates:
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Votre stage au sein de la CEB a été renouvelé pour une nouvelle période.
         </p>
     </div>
@@ -590,7 +590,7 @@ class StageEmailTemplates:
             Détails de votre nouveau stage
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
                 <td style="padding: 10px 0; color: #333;">{nouveau_stage.nom} {nouveau_stage.prenom}</td>
@@ -666,7 +666,7 @@ Email: stages@cebnet.org"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Votre stage a pris fin de manière anticipée. Nous vous remercions pour votre contribution.
         </p>
     </div>
@@ -677,7 +677,7 @@ Email: stages@cebnet.org"""
             Détails de votre stage
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
                 <td style="padding: 10px 0; color: #333;">{stagiaire.prenom} {stagiaire.nom}</td>
@@ -703,7 +703,7 @@ Email: stages@cebnet.org"""
             Prochaines étapes
         </h3>
         
-        <ol style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ol style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 10px;">Restituer tout équipement emprunté</li>
             <li style="margin-bottom: 10px;">Soumettre votre rapport de stage</li>
             <li style="margin-bottom: 10px;">Contacter le service des stages pour attestation</li>
@@ -764,7 +764,7 @@ Email: stages@cebnet.org"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Les dates de votre stage ont été modifiées.
         </p>
     </div>
@@ -775,7 +775,7 @@ Email: stages@cebnet.org"""
             Comparaison des dates
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 180px; color: #666; font-weight: 600;">Ancienne date de début :</td>
                 <td style="padding: 10px 0; color: #333;">{ancienne_debut.strftime('%d/%m/%Y') if ancienne_debut else 'N/A'}</td>
@@ -797,7 +797,7 @@ Email: stages@cebnet.org"""
     
     <!-- Note -->
     <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
-        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.7;">
             Pour toute question, contactez votre responsable ou le service des stages.
         </p>
     </div>
@@ -844,7 +844,7 @@ Communauté Électrique du Bénin"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous sommes ravis de vous accueillir au sein de la Communauté Électrique du Bénin.
         </p>
     </div>
@@ -855,7 +855,7 @@ Communauté Électrique du Bénin"""
             Informations de votre stage
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
                 <td style="padding: 10px 0; color: #333;">{stagiaire.prenom} {stagiaire.nom}</td>
@@ -885,7 +885,7 @@ Communauté Électrique du Bénin"""
             Informations pratiques
         </h4>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 8px;">Présentez-vous à l'accueil avec convention de stage</li>
             <li style="margin-bottom: 8px;">Horaires : 7h00 - 16h00</li>
             <li>Pause déjeuner : 12h00 - 13h00</li>
@@ -952,7 +952,7 @@ class PreferenceEmailTemplates:
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Vous êtes maintenant abonné(e) aux emails des nouveautés de la plateforme Stages CEB.
         </p>
     </div>
@@ -963,7 +963,7 @@ class PreferenceEmailTemplates:
             Ce que vous recevrez
         </h3>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 10px;">Nouvelles fonctionnalités de la plateforme</li>
             <li style="margin-bottom: 10px;">Mises à jour importantes</li>
             <li style="margin-bottom: 10px;">Conseils d'utilisation</li>
@@ -976,7 +976,7 @@ class PreferenceEmailTemplates:
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Gestion de vos préférences
         </p>
-        <p style="color: #666; font-size: 14px; margin: 10px 0 0 0; line-height: 1.5;">
+        <p style="color: #666; font-size: 15px; margin: 10px 0 0 0; line-height: 1.7;">
             Vous pouvez modifier vos préférences dans la section "Paramètres" de votre profil.
         </p>
     </div>
@@ -1027,7 +1027,7 @@ class DemandeEmailTemplates:
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Une nouvelle candidature a été soumise et nécessite votre attention.
         </p>
     </div>
@@ -1038,7 +1038,7 @@ class DemandeEmailTemplates:
             Informations du candidat
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Nom complet :</td>
                 <td style="padding: 10px 0; color: #333;">{demande.etudiant_nom} {demande.etudiant_prenom}</td>
@@ -1087,7 +1087,7 @@ class DemandeEmailTemplates:
     
     <!-- Note -->
     <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
-        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.7;">
             Cette demande est en attente de traitement.
         </p>
     </div>
@@ -1145,7 +1145,7 @@ Communauté Électrique du Bénin"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous vous confirmons la prise en compte de votre candidature 
             auprès de la Communauté Électrique du Bénin.
         </p>
@@ -1167,7 +1167,7 @@ Communauté Électrique du Bénin"""
             Instruction administrative
         </h3>
         
-        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+        <p style="color: #666; font-size: 15px; line-height: 1.75;">
             Votre dossier sera examiné conformément à notre procédure de sélection. 
             Vous serez informé(e) de l'avancement du traitement dans les délais réglementaires.
         </p>
@@ -1224,7 +1224,7 @@ Téléphone: +229 21 30 05 06"""
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous vous remercions de l'intérêt que vous avez porté à la Communauté Électrique du Bénin.
         </p>
     </div>
@@ -1235,12 +1235,12 @@ Téléphone: +229 21 30 05 06"""
             Décision
         </h3>
         
-        <p style="color: #6B7280; font-size: 14px; margin-bottom: 15px; line-height: 1.6;">
+        <p style="color: #6B7280; font-size: 15px; margin-bottom: 15px; line-height: 1.75;">
             Après un examen attentif de votre dossier, nous regrettons de vous informer que votre candidature n'a pas été retenue pour cette session.
         </p>
         
         <div style="background-color: #F7F8FA; padding: 15px; border-radius: 0; margin: 15px 0;">
-            <p style="color: #1F2933; font-size: 14px; margin: 0; line-height: 1.6;">
+            <p style="color: #1F2933; font-size: 15px; margin: 0; line-height: 1.75;">
                 <strong>Motif :</strong> {raison}
             </p>
         </div>
@@ -1252,7 +1252,7 @@ Téléphone: +229 21 30 05 06"""
             Informations de votre candidature
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Nom complet :</td>
                 <td style="padding: 10px 0; color: #333;">{demande.etudiant_nom} {demande.etudiant_prenom}</td>
@@ -1334,7 +1334,7 @@ class AttestationEmailTemplates:
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous avons le plaisir de vous informer que votre demande d'attestation de stage 
             a été approuvée par nos services.
         </p>
@@ -1346,7 +1346,7 @@ class AttestationEmailTemplates:
             Détails de votre stage
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
                 <td style="padding: 10px 0; color: #333;">{stagiaire.nom} {stagiaire.prenom}</td>
@@ -1376,7 +1376,7 @@ class AttestationEmailTemplates:
             Prochaines étapes
         </h3>
         
-        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.6;">
+        <p style="color: #666; font-size: 15px; margin: 0; line-height: 1.75;">
             Votre attestation est en cours de préparation par le service des stages. 
             Vous recevrez une nouvelle notification dès qu'elle sera disponible pour retrait.
         </p>
@@ -1388,7 +1388,7 @@ class AttestationEmailTemplates:
             Délai de traitement
         </h4>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 8px;">La préparation de votre attestation prendra quelques jours ouvrables</li>
             <li style="margin-bottom: 8px;">Vous serez informé(e) par email dès qu'elle sera prête</li>
             <li>Aucune action n'est requise de votre part pour le moment</li>
@@ -1425,7 +1425,7 @@ class AttestationEmailTemplates:
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous avons examiné votre demande d'attestation de stage et regrettons de vous informer 
             qu'elle n'a pas été approuvée.
         </p>
@@ -1437,7 +1437,7 @@ class AttestationEmailTemplates:
             Motif du refus
         </h3>
         
-        <p style="color: #1F2933; font-size: 14px; margin: 0; line-height: 1.6;">
+        <p style="color: #1F2933; font-size: 15px; margin: 0; line-height: 1.75;">
             {demande_attestation.motif_refus or "Raison non spécifiée"}
         </p>
     </div>
@@ -1448,7 +1448,7 @@ class AttestationEmailTemplates:
             Détails de la demande
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
                 <td style="padding: 10px 0; color: #333;">{stagiaire.nom} {stagiaire.prenom}</td>
@@ -1474,7 +1474,7 @@ class AttestationEmailTemplates:
             Prochaines étapes
         </h3>
         
-        <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.6;">
+        <p style="color: #666; font-size: 15px; margin: 0; line-height: 1.75;">
             Vous pouvez soumettre une nouvelle demande d'attestation après avoir pris en compte 
             les remarques mentionnées ci-dessus.
         </p>
@@ -1482,7 +1482,7 @@ class AttestationEmailTemplates:
     
     <!-- Note -->
     <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 30px;">
-        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.5;">
+        <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.7;">
             Nous restons à votre disposition pour toute information complémentaire.
         </p>
     </div>
@@ -1525,7 +1525,7 @@ class AttestationEmailTemplates:
     
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Bonne nouvelle ! Votre attestation de stage a été générée et est désormais 
             disponible pour retrait.
         </p>
@@ -1537,7 +1537,7 @@ class AttestationEmailTemplates:
             Informations de votre attestation
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
                 <td style="padding: 10px 0; color: #333;">{stagiaire.nom} {stagiaire.prenom}</td>
@@ -1565,7 +1565,7 @@ class AttestationEmailTemplates:
             Modalités de retrait
         </h3>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 10px;">Présentez-vous au service des stages de la CEB</li>
             <li style="margin-bottom: 10px;">Munissez-vous d'une pièce d'identité valide</li>
             <li style="margin-bottom: 10px;">Horaires : Lundi à Vendredi, 7h00 - 16h00</li>
@@ -1601,12 +1601,12 @@ class AttestationEmailTemplates:
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
     <!-- Message principal -->
     <div style="margin-bottom: 30px;">
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Nous avons le plaisir de vous informer que votre attestation de stage a été signée 
             et est désormais disponible en téléchargement.
         </p>
         
-        <p style="color: #6B7280; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
             Votre attestation signée est jointe à cet email au format PDF. 
             Conservez précieusement ce document qui pourra vous être demandé pour vos démarches administratives.
         </p>
@@ -1614,7 +1614,7 @@ class AttestationEmailTemplates:
 
     <!-- Pièce jointe -->
     <div style="background-color: #F7F8FA; border-left: 4px solid #2B2F33; padding: 15px; margin: 20px 0; border-radius: 0;">
-        <p style="color: #1F2933; font-size: 14px; margin: 0;">
+        <p style="color: #1F2933; font-size: 15px; margin: 0;">
             📎 <strong>Pièce jointe :</strong> Votre attestation de stage signée est jointe à cet email.
         </p>
     </div>
@@ -1625,7 +1625,7 @@ class AttestationEmailTemplates:
             Détails de votre attestation
         </h3>
         
-        <table style="width: 100%; font-size: 14px;">
+        <table style="width: 100%; font-size: 15px;">
             <tr>
                 <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
                 <td style="padding: 10px 0; color: #333;">{stagiaire.nom} {stagiaire.prenom}</td>
@@ -1655,7 +1655,7 @@ class AttestationEmailTemplates:
             Conseils importants
         </h3>
         
-        <ul style="color: #666; font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 0;">
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 8px;">Conservez précieusement ce document</li>
             <li style="margin-bottom: 8px;">Faites des copies pour vos dossiers personnels</li>
             <li style="margin-bottom: 8px;">L'attestation originale peut vous être demandée pour vos démarches</li>
