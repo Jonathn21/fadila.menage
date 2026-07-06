@@ -872,37 +872,22 @@ Téléphone: +229 21 30 05 06"""
     </div>
 
     <!-- Récapitulatif du stage -->
-    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 30px;">
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Récapitulatif de votre stage
         </h3>
 
-        <table style="width: 100%; font-size: 15px;">
-            <tr>
-                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
-                <td style="padding: 10px 0; color: #333;">{stagiaire.prenom} {stagiaire.nom}</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px 0; color: #666; font-weight: 600;">Service :</td>
-                <td style="padding: 10px 0; color: #333;">{stagiaire.service or 'N/A'}</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px 0; color: #666; font-weight: 600;">Direction :</td>
-                <td style="padding: 10px 0; color: #333;">{stagiaire.direction or 'N/A'}</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px 0; color: #666; font-weight: 600;">Période :</td>
-                <td style="padding: 10px 0; color: #333;">Du {stagiaire.date_debut.strftime('%d/%m/%Y')} au {stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px 0; color: #666; font-weight: 600;">Durée :</td>
-                <td style="padding: 10px 0; color: #333;">{duree} jours</td>
-            </tr>
-        </table>
+        <p style="color: #444; font-size: 15px; line-height: 1.8; margin: 0;">
+            Vous avez effectué votre stage au sein du service <strong>{stagiaire.service or 'N/A'}</strong>
+            de la direction <strong>{stagiaire.direction or 'N/A'}</strong>, du
+            <strong>{stagiaire.date_debut.strftime('%d/%m/%Y')}</strong> au
+            <strong>{stagiaire.date_fin.strftime('%d/%m/%Y')}</strong>, soit une durée de
+            <strong>{duree} jours</strong>.
+        </p>
     </div>
 
     <!-- Démarches à effectuer -->
-    <div style="background-color: #F7F8FA; border: 1px solid #ECECEE; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+    <div style="background-color: #F7F8FA; border: 1px solid #ECECEE; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Démarches de fin de stage
         </h3>
@@ -916,7 +901,7 @@ Téléphone: +229 21 30 05 06"""
     </div>
 
     <!-- Message de remerciement -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 8px; margin-top: 20px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Merci pour votre contribution et nous vous souhaitons plein succès dans la suite de votre parcours
         </p>
@@ -983,7 +968,7 @@ class AlerteEmailTemplates:
 
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
-    <div style="background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+    <div style="background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 16px; margin-bottom: 25px;">
         <p style="color: #DC2626; font-size: 15px; font-weight: 600; margin: 0;">
             {nb} demande(s) en attente depuis plus de {seuil_jours} jours
         </p>
@@ -1002,7 +987,7 @@ class AlerteEmailTemplates:
         </tbody>
     </table>
 
-    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 8px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Veuillez traiter ces demandes dans les plus brefs délais
         </p>
@@ -1045,7 +1030,7 @@ Communauté Électrique du Bénin"""
 
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
-    <div style="background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+    <div style="background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 16px; margin-bottom: 25px;">
         <p style="color: #D97706; font-size: 15px; font-weight: 600; margin: 0;">
             {nb} demande(s) d'attestation en attente depuis plus de {seuil_jours} jours
         </p>
@@ -1101,7 +1086,7 @@ Communauté Électrique du Bénin"""
 
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
-    <div style="background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+    <div style="background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 16px; margin-bottom: 25px;">
         <p style="color: #2563EB; font-size: 15px; font-weight: 600; margin: 0;">
             {nb} stagiaire(s) atteignent la mi-parcours de leur stage
         </p>
@@ -1126,7 +1111,7 @@ Communauté Électrique du Bénin"""
         </tbody>
     </table>
 
-    <div style="background-color: #F7F8FA; border-radius: 0; padding: 18px; margin-bottom: 20px;">
+    <div style="background-color: #F7F8FA; border-radius: 8px; padding: 18px; margin-bottom: 20px;">
         <h4 style="color: #1F2933; margin: 0 0 10px 0; font-size: 15px; font-weight: bold;">Points à vérifier</h4>
         <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
             <li style="margin-bottom: 8px;">Progression des objectifs de stage</li>
@@ -1180,7 +1165,7 @@ Communauté Électrique du Bénin"""
 
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
-    <div style="background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+    <div style="background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 16px; margin-bottom: 25px;">
         <p style="color: #2563EB; font-size: 15px; font-weight: 600; margin: 0;">
             {nb} stagiaire(s) arrivent le {date_cible.strftime('%d/%m/%Y')}
         </p>
@@ -1238,7 +1223,7 @@ Communauté Électrique du Bénin"""
 
         content = f"""
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
-    <div style="background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+    <div style="background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 16px; margin-bottom: 25px;">
         <p style="color: #D97706; font-size: 15px; font-weight: 600; margin: 0;">
             {nb} stage(s) se terminent dans les prochains jours
         </p>
@@ -1291,62 +1276,38 @@ Communauté Électrique du Bénin"""
     </div>
 
     <!-- Statistiques clés -->
-    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Stagiaires
         </h3>
-        <table style="width: 100%; font-size: 15px;">
-            <tr>
-                <td style="padding: 8px 0; color: #666;">Stagiaires actifs :</td>
-                <td style="padding: 8px 0; color: #333; font-weight: 600; text-align: right;">{stats['stagiaires_actifs']}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0; color: #666;">Nouveaux cette semaine :</td>
-                <td style="padding: 8px 0; color: #333; font-weight: 600; text-align: right;">{stats['nouveaux_stages']}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0; color: #666;">Stages terminés cette semaine :</td>
-                <td style="padding: 8px 0; color: #333; font-weight: 600; text-align: right;">{stats['stages_termines']}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0; color: #666;">Fins prévues cette semaine :</td>
-                <td style="padding: 8px 0; color: #DC2626; font-weight: 600; text-align: right;">{stats['fins_prevues']}</td>
-            </tr>
-        </table>
+        <p style="color: #444; font-size: 15px; line-height: 1.8; margin: 0;">
+            La plateforme compte actuellement <strong>{stats['stagiaires_actifs']} stagiaire(s) actif(s)</strong>.
+            Cette semaine, <strong>{stats['nouveaux_stages']}</strong> nouveau(x) stage(s) ont débuté et
+            <strong>{stats['stages_termines']}</strong> se sont achevés ;
+            <strong>{stats['fins_prevues']}</strong> fin(s) de stage sont prévues dans les prochains jours.
+        </p>
     </div>
 
     <!-- Demandes -->
-    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Demandes de stage
         </h3>
-        <table style="width: 100%; font-size: 15px;">
-            <tr>
-                <td style="padding: 8px 0; color: #666;">Nouvelles demandes :</td>
-                <td style="padding: 8px 0; color: #333; font-weight: 600; text-align: right;">{stats['nouvelles_demandes']}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0; color: #666;">En attente de traitement :</td>
-                <td style="padding: 8px 0; color: #D97706; font-weight: 600; text-align: right;">{stats['demandes_en_attente']}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0; color: #666;">En retard (&gt; 7 jours) :</td>
-                <td style="padding: 8px 0; color: #DC2626; font-weight: 600; text-align: right;">{stats['demandes_en_retard']}</td>
-            </tr>
-        </table>
+        <p style="color: #444; font-size: 15px; line-height: 1.8; margin: 0;">
+            <strong>{stats['nouvelles_demandes']}</strong> nouvelle(s) demande(s) de stage ont été reçues cette semaine.
+            <strong>{stats['demandes_en_attente']}</strong> demande(s) restent en attente de traitement,
+            dont <strong>{stats['demandes_en_retard']}</strong> en retard de plus de 7 jours.
+        </p>
     </div>
 
     <!-- Attestations -->
-    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Attestations
         </h3>
-        <table style="width: 100%; font-size: 15px;">
-            <tr>
-                <td style="padding: 8px 0; color: #666;">Attestations en attente :</td>
-                <td style="padding: 8px 0; color: #D97706; font-weight: 600; text-align: right;">{stats['attestations_en_attente']}</td>
-            </tr>
-        </table>
+        <p style="color: #444; font-size: 15px; line-height: 1.8; margin: 0;">
+            <strong>{stats['attestations_en_attente']}</strong> demande(s) d'attestation attendent d'être traitées.
+        </p>
     </div>
 </div>
         """
