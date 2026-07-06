@@ -52,7 +52,8 @@ export const useWebSocket = (onMessage: (data: WebSocketMessage) => void) => {
         return;
       }
 
-      const wsUrl = `ws://localhost:8000/ws/notifications/?token=${encodeURIComponent(token)}`;
+      const wsBase = (import.meta.env.VITE_WS_URL || "ws://localhost:8000/ws/").replace(/\/?$/, "/");
+      const wsUrl = `${wsBase}notifications/?token=${encodeURIComponent(token)}`;
       
       console.log(`🔗 Connexion WebSocket (tentative ${reconnectAttempts + 1})...`);
       

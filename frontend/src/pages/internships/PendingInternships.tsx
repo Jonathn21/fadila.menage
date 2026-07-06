@@ -651,13 +651,13 @@ const PendingInternships: React.FC = () => {
                 </div>
                 
                 {/* Version Desktop - Tableau avec scroll horizontal */}
-                <div className="hidden md:block border rounded-lg overflow-hidden">
+                <div className="hidden md:block rounded-xl border border-border/80 overflow-hidden shadow-card bg-card">
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[800px]">
                       <thead>
-                        <tr className="border-b bg-muted/50">
+                        <tr className="border-b border-border thead-brushed">
                           {columns.map((column) => (
-                            <th key={column.key} className="text-left p-3 font-medium">
+                            <th key={column.key} className="text-left p-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                               <SortableHeader column={column} />
                             </th>
                           ))}
@@ -678,7 +678,7 @@ const PendingInternships: React.FC = () => {
                           </tr>
                         ) : (
                           filteredInternships.map((internship) => (
-                            <tr key={internship.id} className="border-b hover:bg-muted/50 transition-colors">
+                            <tr key={internship.id} className="border-b border-border/50 odd:bg-card even:bg-muted/25 hover:bg-accent/50 transition-colors">
                               {columns.map((column) => (
                                 <td key={column.key} className="p-3">
                                   {column.render 

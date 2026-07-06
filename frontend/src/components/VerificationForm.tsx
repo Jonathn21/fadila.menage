@@ -190,7 +190,7 @@ const VerificationForm = () => {
   const handleBackToLogin = () => {
     sessionStorage.removeItem("user_id");
     sessionStorage.removeItem("masked_email");
-    navigate("/");
+    navigate("/connexion");
   };
 
   return (
@@ -198,7 +198,7 @@ const VerificationForm = () => {
       
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <Card className="w-full">
+          <Card className="w-full overflow-hidden border-border/70 shadow-elevated">
             <CardHeader className="space-y-4 pb-6">
               <div className="flex justify-center">
                 <Logo />
@@ -291,7 +291,7 @@ const VerificationForm = () => {
               
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">
-                  Copyright © 2025 - CEB. Tous droits réservés.
+                  Copyright © {new Date().getFullYear()} - CEB. Tous droits réservés.
                 </p>
               </div>
             </CardFooter>

@@ -60,7 +60,53 @@
   * {
     @apply border-border;
   }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    background-image:
+      radial-gradient(900px 480px at 85% -10%, hsl(210 45% 95% / 0.9), transparent 60%),
+      linear-gradient(180deg, hsl(210 30% 98%), hsl(214 28% 95.5%));
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
+  }
+
+  ::selection {
+    @apply bg-primary/15 text-foreground;
+  }
+
+  /* Surfaces métal brossé (texture + dégradé combinés) */
+  .surface-brushed {
+    background-image:
+      repeating-linear-gradient(90deg, rgb(16 24 40 / 0.028) 0px, rgb(16 24 40 / 0.028) 1px, transparent 1px, transparent 3px),
+      linear-gradient(180deg, hsl(var(--card)), hsl(var(--secondary) / 0.6));
+  }
+  .thead-brushed {
+    background-image:
+      repeating-linear-gradient(90deg, rgb(16 24 40 / 0.03) 0px, rgb(16 24 40 / 0.03) 1px, transparent 1px, transparent 3px),
+      linear-gradient(180deg, hsl(var(--muted) / 0.6), hsl(var(--secondary)));
+  }
+
+  /* Scrollbar discrète et cohérente */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/25 rounded-full border-2 border-transparent bg-clip-padding;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/40;
   }
 }

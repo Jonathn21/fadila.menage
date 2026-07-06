@@ -88,7 +88,7 @@ const ResetPasswordForm = () => {
         });
 
         setTimeout(() => {
-          navigate("/");
+          navigate("/connexion");
         }, 3000);
       } else {
         toast({
@@ -123,7 +123,7 @@ const ResetPasswordForm = () => {
         <PublicHeader />
 
         <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8 max-w-md">
-          <Card>
+          <Card className="overflow-hidden border-border/70 shadow-elevated">
             <CardHeader className="space-y-4 pb-6">
               <div className="flex justify-center">
                 <Logo />
@@ -153,7 +153,7 @@ const ResetPasswordForm = () => {
 
             <CardFooter>
               <Button 
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/connexion")}
                 className="w-full"
               >
                 Se connecter maintenant
@@ -172,7 +172,7 @@ const ResetPasswordForm = () => {
         <PublicHeader />
 
         <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8 max-w-md">
-        <Card>
+        <Card className="overflow-hidden border-border/70 shadow-elevated">
         <CardHeader className="space-y-4 pb-6">
           <div className="flex justify-center">
             <Logo />
@@ -295,7 +295,7 @@ const ResetPasswordForm = () => {
 
         <CardFooter className="flex flex-col space-y-3 border-t pt-6">
           <Button 
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/connexion")}
             variant="outline" 
             className="w-full"
             disabled={loading}
@@ -309,7 +309,7 @@ const ResetPasswordForm = () => {
             <span>Système sécurisé</span>
           </div>
           <p className="text-xs text-muted-foreground text-center">
-            Copyright © 2025 - CEB. Tous droits réservés.
+            Copyright © {new Date().getFullYear()} - CEB. Tous droits réservés.
           </p>
         </CardFooter>
       </Card>

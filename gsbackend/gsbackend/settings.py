@@ -13,6 +13,27 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 load_dotenv()
 
 # ======================
+# MONITORING D'ERREURS (Sentry)
+# Actif uniquement si SENTRY_DSN est défini. Le try/except évite de casser
+# le démarrage tant que sentry-sdk n'est pas installé dans l'image.
+# ======================
+SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
+if SENTRY_DSN:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
+
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            integrations=[DjangoIntegration()],
+            environment=os.environ.get('SENTRY_ENVIRONMENT', 'production'),
+            send_default_pii=False,
+            traces_sample_rate=0.1,
+        )
+    except ImportError:
+        pass
+
+# ======================
 # DJANGO CONFIG
 # ======================
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-lo8@=+2uy^&!0ksxfx3*%4e4qg+gnx4kax-nxrw(ri(u9+rxbw')

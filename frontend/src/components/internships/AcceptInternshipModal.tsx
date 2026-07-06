@@ -53,7 +53,7 @@ import {
   CalendarDays,
   Clock,
   ArrowLeft,
-  Download,
+
   FileText,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -337,7 +337,7 @@ const RemunerationSection: React.FC<{
             type="checkbox"
             checked={field.value}
             onChange={field.onChange}
-            className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
+            className="h-5 w-5 cursor-pointer rounded border-border accent-primary focus:ring-primary/30"
           />
         </FormControl>
       </FormItem>
@@ -353,6 +353,7 @@ const RemunerationSection: React.FC<{
               <FormLabel>Montant de la rémunération (FCFA)</FormLabel>
               <FormControl>
                 <div className="relative">
+                  <Coins className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="number"
                     placeholder="Entrez le montant"
@@ -417,12 +418,12 @@ const StepNavigation: React.FC<{
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Générer la lettre de stage
+              Traitement...
             </>
           ) : (
             <>
-              <FileText className="h-4 w-4" />
-              Générer la lettre de stage
+              <CheckCircle className="h-4 w-4" />
+              Terminer
             </>
           )}
         </Button>
@@ -690,38 +691,6 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
     }
   };
 
-  // Fonction pour télécharger le PDF généré
-  const handleDownloadPdf = async () => {
-    if (!generatedPdf?.url) return;
-
-    try {
-      const response = await apiClient.get(generatedPdf.url, {
-        responseType: "blob",
-      });
-      
-      const blob = response.data;
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `lettre_${studentName.replace(/\s+/g, "_")}_a_signer.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Téléchargement réussi",
-        description: "La lettre de stage est prête à être signée",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de télécharger la lettre de stage",
-        variant: "destructive",
-      });
-    }
-  };
-
   const steps = [
     { label: "Général", description: "Type & Lieu" },
     { label: "Affectation", description: "Direction & Service" },
@@ -819,11 +788,11 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
             </div>
             <div>
               <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
-                {generatedPdf ? "Lettre de stage générée" : "Accepter la demande"}
+                {generatedPdf ? "Demande acceptée" : "Formulaire d'acceptation"}
               </DialogTitle>
               <DialogDescription className="text-base">
-                {generatedPdf 
-                  ? "Téléchargez la lettre pour signature" 
+                {generatedPdf
+                  ? "Confirmation de l'acceptation"
                   : `Créez un stage pour ${studentName}`}
               </DialogDescription>
             </div>
@@ -831,44 +800,34 @@ const AcceptInternshipModal: React.FC<AcceptInternshipModalProps> = ({
         </DialogHeader>
 
         <div className="space-y-3 sm:space-y-4 md:space-y-6">
-          {/* Progress Indicator */}
-          <Card className="bg-gradient-to-r from-muted/50 to-muted/30">
-            <CardContent className="pt-6">
-              <ProgressIndicator currentStep={currentStep} steps={steps} />
-            </CardContent>
-          </Card>
+          {/* Progress Indicator (masqué en confirmation) */}
+          {!generatedPdf && (
+            <Card className="bg-gradient-to-r from-muted/50 to-muted/30">
+              <CardContent className="pt-6">
+                <ProgressIndicator currentStep={currentStep} steps={steps} />
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Affichage du PDF généré */}
+          {/* Confirmation après acceptation */}
           {generatedPdf && (
-            <Card className=" bg-green-50/20">
+            <Card className="bg-green-50/20">
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                    <FileText className="h-8 w-8 text-green-600" />
+                    <CheckCircle className="h-8 w-8 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">Lettre de stage générée avec succès</h3>
+                    <h3 className="text-lg font-semibold">Demande acceptée avec succès</h3>
                     <p className="text-muted-foreground mt-1">
-                      La lettre de stage a été générée. Téléchargez-la pour la faire signer.
+                      Le stage de {studentName} a été créé et la lettre de stage a été générée.
                     </p>
                   </div>
-                  <div className="flex gap-3 mt-4">
-                    <Button
-                      onClick={handleDownloadPdf}
-                      className="gap-2"
-                    >
-                      <Download className="h-4 w-4" />
-                      Télécharger la lettre de stage
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={handleClose}
-                    >
-                      Fermer
-                    </Button>
-                  </div>
+                  <Button onClick={handleClose} className="mt-4 min-w-[160px]">
+                    Fermer
+                  </Button>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Après signature, uploadez la lettre signée depuis la page de la demande.
+                    La lettre de stage est disponible depuis la page de la demande. Après signature, uploadez-y la lettre signée.
                   </p>
                 </div>
               </CardContent>

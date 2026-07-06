@@ -16,13 +16,11 @@
 #  Les 12 générateurs de RapportGeneratorService sont INCHANGÉS : ils héritent
 #  automatiquement des améliorations car ils passent tous par ces helpers.
 #
-#  NB — 2 bugs connus restent dans les générateurs (non corrigés ici, sur
-#  demande) :
-#    1. generer_synthese_mensuelle : l'évolution du taux d'acceptation
-#       (ex. "85.5%") plante sur int() et s'affiche "—" → passer en float().
-#    2. generer_audit_actions : par_user / par_mois_data calculés sur qs[:1000]
-#       alors que total = qs.count() → faux au-delà de 1000 actions
-#       → utiliser une agrégation SQL.
+#  Les 2 bugs historiques des générateurs sont corrigés :
+#    1. generer_synthese_mensuelle : l'évolution accepte les valeurs décimales
+#       ("85.5%") via float() au lieu de int().
+#    2. generer_audit_actions : top utilisateurs / activité mensuelle calculés
+#       par agrégation SQL sur tout le queryset (plus de troncature à 1000).
 # ============================================================================
 
 import os
@@ -60,7 +58,9 @@ from utilisateurs.models import Utilisateur
 
 # ── Constantes ──────────────────────────────────────────────────────────────
 
-LOGO_PATH = os.path.join(os.path.dirname(__file__), 'assets', 'ceb-logo.png')
+# Espace vertical réservé en haut de la première page : les rapports sont
+# imprimés sur du papier à en-tête pré-imprimé (pas de logo dans le PDF).
+LETTERHEAD_SPACE = 3.2 * cm
 
 # Palette professionnelle
 CLR_PRIMARY    = '#1e293b'
@@ -345,12 +345,15 @@ class NumberedCanvas(_rl_canvas.Canvas):
     def _draw_footer(self, total):
         self.saveState()
         self.setStrokeColor(BORDER_COLOR)
-        self.setLineWidth(0.5)
-        self.line(2 * cm, 1.5 * cm, A4[0] - 2 * cm, 1.5 * cm)
-        self.setFont('Helvetica', 7)
+        self.setLineWidth(0.4)
+        self.line(2 * cm, 1.55 * cm, A4[0] - 2 * cm, 1.55 * cm)
+        self.setFont('Helvetica', 6.5)
         self.setFillColor(colors.HexColor(CLR_TEXT_LIGHT))
-        self.drawString(2 * cm, 1.05 * cm, "CEB · Gestion des Stages")
-        self.drawRightString(A4[0] - 2 * cm, 1.05 * cm, f"Page {self._pageNumber} / {total}")
+        self.drawString(2 * cm, 1.1 * cm,
+                        "COMMUNAUTÉ ÉLECTRIQUE DU BÉNIN  ·  GESTION DES STAGES")
+        self.drawCentredString(A4[0] / 2, 1.1 * cm,
+                               date.today().strftime("%d/%m/%Y"))
+        self.drawRightString(A4[0] - 2 * cm, 1.1 * cm, f"Page {self._pageNumber} / {total}")
         self.restoreState()
 
 
@@ -373,88 +376,103 @@ def make_pdf_doc(buffer, title):
 
 
 def pdf_header(title, subtitle, styles):
-    """Bloc d'en-tête avec logo CEB, titre et sous-titre."""
-    elements = []
+    """Bloc titre éditorial, sans logo : l'espace supérieur est laissé vierge
+    pour l'impression sur papier à en-tête pré-imprimé."""
+    elements = [Spacer(1, LETTERHEAD_SPACE)]
 
-    if os.path.exists(LOGO_PATH):
-        logo = RLImage(LOGO_PATH, width=1.5*cm, height=1.5*cm)
-        org_text = Paragraph(
-            '<font color="#1e293b"><b>CEB</b></font><br/>'
-            '<font size="7" color="#64748b">Communauté Électrique du Bénin</font><br/>'
-            '<font size="6" color="#94a3b8">Gestion des Stages</font>',
-            ParagraphStyle('orgHeader', fontSize=10, leading=13)
-        )
-        date_text = Paragraph(
-            f'<font size="7" color="#94a3b8">Généré le {date.today().strftime("%d/%m/%Y")} '
-            f'à {timezone.now().strftime("%H:%M")}</font>',
-            ParagraphStyle('dateRight', fontSize=7, alignment=TA_RIGHT)
-        )
-        header_table = Table([[logo, org_text, date_text]], colWidths=[2*cm, 10*cm, 5*cm])
-        header_table.setStyle(TableStyle([
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 0),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-        ]))
-        elements.append(header_table)
-    else:
-        elements.append(Paragraph(
-            '<font color="#6366f1"><b>CEB</b></font> — Gestion des Stages',
-            ParagraphStyle('org', fontSize=9, textColor=colors.HexColor(CLR_TEXT_MUTED), alignment=TA_LEFT)
-        ))
+    # Ligne de contexte : nature du document à gauche, horodatage à droite
+    kicker = Paragraph(
+        'RAPPORT &nbsp;·&nbsp; GESTION DES STAGES',
+        ParagraphStyle('kicker', fontName='Helvetica-Bold', fontSize=7.5,
+                       textColor=colors.HexColor(CLR_TEXT_LIGHT), leading=10)
+    )
+    gen_info = Paragraph(
+        f'Généré le {date.today().strftime("%d/%m/%Y")} à {timezone.now().strftime("%H:%M")}',
+        ParagraphStyle('genInfo', fontName='Helvetica', fontSize=7.5,
+                       textColor=colors.HexColor(CLR_TEXT_LIGHT), alignment=TA_RIGHT, leading=10)
+    )
+    meta = Table([[kicker, gen_info]], colWidths=[10.5*cm, 6.5*cm])
+    meta.setStyle(TableStyle([
+        ('VALIGN',        (0, 0), (-1, -1), 'BOTTOM'),
+        ('LEFTPADDING',   (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING',  (0, 0), (-1, -1), 0),
+        ('TOPPADDING',    (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    elements.append(meta)
 
-    elements.append(Spacer(1, 0.4*cm))
-    elements.append(HRFlowable(width="100%", thickness=2, color=ACCENT_COLOR, spaceAfter=8))
+    # Double filet éditorial : trait fort + trait fin
+    elements.append(HRFlowable(width="100%", thickness=1.4, color=HEADER_COLOR, spaceAfter=1.6))
+    elements.append(HRFlowable(width="100%", thickness=0.4, color=BORDER_COLOR, spaceAfter=14))
+
     elements.append(Paragraph(
         f'<b>{title}</b>',
-        ParagraphStyle('title', fontSize=16, textColor=HEADER_COLOR, spaceAfter=4, leading=20)
+        ParagraphStyle('title', fontName='Helvetica-Bold', fontSize=19,
+                       textColor=HEADER_COLOR, spaceAfter=5, leading=23)
     ))
     if subtitle:
         elements.append(Paragraph(
             subtitle,
-            ParagraphStyle('sub', fontSize=10, textColor=colors.HexColor(CLR_TEXT_MUTED), spaceAfter=6)
+            ParagraphStyle('sub', fontSize=9.5, textColor=colors.HexColor(CLR_TEXT_MUTED),
+                           spaceAfter=6, leading=13)
         ))
-    elements.append(HRFlowable(width="100%", thickness=0.5, color=BORDER_COLOR, spaceAfter=16))
+    elements.append(Spacer(1, 0.5*cm))
     return elements
 
 
 def pdf_section_title(text, styles, color=CLR_ACCENT):
-    """Titre de section avec puce de couleur."""
-    return [
-        Spacer(1, 10),
-        Paragraph(
-            f'<font color="{color}">■</font>  <b>{text}</b>',
-            ParagraphStyle('sectionTitle', fontSize=12, textColor=HEADER_COLOR, spaceAfter=8, leading=16)
-        ),
-    ]
+    """Titre de section : barrette de couleur + intitulé en capitales espacées."""
+    bar = Table([['']], colWidths=[0.09*cm], rowHeights=[0.40*cm])
+    bar.setStyle(TableStyle([
+        ('BACKGROUND',    (0, 0), (-1, -1), colors.HexColor(color)),
+        ('LEFTPADDING',   (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING',  (0, 0), (-1, -1), 0),
+        ('TOPPADDING',    (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    label = Paragraph(
+        f'<b>{str(text).upper()}</b>',
+        ParagraphStyle('sectionTitle', fontName='Helvetica-Bold', fontSize=10,
+                       textColor=HEADER_COLOR, leading=13)
+    )
+    row = Table([[bar, label]], colWidths=[0.28*cm, 16.72*cm])
+    row.setStyle(TableStyle([
+        ('VALIGN',        (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING',   (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING',  (0, 0), (-1, -1), 0),
+        ('TOPPADDING',    (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    return [Spacer(1, 14), row, Spacer(1, 9)]
 
 
 def _kpi_card(label, value, accent, card_w):
-    """Une carte KPI : grand chiffre coloré + libellé, liseré de couleur à gauche."""
+    """Une carte KPI raffinée : libellé en petites capitales, grand chiffre,
+    filet de couleur en tête de carte."""
     val_str = str(value)
     n = len(val_str)
-    val_size = 20 if n <= 6 else 15 if n <= 11 else 10
+    val_size = 19 if n <= 6 else 14 if n <= 11 else 10
+    lbl_p = Paragraph(
+        label.upper(),
+        ParagraphStyle('kl', fontName='Helvetica-Bold', fontSize=6.3, leading=8.5,
+                       textColor=colors.HexColor(CLR_TEXT_MUTED))
+    )
     val_p = Paragraph(
         f'<b>{val_str}</b>',
         ParagraphStyle('kv', fontName='Helvetica-Bold', fontSize=val_size,
                        leading=val_size + 2, textColor=colors.HexColor(accent))
     )
-    lbl_p = Paragraph(
-        label.upper(),
-        ParagraphStyle('kl', fontName='Helvetica', fontSize=7, leading=9,
-                       textColor=colors.HexColor(CLR_TEXT_MUTED))
-    )
-    card = Table([[val_p], [lbl_p]], colWidths=[card_w])
+    card = Table([[lbl_p], [val_p]], colWidths=[card_w])
     card.setStyle(TableStyle([
-        ('BACKGROUND',    (0, 0), (-1, -1), LIGHT_BG),
-        ('LINEBEFORE',    (0, 0), (0, -1), 3, colors.HexColor(accent)),
-        ('BOX',           (0, 0), (-1, -1), 0.5, BORDER_COLOR),
-        ('ROUNDEDCORNERS', [5, 5, 5, 5]),
+        ('BACKGROUND',    (0, 0), (-1, -1), colors.white),
+        ('LINEABOVE',     (0, 0), (-1, 0), 2.2, colors.HexColor(accent)),
+        ('BOX',           (0, 0), (-1, -1), 0.4, BORDER_COLOR),
         ('LEFTPADDING',   (0, 0), (-1, -1), 10),
         ('RIGHTPADDING',  (0, 0), (-1, -1), 8),
         ('TOPPADDING',    (0, 0), (0, 0), 9),
-        ('BOTTOMPADDING', (0, 0), (0, 0), 1),
+        ('BOTTOMPADDING', (0, 0), (0, 0), 3),
         ('TOPPADDING',    (0, 1), (0, 1), 0),
-        ('BOTTOMPADDING', (0, 1), (0, 1), 9),
+        ('BOTTOMPADDING', (0, 1), (0, 1), 10),
     ]))
     return card
 
@@ -506,28 +524,35 @@ def pdf_kpi_table(kpis, col_widths=None):
 
 
 def pdf_table(data, col_widths, header_color=None):
-    """Table ReportLab avec style standard amélioré (filets horizontaux seuls)."""
+    """Table raffinée, style rapport institutionnel : en-tête sobre encadré de
+    filets (fort au-dessus, accent en dessous), corps aéré, filets hairline."""
     hc = header_color or ACCENT_COLOR
+    if data and isinstance(data[0], (list, tuple)):
+        data = [[h.upper() if isinstance(h, str) else h for h in data[0]]] + list(data[1:])
     t = Table(data, colWidths=col_widths, repeatRows=1)
     t.setStyle(TableStyle([
-        ('BACKGROUND',    (0, 0), (-1, 0), hc),
-        ('TEXTCOLOR',     (0, 0), (-1, 0), colors.white),
+        # En-tête : pas d'aplat, typographie en capitales + double filet
+        ('TEXTCOLOR',     (0, 0), (-1, 0), HEADER_COLOR),
         ('FONTNAME',      (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE',      (0, 0), (-1, 0), 8),
-        ('ALIGN',         (0, 0), (-1, 0), 'CENTER'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-        ('TOPPADDING',    (0, 0), (-1, 0), 8),
+        ('FONTSIZE',      (0, 0), (-1, 0), 7.3),
+        ('ALIGN',         (0, 0), (-1, 0), 'LEFT'),
+        ('LINEABOVE',     (0, 0), (-1, 0), 1.1, HEADER_COLOR),
+        ('LINEBELOW',     (0, 0), (-1, 0), 0.8, hc),
+        ('TOPPADDING',    (0, 0), (-1, 0), 7),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        # Corps
         ('FONTNAME',      (0, 1), (-1, -1), 'Helvetica'),
         ('FONTSIZE',      (0, 1), (-1, -1), 8),
+        ('TEXTCOLOR',     (0, 1), (-1, -1), colors.HexColor('#334155')),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, LIGHT_BG]),
         ('ALIGN',         (0, 1), (-1, -1), 'LEFT'),
         ('VALIGN',        (0, 0), (-1, -1), 'MIDDLE'),
-        ('LEFTPADDING',   (0, 0), (-1, -1), 8),
-        ('RIGHTPADDING',  (0, 0), (-1, -1), 8),
-        ('TOPPADDING',    (0, 1), (-1, -1), 7),
-        ('BOTTOMPADDING', (0, 1), (-1, -1), 7),
-        ('LINEBELOW',     (0, 1), (-1, -1), 0.3, BORDER_COLOR),
-        ('LINEBELOW',     (0, 0), (-1, 0), 1.5, hc),
+        ('LEFTPADDING',   (0, 0), (-1, -1), 7),
+        ('RIGHTPADDING',  (0, 0), (-1, -1), 7),
+        ('TOPPADDING',    (0, 1), (-1, -1), 6.5),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 6.5),
+        ('LINEBELOW',     (0, 1), (-1, -2), 0.25, BORDER_COLOR),
+        ('LINEBELOW',     (0, -1), (-1, -1), 0.8, HEADER_COLOR),
     ]))
     return t
 
@@ -543,55 +568,58 @@ def pdf_footer_note(text):
 # ── Helpers Excel ─────────────────────────────────────────────────────────────
 
 EXCEL_BORDER = Border(
-    left=Side(style='thin', color='E2E8F0'),
-    right=Side(style='thin', color='E2E8F0'),
-    top=Side(style='thin', color='E2E8F0'),
     bottom=Side(style='thin', color='E2E8F0'),
 )
-
 
 def make_excel_wb(title):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = title[:30]
     ws.sheet_properties.tabColor = '6366F1'
+    ws.sheet_view.showGridLines = False
     return wb, ws
 
 
 def excel_title_block(ws, title, subtitle='', merge_cols=5):
-    """Bloc titre professionnel en haut de la feuille."""
+    """Bloc titre éditorial : titre à gauche, horodatage discret, filet sous le bloc."""
     end_col = get_column_letter(merge_cols)
 
     ws.merge_cells(f'A1:{end_col}1')
     cell = ws['A1']
     cell.value = title
-    cell.font = Font(bold=True, size=14, color='1E293B')
-    cell.alignment = Alignment(horizontal='center', vertical='center')
-    cell.fill = PatternFill('solid', fgColor='F1F5F9')
-    ws.row_dimensions[1].height = 36
+    cell.font = Font(bold=True, size=15, color='1E293B')
+    cell.alignment = Alignment(horizontal='left', vertical='center')
+    ws.row_dimensions[1].height = 34
 
-    if subtitle:
-        ws.merge_cells(f'A2:{end_col}2')
-        cell2 = ws['A2']
-        cell2.value = subtitle
-        cell2.font = Font(size=9, italic=True, color='64748B')
-        cell2.alignment = Alignment(horizontal='center', vertical='center')
-        ws.row_dimensions[2].height = 22
-        return 4
-    return 3
+    sub_text = subtitle or ''
+    gen_text = f"Généré le {date.today().strftime('%d/%m/%Y')} à {timezone.now().strftime('%H:%M')}"
+    ws.merge_cells(f'A2:{end_col}2')
+    cell2 = ws['A2']
+    cell2.value = f"{sub_text}   —   {gen_text}" if sub_text else gen_text
+    cell2.font = Font(size=9, color='64748B')
+    cell2.alignment = Alignment(horizontal='left', vertical='center')
+    ws.row_dimensions[2].height = 20
+    for col in range(1, merge_cols + 1):
+        ws.cell(row=2, column=col).border = Border(bottom=Side(style='thin', color='CBD5E1'))
+
+    return 4
 
 
 def excel_header_row(ws, headers, row=1, fill_color="1e293b", freeze=False):
-    """Ligne d'en-tête stylée. freeze=True fige les volets sous l'en-tête."""
-    fill = PatternFill("solid", fgColor=fill_color)
-    font = Font(bold=True, color="FFFFFF", size=10)
+    """Ligne d'en-tête éditoriale : capitales sombres sur fond blanc, filet fort
+    au-dessus, filet de couleur d'accent (fill_color) en dessous."""
+    accent = (fill_color or "1e293b").lstrip('#').upper()
+    font = Font(bold=True, color="1E293B", size=9)
+    border = Border(
+        top=Side(style='medium', color='1E293B'),
+        bottom=Side(style='thin', color=accent),
+    )
     for col, h in enumerate(headers, 1):
-        cell = ws.cell(row=row, column=col, value=h)
-        cell.fill = fill
+        cell = ws.cell(row=row, column=col, value=h.upper() if isinstance(h, str) else h)
         cell.font = font
-        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        cell.border = EXCEL_BORDER
-    ws.row_dimensions[row].height = 28
+        cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+        cell.border = border
+    ws.row_dimensions[row].height = 26
     if freeze:
         ws.freeze_panes = ws.cell(row=row + 1, column=1)
 
@@ -601,15 +629,19 @@ def excel_data_row(ws, values, row, even=False):
     fill = PatternFill("solid", fgColor="F8FAFC") if even else PatternFill("solid", fgColor="FFFFFF")
     for col, v in enumerate(values, 1):
         cell = ws.cell(row=row, column=col, value=v)
-        cell.alignment = Alignment(vertical="center", wrap_text=True)
         cell.fill = fill
         cell.border = EXCEL_BORDER
+        cell.font = Font(size=9.5, color='334155')
         if isinstance(v, bool):
-            pass
+            cell.alignment = Alignment(vertical="center", wrap_text=True)
         elif isinstance(v, int):
             cell.number_format = '#,##0'
+            cell.alignment = Alignment(horizontal="right", vertical="center")
         elif isinstance(v, float):
             cell.number_format = '#,##0.0'
+            cell.alignment = Alignment(horizontal="right", vertical="center")
+        else:
+            cell.alignment = Alignment(vertical="center", wrap_text=True)
     ws.row_dimensions[row].height = 20
 
 
@@ -1171,9 +1203,10 @@ class RapportGeneratorService:
             excel_header_row(ws, ['Indicateur', f'{nom_mois} {annee}', 'Mois précédent', 'Évolution'], row=start)
             for i, (label, val, prec) in enumerate(kpis, start + 1):
                 try:
-                    v1 = int(str(val).replace('%', ''))
-                    v2 = int(str(prec).replace('%', ''))
-                    evol = f"+{v1 - v2}" if v1 >= v2 else str(v1 - v2)
+                    v1 = float(str(val).replace('%', ''))
+                    v2 = float(str(prec).replace('%', ''))
+                    diff = round(v1 - v2, 1)
+                    evol = f"+{diff:g}" if diff >= 0 else f"{diff:g}"
                 except (ValueError, TypeError):
                     evol = '—'
                 excel_data_row(ws, [label, val, prec, evol], i, even=(i % 2 == 0))
@@ -1235,8 +1268,8 @@ class RapportGeneratorService:
         data = [['Indicateur', f'{nom_mois} {annee}', 'Mois précédent', 'Évolution']]
         for label, val, prec in kpis:
             try:
-                diff = int(str(val).replace('%', '')) - int(str(prec).replace('%', ''))
-                evol = Paragraph(f'<font color="{"#10b981" if diff >= 0 else "#ef4444"}"><b>{"+" if diff >= 0 else ""}{diff}</b></font>', styles['Normal'])
+                diff = round(float(str(val).replace('%', '')) - float(str(prec).replace('%', '')), 1)
+                evol = Paragraph(f'<font color="{"#10b981" if diff >= 0 else "#ef4444"}"><b>{"+" if diff >= 0 else ""}{diff:g}</b></font>', styles['Normal'])
             except (ValueError, TypeError):
                 evol = '—'
             data.append([label, str(val), str(prec), evol])
@@ -1996,15 +2029,19 @@ class RapportGeneratorService:
 
         total = qs.count()
 
-        # Stats par utilisateur (top 10)
-        par_user = {}
+        # Stats agrégées en SQL sur TOUT le queryset (et non un échantillon)
+        from django.db.models.functions import ExtractMonth
+
+        top_users = [
+            (r['user__email'] or 'Système', r['n'])
+            for r in qs.values('user__email').annotate(n=Count('id')).order_by('-n')[:10]
+        ]
+        nb_users_distincts = qs.values('user').distinct().count()
+
         par_mois_data = [0] * 12
-        for a in qs[:1000]:
-            u = a.user.email if a.user else 'Système'
-            par_user[u] = par_user.get(u, 0) + 1
-            if a.timestamp:
-                par_mois_data[a.timestamp.month - 1] += 1
-        top_users = sorted(par_user.items(), key=lambda x: -x[1])[:10]
+        for r in qs.annotate(m=ExtractMonth('timestamp')).values('m').annotate(n=Count('id')):
+            if r['m']:
+                par_mois_data[r['m'] - 1] = r['n']
 
         filename = f"audit_actions_{annee}"
 
@@ -2065,7 +2102,7 @@ class RapportGeneratorService:
         elements.extend(pdf_section_title("Synthèse", styles, color='#64748b'))
         elements.append(pdf_kpi_table([
             ('Total actions enregistrées', total),
-            ('Utilisateurs distincts', len(par_user)),
+            ('Utilisateurs distincts', nb_users_distincts),
             ('Utilisateur le plus actif', top_users[0][0] if top_users else 'N/A', CLR_ACCENT),
         ]))
         elements.append(Spacer(1, 14))

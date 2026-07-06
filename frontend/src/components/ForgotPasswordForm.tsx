@@ -65,7 +65,7 @@ const ForgotPasswordForm = () => {
         
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-md">
-            <Card className="w-full">
+            <Card className="w-full overflow-hidden border-border/70 shadow-elevated">
               <CardHeader className="space-y-4 pb-6">
                 <div className="flex justify-center">
                   <Logo />
@@ -96,7 +96,7 @@ const ForgotPasswordForm = () => {
 
               <CardFooter className="flex flex-col space-y-3">
                 <Button 
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/connexion")}
                   className="w-full"
                   variant="outline"
                 >
@@ -126,7 +126,7 @@ const ForgotPasswordForm = () => {
     <div className="min-h-screen flex flex-col">      
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <Card className="w-full">
+          <Card className="w-full overflow-hidden border-border/70 shadow-elevated">
             <CardHeader className="space-y-4 pb-6">
               <div className="flex justify-center">
                 <Logo />
@@ -157,7 +157,7 @@ const ForgotPasswordForm = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10 h-11"
-                      placeholder="utilisateur"
+                      placeholder="nom@exemple.com"
                       disabled={loading}
                     />
                   </div>
@@ -182,7 +182,7 @@ const ForgotPasswordForm = () => {
 
             <CardFooter className="flex flex-col space-y-3 border-t pt-6">
               <Button 
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/connexion")}
                 variant="outline" 
                 className="w-full"
                 disabled={loading}
@@ -196,7 +196,7 @@ const ForgotPasswordForm = () => {
                 <span>Système sécurisé</span>
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Copyright © 2025 - CEB. Tous droits réservés.
+                Copyright © {new Date().getFullYear()} - CEB. Tous droits réservés.
               </p>
             </CardFooter>
           </Card>

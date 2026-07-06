@@ -6,7 +6,7 @@ const envConfig = {
     refreshEndpoint: "/token/refresh/",
   },
   websocket: {
-    url: import.meta.env.VITE_WS_URL || "ws://185.158.5.60:8000/api/",
+    url: import.meta.env.VITE_WS_URL || "ws://localhost:8000/ws/",
   },
 };
 

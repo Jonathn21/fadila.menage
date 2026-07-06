@@ -247,7 +247,7 @@ const Users = () => {
     <DashboardLayout>
       <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* En-tête de la page */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+        <div className="relative overflow-hidden rounded-xl border border-border/80 surface-brushed shadow-card px-4 py-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div className="flex flex-col gap-1 sm:gap-2">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Gestion des Utilisateurs</h1>

@@ -901,14 +901,14 @@ const InternshipsPage: React.FC = () => {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // Fetch des données
+  // Fetch des données — pagination et tri côté serveur
   const fetchInternships = async () => {
     setLoading(true);
     try {
-      // CORRECTION: Créer un objet params sans envoyer de chaînes vides
       const params: Record<string, string> = {};
-      
+
       if (searchQuery) params.q = searchQuery;
       if (genderFilter !== "Tous") params.genre = genderFilter;
       if (educationLevelFilter !== "Tous") params.etudiant_niveau = educationLevelFilter;
@@ -916,10 +916,17 @@ const InternshipsPage: React.FC = () => {
       if (internshipTypeFilter !== "Tous") params.type_stage = internshipTypeFilter;
       if (config.showStatusFilter && statusFilter !== "Tous") params.statut_stage = statusFilter;
 
+      params.page = String(currentPage);
+      params.page_size = String(itemsPerPage);
+      if (sortConfig.direction && sortConfig.field) {
+        const field = sortConfig.field === "etudiant_complet" ? "etudiant_nom" : String(sortConfig.field);
+        params.ordering = sortConfig.direction === "desc" ? `-${field}` : field;
+      }
+
       const response = await apiClient.get(config.endpoint, { params });
       setInternships(response.data.results);
       setFilteredInternships(response.data.results);
-      setCurrentPage(1);
+      setTotalCount(response.data.count ?? response.data.results.length);
     } catch (error) {
       console.error(error);
       toast({
@@ -932,10 +939,14 @@ const InternshipsPage: React.FC = () => {
     }
   };
 
-  // CORRECTION: Ajout de config.endpoint dans les dépendances
   useEffect(() => {
     fetchInternships();
-  }, [searchQuery, specializationFilter, internshipTypeFilter, educationLevelFilter, genderFilter, statusFilter, currentStatus, config.endpoint]);
+  }, [searchQuery, specializationFilter, internshipTypeFilter, educationLevelFilter, genderFilter, statusFilter, currentStatus, config.endpoint, currentPage, itemsPerPage, sortConfig]);
+
+  // Retour à la page 1 quand un filtre ou la recherche change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, specializationFilter, internshipTypeFilter, educationLevelFilter, genderFilter, statusFilter, config.endpoint]);
 
   // Tri
   const handleSort = (field: SortField) => {
@@ -947,37 +958,7 @@ const InternshipsPage: React.FC = () => {
     setSortConfig({ field, direction });
   };
 
-  useEffect(() => {
-    if (sortConfig.direction) {
-      const sortedData = [...internships].sort((a, b) => {
-        // CORRECTION: Correction des noms de variables
-        let aValue: unknown = a[sortConfig.field as keyof Internship];
-        let bValue: unknown = b[sortConfig.field as keyof Internship];
-
-        if (sortConfig.field === "etudiant_complet") {
-          aValue = `${a.etudiant_nom} ${a.etudiant_prenom}`.toLowerCase();
-          bValue = `${b.etudiant_nom} ${b.etudiant_prenom}`.toLowerCase();
-        }
-
-        if (["date_soumission", "date_acceptation", "date_refus"].includes(sortConfig.field as string)) {
-          aValue = new Date(aValue as string).getTime();
-          bValue = new Date(bValue as string).getTime();
-        }
-
-        if (typeof aValue === "string") aValue = aValue.toLowerCase();
-        if (typeof bValue === "string") bValue = bValue.toLowerCase();
-
-        if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-      setFilteredInternships(sortedData);
-      setCurrentPage(1);
-    } else {
-      setFilteredInternships([...internships]);
-      setCurrentPage(1);
-    }
-  }, [sortConfig, internships]);
+  // Le tri est désormais effectué côté serveur (paramètre `ordering`).
 
   const getSortIcon = (field: SortField) => {
     if (sortConfig.field !== field) {
@@ -993,16 +974,12 @@ const InternshipsPage: React.FC = () => {
     }
   };
 
-  // Pagination
-  const paginatedInternships = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredInternships.slice(startIndex, endIndex);
-  }, [filteredInternships, currentPage, itemsPerPage]);
+  // Pagination côté serveur : la page courante est déjà la seule chargée
+  const paginatedInternships = filteredInternships;
 
   const totalPages = useMemo(() => {
-    return Math.ceil(filteredInternships.length / itemsPerPage);
-  }, [filteredInternships.length, itemsPerPage]);
+    return Math.max(1, Math.ceil(totalCount / itemsPerPage));
+  }, [totalCount, itemsPerPage]);
 
   const goToPage = useCallback((page: number) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
@@ -1192,7 +1169,7 @@ const InternshipsPage: React.FC = () => {
       <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* En-tête */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+          <div className="relative overflow-hidden rounded-xl border border-border/80 surface-brushed shadow-card px-4 py-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">{config.title}</h1>
               <CardDescription className="text-xs sm:text-sm text-gray-600">{config.description}</CardDescription>
@@ -1360,7 +1337,7 @@ const InternshipsPage: React.FC = () => {
                 {/* En-tête du tableau */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3 sm:mb-4">
                   <h3 className="font-semibold text-sm sm:text-base text-gray-900">
-                    {filteredInternships.length} demande{filteredInternships.length !== 1 ? 's' : ''}
+                    {totalCount} demande{totalCount !== 1 ? 's' : ''}
                   </h3>
                   <div className="flex items-center gap-2">
                     <span className="text-xs sm:text-sm text-gray-600">Afficher</span>
@@ -1380,7 +1357,7 @@ const InternshipsPage: React.FC = () => {
                 </div>
 
                 {/* Version Desktop - Tableau - CORRECTION: Style inline pour les grilles dynamiques */}
-                <div className="hidden lg:block border rounded-lg overflow-hidden">
+                <div className="hidden lg:block rounded-xl border border-border/80 overflow-hidden shadow-card bg-card">
                   <div className="overflow-x-auto">
                     <div className="min-w-[900px]">
                       {/* En-tête avec style inline */}
@@ -1389,7 +1366,7 @@ const InternshipsPage: React.FC = () => {
                           display: 'grid', 
                           gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` 
                         }}
-                        className="border-b border-gray-200 bg-gray-50/50 p-3"
+                        className="border-b border-border thead-brushed p-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                       >
                         {columns.map((column) => (
                           <div key={column.key} className="px-2">
@@ -1412,8 +1389,8 @@ const InternshipsPage: React.FC = () => {
                               display: 'grid', 
                               gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` 
                             }}
-                            className={`border-b border-gray-100 p-3 hover:bg-gray-50/30 transition-colors ${
-                              index % 2 === 0 ? 'bg-white' : 'bg-gray-50/10'
+                            className={`border-b border-border/50 p-3 hover:bg-accent/50 transition-colors ${
+                              index % 2 === 0 ? 'bg-card' : 'bg-muted/25'
                             }`}
                           >
                             {columns.map((column) => (
@@ -1512,7 +1489,7 @@ const InternshipsPage: React.FC = () => {
                 {paginatedInternships.length > 0 && (
                   <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-4 md:pt-6 border-t mt-4 md:mt-6">
                     <div className="text-xs sm:text-sm text-gray-600">
-                      Affichage de {(currentPage - 1) * itemsPerPage + 1} à {Math.min(currentPage * itemsPerPage, filteredInternships.length)} sur {filteredInternships.length}
+                      Affichage de {(currentPage - 1) * itemsPerPage + 1} à {Math.min(currentPage * itemsPerPage, totalCount)} sur {totalCount}
                     </div>
                     <div className="flex items-center gap-1 md:gap-2">
                       <Button variant="outline" size="sm" onClick={goToPreviousPage} disabled={currentPage === 1} className="h-8 sm:h-9 px-2 sm:px-3 text-gray-700">

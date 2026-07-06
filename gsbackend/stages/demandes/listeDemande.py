@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Q
 from ..models import Demande
 from ..serializers import DemandeSerializer
@@ -67,21 +68,55 @@ class DemandeBaseAPIView(APIView):
             
         return queryset
 
+    # Champs de tri autorisés (protection contre l'injection d'ordering)
+    ordering_whitelist = {
+        'etudiant_nom', 'etudiant_prenom', 'etudiant_specialite',
+        'etudiant_niveau', 'type_stage', 'statut_stage',
+        'date_soumission', 'genre',
+    }
+
+    def apply_ordering(self, queryset, request):
+        """Tri côté serveur : ?ordering=champ ou ?ordering=-champ (whitelist)."""
+        ordering = request.GET.get('ordering', '').strip()
+        if ordering and ordering.lstrip('-') in self.ordering_whitelist:
+            return queryset.order_by(ordering)
+        return queryset
+
     def get(self, request):
-        """Méthode GET standardisée"""
+        """GET avec filtres, tri et pagination serveur optionnelle.
+
+        Sans paramètre `page`, renvoie la liste complète (rétro-compatible).
+        Avec `page` (et `page_size`, max 100), renvoie la page demandée :
+        {count, num_pages, page, results}.
+        """
         try:
-            # Récupération et filtrage du queryset
             queryset = self.get_queryset()
             queryset = self.apply_filters(queryset, request)
+            queryset = self.apply_ordering(queryset, request)
 
-            # Sérialisation
+            page_param = request.GET.get('page', '').strip()
+            if page_param:
+                try:
+                    page_size = min(max(int(request.GET.get('page_size', 10)), 1), 100)
+                    paginator = Paginator(queryset, page_size)
+                    page = paginator.page(min(max(int(page_param), 1), max(paginator.num_pages, 1)))
+                except (ValueError, EmptyPage):
+                    return Response({"error": "Paramètres de pagination invalides"}, status=400)
+
+                serializer = self.serializer_class(page.object_list, many=True)
+                return Response({
+                    "count": paginator.count,
+                    "num_pages": paginator.num_pages,
+                    "page": page.number,
+                    "results": serializer.data,
+                })
+
             serializer = self.serializer_class(queryset, many=True)
-
             return Response({
                 "count": len(serializer.data),
                 "results": serializer.data
             })
-            
+
         except Exception as e:
             logger.error(f"Erreur dans {self.__class__.__name__}: {str(e)}")
             return Response(

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import InternshipTypeStep from "@/components/internship-application/InternshipTypeStep";
 import DocumentUploadStep from "@/components/internship-application/DocumentUploadStep";
@@ -184,60 +185,63 @@ const PublicInternshipApplication = () => {
         }}
       >
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-lg sm:text-xl md:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">CARRIÈRES</h1>
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 sm:mb-4">DEMANDE DE STAGE</h1>
           <p className="text-base sm:text-lg opacity-90 max-w-3xl mx-auto px-4">
-            Vous souhaitez rejoindre l'équipe de la CEB ? Envoyez-nous vos
-            informations et documents, et nous vous contacterons au besoin.
+            Vous souhaitez effectuer un stage à la CEB ? Transmettez-nous vos
+            informations et vos documents, puis suivez votre demande en ligne.
           </p>
         </div>
       </div>
 
       <div className="flex-1 container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-4xl">
         <Card className="shadow-lg">
-          <CardHeader className="pb-4 sm:pb-6">
-            <div className="flex flex-col gap-3 sm:gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <CardTitle className="text-lg sm:text-xl md:text-2xl">
-                  <span className="block sm:inline">
-                    {steps[currentStep]} - 
-                  </span>
-                  <span className="text-sm sm:text-base font-normal text-muted-foreground ml-0 sm:ml-2 block sm:inline">
-                    Étape {currentStep + 1} sur {steps.length}
-                  </span>
-                </CardTitle>
-                <div className="flex sm:hidden items-center justify-center space-x-1">
-                  {steps.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`h-2 w-2 rounded-full ${
-                        index === currentStep
-                          ? "bg-primary"
-                          : index < currentStep
-                          ? "bg-primary/50"
-                          : "bg-gray-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-              <Progress
-                value={((currentStep + 1) / steps.length) * 100}
-                className="w-full h-2 hidden sm:block"
-              />
-              <div className="hidden sm:flex justify-between text-xs sm:text-sm text-muted-foreground">
-                {steps.map((step, index) => (
-                  <div key={index} className="text-center">
-                    <div className={`font-medium ${index <= currentStep ? "text-primary" : "text-gray-400"}`}>
-                      Étape {index + 1}
+          <CardHeader className="border-b border-border/60 bg-muted/40 py-5 sm:py-6">
+            <div className="flex items-center">
+              {steps.map((step, index) => {
+                const isDone = index < currentStep;
+                const isActive = index === currentStep;
+                return (
+                  <React.Fragment key={step}>
+                    <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                      <div
+                        className={cn(
+                          "flex h-9 w-9 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors",
+                          isDone && "border-primary bg-primary text-primary-foreground",
+                          isActive && "border-primary bg-card text-primary shadow-sm ring-4 ring-primary/10",
+                          !isDone && !isActive && "border-border bg-card text-muted-foreground"
+                        )}
+                      >
+                        {isDone ? <Check className="h-4 w-4" /> : index + 1}
+                      </div>
+                      <div className={cn("leading-tight", !isActive && "hidden sm:block")}>
+                        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                          Étape {index + 1}/{steps.length}
+                        </p>
+                        <p
+                          className={cn(
+                            "text-sm font-semibold",
+                            isActive ? "text-foreground" : isDone ? "text-foreground/80" : "text-muted-foreground"
+                          )}
+                        >
+                          {step}
+                        </p>
+                      </div>
                     </div>
-                    <div className="truncate max-w-[100px]">{step}</div>
-                  </div>
-                ))}
-              </div>
+                    {index < steps.length - 1 && (
+                      <div
+                        className={cn(
+                          "mx-2 sm:mx-4 h-0.5 flex-1 rounded-full transition-colors",
+                          index < currentStep ? "bg-primary" : "bg-border"
+                        )}
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6 pb-6">
+          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6 pb-6 pt-5 sm:pt-6">
             {currentStep === 0 && (
               <InternshipTypeStep
                 data={applicationData}

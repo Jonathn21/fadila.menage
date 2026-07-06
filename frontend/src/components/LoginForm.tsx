@@ -5,12 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import apiClient from "@/lib/apiClient";
-import PublicHeader from "@/components/PublicHeader1";
-import PublicFooter from "@/components/PublicFooter";
 import Logo from "./Logo";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import PublicHeader1 from "./PublicHeader1";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -184,12 +181,28 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      
-      <div className="flex-1 flex items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
+      {/* Fond décoratif discret */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+            maskImage: "radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 75%)",
+            WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 75%)",
+          }}
+        />
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-4 relative">
         <div className="w-full max-w-md">
-          <Card className="w-full">
-            <CardHeader className="space-y-4 pb-6">
+          <Card className="w-full overflow-hidden border-border/70 shadow-elevated">
+            {/* Liseré de marque */}
+            <CardHeader className="space-y-4 pb-6 pt-8">
               <div className="flex justify-center">
                 <Logo />
               </div>
@@ -219,7 +232,7 @@ const LoginForm = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10 h-11"
-                      placeholder="utilisateur"
+                      placeholder="nom@exemple.com"
                       disabled={isLoading}
                       required
                     />

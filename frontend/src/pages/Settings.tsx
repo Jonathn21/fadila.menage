@@ -14,7 +14,9 @@ const Settings = () => {
   return (
     <DashboardLayout>
       <div className="w-full max-w-2xl mx-auto px-1 sm:px-0">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Paramètres</h1>
+        <div className="relative overflow-hidden rounded-xl border border-border/80 surface-brushed shadow-card px-4 py-4 sm:px-6 sm:py-5 mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold">Paramètres</h1>
+        </div>
 
         <Tabs defaultValue="notifications">
           {isSuperUser && (

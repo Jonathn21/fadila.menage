@@ -33,3 +33,8 @@ curl
 ping
 frontend_incomplete/
 frontend_old_*/
+
+docker-compose.override.yml
+
+# Backups base de données
+backups/

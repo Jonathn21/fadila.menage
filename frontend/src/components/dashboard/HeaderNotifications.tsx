@@ -185,8 +185,12 @@ const HeaderNotifications: React.FC = () => {
         ...notificationData,
         id: notificationData.id.toString()
       };
-      
+
       addNotification(formattedNotification);
+
+      // Signaler aux autres composants (sidebar) qu'un événement métier vient
+      // d'arriver : ils rafraîchissent leurs compteurs sans polling agressif.
+      window.dispatchEvent(new CustomEvent('app:activity'));
       
       // 🔥 TOAST POUR NOUVELLES NOTIFICATIONS
       if (!formattedNotification.lu) {

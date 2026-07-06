@@ -67,13 +67,13 @@ const Dashboard: React.FC = () => {
       icon: <LoaderCircle className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />,
     },
     {
-      title: "Demandes acceptés",
+      title: "Demandes acceptées",
       value: data.stages_acceptes.toString(),
       color: "bg-green-100",
       icon: <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />,
     },
     {
-      title: "Demandes refusés",
+      title: "Demandes refusées",
       value: data.stages_refuses.toString(),
       color: "bg-red-100",
       icon: <X className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />,
@@ -98,7 +98,10 @@ const Dashboard: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-green-900">Tableau de bord</h1>
+        <div className="relative overflow-hidden rounded-xl border border-border/80 surface-brushed shadow-card px-4 py-4 sm:px-6 sm:py-5">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-green-900">Tableau de bord</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">Vue d'ensemble des demandes et des stages</p>
+        </div>
 
         {/* Statistiques */}
         <DashboardStats stats={stats} />

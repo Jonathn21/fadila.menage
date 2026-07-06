@@ -113,8 +113,16 @@ const SidebarNavigation = () => {
     };
     fetchCounts();
 
-    const interval = setInterval(fetchCounts, 10000);
-    return () => clearInterval(interval);
+    // Rafraîchissement piloté par le WebSocket : le header émet 'app:activity'
+    // à chaque notification métier. Le polling n'est plus qu'un filet de
+    // sécurité lent (2 min) en cas de WebSocket déconnecté.
+    const onActivity = () => fetchCounts();
+    window.addEventListener('app:activity', onActivity);
+    const fallback = setInterval(fetchCounts, 120000);
+    return () => {
+      window.removeEventListener('app:activity', onActivity);
+      clearInterval(fallback);
+    };
   }, []);
 
   const Badge = ({ count, variant = "default" }: { count: number; variant?: "default" | "destructive" | "warning" | "success"; }) => {
@@ -280,14 +288,23 @@ const SidebarNavigation = () => {
           Gestion des stages
         </span>
         <span className="block text-xs text-green-300 leading-tight">
-          Gerez vos demandes de stage
+          Gérez vos demandes de stage
         </span>
       </div>
     </div>
   );
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-green-900 to-emerald-900 border-r border-green-800">
+    <div className="relative flex flex-col h-full bg-gradient-to-b from-green-900 via-green-900 to-emerald-950 border-r border-green-800 shadow-[inset_-1px_0_0_rgba(255,255,255,0.06)]">
+      {/* Reflet satiné + texture brossée */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(115deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.025) 32%, transparent 55%), radial-gradient(560px 280px at 0% 0%, rgba(255,255,255,0.09), transparent 60%), repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 3px)",
+        }}
+      />
       {/* Logo intégré */}
       <Logo />
       
@@ -298,7 +315,7 @@ const SidebarNavigation = () => {
             <SidebarMenuButton 
               asChild 
               isActive={location.pathname === "/accueil"} 
-              className="text-sm py-2.5 hover:bg-green-800 transition-colors rounded-lg mx-2 data-[active=true]:bg-green-700 data-[active=true]:text-white data-[active=true]:shadow-sm"
+              className="text-sm py-2.5 hover:bg-green-800 transition-colors rounded-lg mx-2 data-[active=true]:bg-gradient-to-b data-[active=true]:from-green-600 data-[active=true]:to-green-700 data-[active=true]:text-white data-[active=true]:shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(0,0,0,0.25)]"
             >
               <Link to="/accueil" className="flex items-center">
                 <LayoutDashboard className="size-4 text-green-300" />
@@ -332,7 +349,7 @@ const SidebarNavigation = () => {
                       to={subItem.path} 
                       className={cn(
                         "flex items-center rounded-lg px-3 py-2 text-xs transition-colors group/subitem text-green-100", 
-                        isActive ? "bg-green-700 text-white font-medium shadow-sm" : "hover:bg-green-800/50"
+                        isActive ? "bg-gradient-to-b from-green-600 to-green-700 text-white font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(0,0,0,0.25)]" : "hover:bg-green-800/50"
                       )}
                     >
                       <span className={cn("mr-2.5", isActive ? "text-green-200" : "text-green-400")}>
@@ -375,7 +392,7 @@ const SidebarNavigation = () => {
                       to={subItem.path} 
                       className={cn(
                         "flex items-center rounded-lg px-3 py-2 text-xs transition-colors group/subitem text-green-100", 
-                        isActive ? "bg-green-700 text-white font-medium shadow-sm" : "hover:bg-green-800/50"
+                        isActive ? "bg-gradient-to-b from-green-600 to-green-700 text-white font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(0,0,0,0.25)]" : "hover:bg-green-800/50"
                       )}
                     >
                       <span className={cn("mr-2.5", isActive ? "text-green-200" : "text-green-400")}>
@@ -418,7 +435,7 @@ const SidebarNavigation = () => {
                       to={subItem.path}
                       className={cn(
                         "flex items-center rounded-lg px-3 py-2 text-xs transition-colors group/subitem text-green-100",
-                        isActive ? "bg-green-700 text-white font-medium shadow-sm" : "hover:bg-green-800/50"
+                        isActive ? "bg-gradient-to-b from-green-600 to-green-700 text-white font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(0,0,0,0.25)]" : "hover:bg-green-800/50"
                       )}
                     >
                       <span className={cn("mr-2.5", isActive ? "text-green-200" : "text-green-400")}>
@@ -445,7 +462,7 @@ const SidebarNavigation = () => {
               <SidebarMenuButton 
                 asChild 
                 isActive={location.pathname === item.path} 
-                className="text-sm py-2.5 hover:bg-green-800 transition-colors rounded-lg mx-2 data-[active=true]:bg-green-700 data-[active=true]:text-white data-[active=true]:shadow-sm"
+                className="text-sm py-2.5 hover:bg-green-800 transition-colors rounded-lg mx-2 data-[active=true]:bg-gradient-to-b data-[active=true]:from-green-600 data-[active=true]:to-green-700 data-[active=true]:text-white data-[active=true]:shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(0,0,0,0.25)]"
               >
                 <Link to={item.path} className="flex items-center justify-between w-full">
                   <div className="flex items-center">
@@ -463,7 +480,7 @@ const SidebarNavigation = () => {
       <div className="mt-auto border-t border-green-800 p-3">
         <Button
           onClick={handleLogout}
-          className="w-full justify-start py-2.5 text-sm bg-green-800/30 hover:bg-green-700/50 text-white border border-green-700 hover:border-green-600 transition-colors"
+          className="w-full justify-start py-2.5 text-sm bg-gradient-to-b from-green-700/50 to-green-900/60 hover:from-green-600/60 hover:to-green-800/70 text-white border border-green-700 hover:border-green-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-colors"
         >
           <LogOut className="mr-3 h-4 w-4 text-green-300" />
           Déconnexion

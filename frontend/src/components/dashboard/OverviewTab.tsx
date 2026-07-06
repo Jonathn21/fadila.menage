@@ -260,7 +260,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 asChild
               >
                 <Link
-                  to="/internships/pending"
+                  to="/demandes/toutes"
                   className="font-medium"
                 >
                   <span>Voir toutes les demandes</span>
@@ -370,21 +370,6 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
               )}
             </CardContent>
 
-            {upcomingEvents.length > 0 && (
-              <CardFooter className="border-t border-gray-200 px-4 py-3 bg-gray-50/30">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-between group text-gray-700 hover:text-primary hover:bg-gray-100 text-xs sm:text-sm"
-                  asChild
-                >
-                  <Link to="/calendar" className="font-medium">
-                    <span>Voir le calendrier complet</span>
-                    <ArrowUpRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </Link>
-                </Button>
-              </CardFooter>
-            )}
           </Card>
         )}
       </div>

@@ -139,7 +139,7 @@ const REPORT_CATALOGUE: ReportConfig[] = [
   {
     id: "demandes_en_cours", label: "Demandes en cours",
     description: "Liste des dossiers actifs avec statut, délai écoulé et alertes de retard",
-    icon: <Hourglass size={15}/>, category: "Opérationnel", formats: ["pdf","excel"],
+    icon: <Hourglass size={15}/>, category: "Opérationnel", formats: ["excel"],
     accentColor: "#f59e0b", badge: "Quotidien",
     params: [
       { key: "statut", label: "Statut", type: "select", defaultValue: "tous", options: [
@@ -156,14 +156,14 @@ const REPORT_CATALOGUE: ReportConfig[] = [
   {
     id: "stages_actifs", label: "Stages actifs",
     description: "Tous les stagiaires actuellement en poste par direction et service",
-    icon: <UserPlus size={15}/>, category: "Opérationnel", formats: ["pdf","excel"],
+    icon: <UserPlus size={15}/>, category: "Opérationnel", formats: ["excel"],
     accentColor: "#3b82f6",
     params: [{ key: "direction", label: "Direction", type: "select", defaultValue: "tous", options: DIRECTIONS }],
   },
   {
     id: "fins_imminentes", label: "Fins de stage imminentes",
     description: "Stages se terminant bientôt — anticiper renouvellements et attestations",
-    icon: <Clock size={15}/>, category: "Opérationnel", formats: ["pdf","excel"],
+    icon: <Clock size={15}/>, category: "Opérationnel", formats: ["excel"],
     accentColor: "#ef4444", badge: "Urgent",
     params: [{ key: "horizon_jours", label: "Horizon", type: "select", defaultValue: "15", options: [
       { value: "7", label: "7 jours" }, { value: "15", label: "15 jours" }, { value: "30", label: "30 jours" },
@@ -172,13 +172,13 @@ const REPORT_CATALOGUE: ReportConfig[] = [
   {
     id: "attestations_en_attente", label: "Attestations en attente",
     description: "Demandes d'attestation non encore traitées avec délai de soumission",
-    icon: <FileSearch size={15}/>, category: "Opérationnel", formats: ["pdf","excel"],
+    icon: <FileSearch size={15}/>, category: "Opérationnel", formats: ["excel"],
     accentColor: "#8b5cf6", params: [],
   },
   {
     id: "synthese_mensuelle", label: "Synthèse mensuelle",
     description: "Volume traité, taux d'acceptation, délai moyen — comparé au mois précédent",
-    icon: <BarChart3 size={15}/>, category: "Performance", formats: ["pdf","excel"],
+    icon: <BarChart3 size={15}/>, category: "Performance", formats: ["excel"],
     accentColor: "#6366f1", badge: "Auto le 1er",
     params: [
       { key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) },
@@ -188,14 +188,14 @@ const REPORT_CATALOGUE: ReportConfig[] = [
   {
     id: "rapport_annuel", label: "Rapport annuel",
     description: "Synthèse complète de l'année avec graphiques, tendances et répartitions",
-    icon: <TrendingUp size={15}/>, category: "Performance", formats: ["pdf","excel"],
+    icon: <TrendingUp size={15}/>, category: "Performance", formats: ["excel"],
     accentColor: "#10b981",
     params: [{ key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) }],
   },
   {
     id: "performance_traitement", label: "Performance de traitement",
     description: "Délais par agent, jours de pic et goulots d'étranglement",
-    icon: <TrendingUp size={15}/>, category: "Performance", formats: ["pdf","excel"],
+    icon: <TrendingUp size={15}/>, category: "Performance", formats: ["excel"],
     accentColor: "#f97316",
     params: [
       { key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) },
@@ -205,7 +205,7 @@ const REPORT_CATALOGUE: ReportConfig[] = [
   {
     id: "repartition_directions", label: "Répartition par direction",
     description: "Nombre de stagiaires par direction et service — charge d'accueil",
-    icon: <Building2 size={15}/>, category: "RH", formats: ["pdf","excel"],
+    icon: <Building2 size={15}/>, category: "RH", formats: ["excel"],
     accentColor: "#0ea5e9",
     params: [
       { key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) },
@@ -217,14 +217,14 @@ const REPORT_CATALOGUE: ReportConfig[] = [
   {
     id: "profil_stagiaires", label: "Profil démographique",
     description: "Genre, niveau d'études, spécialité, établissement, pays de résidence",
-    icon: <GraduationCap size={15}/>, category: "RH", formats: ["pdf","excel"],
+    icon: <GraduationCap size={15}/>, category: "RH", formats: ["excel"],
     accentColor: "#14b8a6",
     params: [{ key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) }],
   },
   {
     id: "etablissements_partenaires", label: "Établissements partenaires",
     description: "Classement des écoles par volume et taux d'acceptation",
-    icon: <Building2 size={15}/>, category: "RH", formats: ["pdf","excel"],
+    icon: <Building2 size={15}/>, category: "RH", formats: ["excel"],
     accentColor: "#84cc16",
     params: [
       { key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) },
@@ -236,14 +236,14 @@ const REPORT_CATALOGUE: ReportConfig[] = [
   {
     id: "renouvellements", label: "Renouvellements de stage",
     description: "Stages renouvelés avec lien précédent → nouveau et taux de renouvellement",
-    icon: <RefreshCw size={15}/>, category: "RH", formats: ["pdf","excel"],
+    icon: <RefreshCw size={15}/>, category: "RH", formats: ["excel"],
     accentColor: "#6366f1",
     params: [{ key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) }],
   },
   {
     id: "audit_actions", label: "Audit des actions",
     description: "Journal complet des actions utilisateurs — qui a fait quoi et quand",
-    icon: <Shield size={15}/>, category: "Conformité", formats: ["pdf","excel"],
+    icon: <Shield size={15}/>, category: "Conformité", formats: ["excel"],
     accentColor: "#64748b",
     params: [
       { key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) },
@@ -257,7 +257,7 @@ const REPORT_CATALOGUE: ReportConfig[] = [
   {
     id: "demandes_archivees", label: "Demandes archivées",
     description: "Dossiers expirés ou archivés automatiquement après 6 mois sans suite",
-    icon: <Archive size={15}/>, category: "Conformité", formats: ["pdf","excel"],
+    icon: <Archive size={15}/>, category: "Conformité", formats: ["excel"],
     accentColor: "#94a3b8",
     params: [{ key: "annee", label: "Année", type: "year", defaultValue: String(new Date().getFullYear()) }],
   },
@@ -292,7 +292,6 @@ const StatCard: React.FC<{
   icon: React.ReactNode; accent?: string;
 }> = ({ title, value, sub, icon, accent }) => (
   <Card className="relative overflow-hidden border border-gray-200">
-    {accent && <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: accent }}/>}
     <CardHeader className="flex flex-col sm:flex-row flex-row sm:items-center sm:justify-between pb-2 pl-4 gap-2 sm:gap-0">
       <CardTitle className="text-xs sm:text-sm font-medium text-gray-900">{title}</CardTitle>
       <span className="text-gray-400">{icon}</span>
@@ -326,7 +325,6 @@ const ReportCard: React.FC<{
   return (
     <>
       <Card className="relative overflow-hidden border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all">
-        <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: config.accentColor }}/>
         <CardHeader className="pb-2 pl-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -440,7 +438,7 @@ const Analytics: React.FC = () => {
   const [history,         setHistory]          = useState<HistoryEntry[]>(loadHistory);
   const [toast,           setToast]            = useState<{ msg: string; type: "success"|"error" } | null>(null);
   const [emailDialog,     setEmailDialog]      = useState(false);
-  const [emailConfig,     setEmailConfig]      = useState({ reportId: "", format: "pdf" as ReportFormat, email: "" });
+  const [emailConfig,     setEmailConfig]      = useState({ reportId: "", format: "excel" as ReportFormat, email: "" });
   const toastRef = useRef<ReturnType<typeof setTimeout>>();
 
   const showToast = (msg: string, type: "success"|"error") => {
@@ -552,7 +550,7 @@ const Analytics: React.FC = () => {
       <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
 
         {/* ── Header ── */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+        <div className="relative overflow-hidden rounded-xl border border-border/80 surface-brushed shadow-card px-4 py-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Tableaux de bord et statistiques</h1>
             <CardDescription className="text-xs sm:text-sm text-gray-600">
@@ -869,7 +867,6 @@ const Analytics: React.FC = () => {
                     { label: "Dans l'historique",     value: history.length,          accent: C_PENDING,   icon: <History size={14}/> },
                   ].map(s => (
                     <Card key={s.label} className="relative overflow-hidden border border-gray-200">
-                      <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: s.accent }}/>
                       <CardContent className="pl-4 pt-4 pb-3">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 gap-2 sm:gap-0">
                           <span className="text-[10px] sm:text-xs text-gray-500">{s.label}</span>
@@ -1062,7 +1059,7 @@ const Analytics: React.FC = () => {
                 <Label className="text-xs font-medium text-gray-700">Format</Label>
                 <Select value={emailConfig.format} onValueChange={v => setEmailConfig(c => ({ ...c, format: v as ReportFormat }))}>
                   <SelectTrigger className="h-9 text-xs"><SelectValue/></SelectTrigger>
-                  <SelectContent><SelectItem value="pdf" className="text-xs">PDF</SelectItem><SelectItem value="excel" className="text-xs">Excel</SelectItem></SelectContent>
+                  <SelectContent><SelectItem value="excel" className="text-xs">Excel</SelectItem></SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">

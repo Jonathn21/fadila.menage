@@ -167,8 +167,9 @@ const InternshipTypeStep: React.FC<InternshipTypeStepProps> = ({
   }, [selectedCountry]);
 
   const isFormValid = () => {
-    const requiredFields = ['nom', 'prenom', 'genre', 'paysResidence', 'telephone', 'email', 'domaine', 'niveauEtude'];
-    return requiredFields.every(field => data[field as keyof ApplicationData]) && data.documents.photoPasseport && !photoError;
+    const requiredFields = ['nom', 'prenom', 'genre', 'paysResidence', 'telephone', 'email', 'domaine', 'niveauEtude', 'typeStage'];
+    const hasPhoneDigits = (data.telephone || "").replace(/\D/g, "").length >= 10; // indicatif + 8 chiffres
+    return requiredFields.every(field => data[field as keyof ApplicationData]) && hasPhoneDigits && data.documents.photoPasseport && !photoError;
   };
 
   const isAcademicInternship = data.typeStage === "Académique";

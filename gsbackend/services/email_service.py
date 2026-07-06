@@ -260,7 +260,7 @@ class EmailTemplateService:
         <td align="center" valign="top" style="padding: 26px 12px;">
 
             <!-- ============ EN-TÊTE (logo + identité) ============ -->
-            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" bgcolor="#FFFFFF" role="presentation" style="background-color:#FFFFFF;">
+            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" bgcolor="#FFFFFF" role="presentation" style="background-color:#FFFFFF; border-radius: 10px 10px 0 0; overflow: hidden;">
                 <tr>
                     <td class="header-container es-px" align="left" style="padding: 25px 35px;">
                         <table border="0" cellpadding="0" cellspacing="0" align="left" role="presentation">
@@ -290,7 +290,7 @@ class EmailTemplateService:
             </table>
 
             <!-- ============ PIED DE PAGE ============ -->
-            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" bgcolor="#FFFFFF" role="presentation" style="background-color:#FFFFFF;">
+            <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" bgcolor="#FFFFFF" role="presentation" style="background-color:#FFFFFF; border-radius: 0 0 10px 10px; overflow: hidden;">
                 <tr>
                     <td class="es-px" align="center" style="padding: 35px;">
 
@@ -402,7 +402,7 @@ class EmailContentService:
     </div>
     
     <!-- Message de remerciement -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 8px; margin-top: 20px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Nous vous remercions de votre collaboration avec la Communauté Électrique du Bénin
         </p>
@@ -433,14 +433,14 @@ class EmailContentService:
     </div>
     
     <!-- Avertissement -->
-    <div style="background-color: #F7F8FA; border-left: 4px solid #9AA1A9; padding: 20px; margin: 25px 0; border-radius: 0;">
+    <div style="background-color: #F7F8FA; border-left: 4px solid #9AA1A9; padding: 20px; margin: 25px 0; border-radius: 8px;">
         <p style="color: #6B7280; font-size: 15px; margin: 0;">
             ⚠️ <strong>Instruction requise :</strong> Veuillez procéder à l'examen de ce dossier.
         </p>
     </div>
     
     <!-- Référence -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 0; margin: 30px 0;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 8px; margin: 30px 0;">
         <p style="color: #1F2933; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
             Référence administrative
         </p>
@@ -488,14 +488,14 @@ class EmailContentService:
     </div>
 
     <!-- Pièce jointe -->
-    <div style="background-color: #F7F8FA; border-left: 4px solid #2B2F33; padding: 15px; margin: 20px 0; border-radius: 0;">
+    <div style="background-color: #F7F8FA; border-left: 4px solid #2B2F33; padding: 15px; margin: 20px 0; border-radius: 8px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0;">
             📎 <strong>Pièce jointe :</strong> Votre attestation de stage signée est jointe à cet email.
         </p>
     </div>
 
     <!-- Conseils importants -->
-    <div style="background-color: #F7F8FA; border: 1px solid #ECECEE; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+    <div style="background-color: #F7F8FA; border: 1px solid #ECECEE; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Conseils importants
         </h3>
@@ -509,7 +509,7 @@ class EmailContentService:
     </div>
 
     <!-- Message de remerciement -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 8px; margin-top: 20px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Nous vous remercions pour votre stage au sein de notre organisation et vous souhaitons plein succès dans vos futures entreprises
         </p>
@@ -625,7 +625,7 @@ Le Service des Stages
     </div>
     
     <!-- Référence -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 0; margin: 30px 0;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 8px; margin: 30px 0;">
         <p style="color: #1F2933; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
             Votre référence de dossier
         </p>
@@ -635,7 +635,7 @@ Le Service des Stages
     </div>
     
     <!-- Instruction administrative -->
-    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 30px;">
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Instruction administrative
         </h3>
@@ -647,7 +647,7 @@ Le Service des Stages
     </div>
     
     <!-- Message de remerciement -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 8px; margin-top: 20px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Nous vous remercions de l'intérêt manifesté pour la Communauté Électrique du Bénin
         </p>
@@ -696,7 +696,7 @@ Site web: www.cebnet.org
         piece_jointe_mention = ""
         if convention_pdf_path:
             piece_jointe_mention = """
-    <div style="background-color: #F7F8FA; border-left: 4px solid #2B2F33; padding: 15px; margin: 20px 0; border-radius: 0;">
+    <div style="background-color: #F7F8FA; border-left: 4px solid #2B2F33; padding: 15px; margin: 20px 0; border-radius: 8px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0;">
             📎 <strong>Pièce jointe :</strong> Votre convention de stage signée est jointe à cet email.
         </p>
@@ -716,7 +716,7 @@ Site web: www.cebnet.org
     {piece_jointe_mention}
 
     <!-- Référence -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 0; margin: 30px 0;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 8px; margin: 30px 0;">
         <p style="color: #1F2933; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
             Référence administrative
         </p>
@@ -726,7 +726,7 @@ Site web: www.cebnet.org
     </div>
 
     <!-- Information relative -->
-    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 30px;">
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Information relative au stage
         </h3>
@@ -738,7 +738,7 @@ Site web: www.cebnet.org
     </div>
 
     <!-- Message de bienvenue -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 8px; margin-top: 20px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Nous nous réjouissons de vous accueillir au sein de notre institution
         </p>
@@ -769,7 +769,7 @@ Site web: www.cebnet.org
     </div>
 
     <!-- Référence -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 0; margin: 30px 0;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 8px; margin: 30px 0;">
         <p style="color: #1F2933; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
             Référence administrative
         </p>
@@ -779,7 +779,7 @@ Site web: www.cebnet.org
     </div>
 
     <!-- Information sur le traitement -->
-    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 30px;">
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Information sur le traitement
         </h3>
@@ -791,7 +791,7 @@ Site web: www.cebnet.org
     </div>
 
     <!-- Message patiente -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 8px; margin-top: 20px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Merci de bien vouloir patienter pendant la durée du traitement administratif
         </p>
@@ -823,18 +823,18 @@ Site web: www.cebnet.org
     </div>
 
     <!-- Élément(s) sollicité(s) -->
-    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 30px;">
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Élément(s) sollicité(s)
         </h3>
         
-        <div style="background: white; padding: 20px; border-radius: 0; border: 1px solid #E8EAED;">
+        <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #E8EAED;">
             {message}
         </div>
     </div>
 
     <!-- Référence -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 0; margin: 30px 0;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 8px; margin: 30px 0;">
         <p style="color: #1F2933; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
             Référence de dossier
         </p>
@@ -844,7 +844,7 @@ Site web: www.cebnet.org
     </div>
 
     <!-- Délai de réponse -->
-    <div style="background-color: #F7F8FA; border: 1px solid #ECECEE; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+    <div style="background-color: #F7F8FA; border: 1px solid #ECECEE; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
         <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
             Délai de réponse
         </h3>
@@ -900,7 +900,7 @@ Site web: www.cebnet.org
             Après un examen attentif de votre dossier, nous regrettons de vous informer que votre candidature n'a pas été retenue pour cette session.
         </p>
         
-        <div style="background-color: #F7F8FA; padding: 15px; border-radius: 0; margin: 15px 0;">
+        <div style="background-color: #F7F8FA; padding: 15px; border-radius: 8px; margin: 15px 0;">
             <p style="color: #1F2933; font-size: 15px; margin: 0; line-height: 1.75;">
                 <strong>Motif :</strong> {demande.raison_refus or "Le nombre de places disponibles est limité."}
             </p>
@@ -908,7 +908,7 @@ Site web: www.cebnet.org
     </div>
     
     <!-- Référence -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 0; margin: 30px 0;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 25px; border-radius: 8px; margin: 30px 0;">
         <p style="color: #1F2933; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
             Référence administrative
         </p>
@@ -918,7 +918,7 @@ Site web: www.cebnet.org
     </div>
     
     <!-- Message de fin -->
-    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 8px; margin-top: 20px;">
         <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
             Nous vous remercions encore pour votre candidature et vous souhaitons plein succès dans vos recherches futures
         </p>

@@ -190,3 +190,4 @@ zope.interface==7.2
 zopfli==0.2.3.post1
 django-ratelimit==4.0.0
 python-docx==1.1.2
+sentry-sdk[django]==2.19.2

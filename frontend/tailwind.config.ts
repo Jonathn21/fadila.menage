@@ -18,6 +18,18 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['"Public Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				display: ['Sora', '"Public Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif']
+			},
+			boxShadow: {
+				card: 'inset 0 1px 0 0 rgb(255 255 255 / 0.85), 0 1px 2px 0 rgb(16 24 40 / 0.05), 0 1px 3px 0 rgb(16 24 40 / 0.07)',
+				'card-hover': 'inset 0 1px 0 0 rgb(255 255 255 / 0.85), 0 4px 8px -2px rgb(16 24 40 / 0.08), 0 2px 4px -2px rgb(16 24 40 / 0.05)',
+				elevated: 'inset 0 1px 0 0 rgb(255 255 255 / 0.85), 0 12px 24px -6px rgb(16 24 40 / 0.12), 0 4px 8px -4px rgb(16 24 40 / 0.06)',
+				'input-metal': 'inset 0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 0 0 rgb(255 255 255 / 0.9)',
+				'btn-metal': 'inset 0 1px 0 0 rgb(255 255 255 / 0.25), inset 0 -1px 0 0 rgb(0 0 0 / 0.12), 0 1px 2px 0 rgb(16 24 40 / 0.15)',
+				'btn-metal-light': 'inset 0 1px 0 0 rgb(255 255 255 / 0.9), inset 0 -1px 0 0 rgb(16 24 40 / 0.05), 0 1px 2px 0 rgb(16 24 40 / 0.08)'
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',

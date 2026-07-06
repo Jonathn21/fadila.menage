@@ -353,7 +353,7 @@ const RemunerationSection: React.FC<{
                 type="checkbox"
                 checked={field.value}
                 onChange={field.onChange}
-                className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
+                className="h-5 w-5 cursor-pointer rounded border-border accent-primary focus:ring-primary/30"
               />
             </FormControl>
           </FormItem>

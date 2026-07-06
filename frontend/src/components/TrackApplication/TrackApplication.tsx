@@ -656,7 +656,7 @@ const TrackApplication = () => {
         }}
       >
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-lg sm:text-xl md:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">SUIVI DE DEMANDE</h1>
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 sm:mb-4">SUIVI DE DEMANDE</h1>
           <p className="text-base sm:text-lg opacity-90 max-w-2xl mx-auto">
             Suivez l'état de votre demande de stage en temps réel
           </p>

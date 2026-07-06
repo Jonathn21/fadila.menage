@@ -262,7 +262,7 @@ const RegisterForm = () => {
       </form>
 
       <div className="mt-8 text-center text-sm text-gray-600">
-        Copyright © 2025 - CEB
+        Copyright © {new Date().getFullYear()} - CEB
       </div>
     </div>
   );
