@@ -1450,7 +1450,139 @@ class EmailSenderService:
                 attachments=attachments,
                 reply_to=['attestations@cebnet.org']
             )
-            
+
         except Exception as e:
             logger.error(f"❌ Erreur envoi email attestation signée: {e}", exc_info=True)
             return False
+
+    # =========================================================================
+    # EMAILS DE FIN DE STAGE & ALERTES AUTOMATIQUES
+    # =========================================================================
+
+    @classmethod
+    def send_stagiaire_farewell(cls, stagiaire, async_send: bool = True) -> bool:
+        """Envoie l'email de fin de stage au stagiaire"""
+        from services.email_templates_extended import StageEmailTemplates
+
+        email_data = StageEmailTemplates.stagiaire_farewell(stagiaire)
+        return cls.send_email(
+            to_email=stagiaire.email,
+            subject=email_data['subject'],
+            html_content=email_data['html'],
+            text_content=email_data['text'],
+            async_send=async_send,
+        )
+
+    @classmethod
+    def send_alerte_demandes_en_retard(cls, admin_emails: list, demandes_retard: list, seuil_jours: int = 7, async_send: bool = True) -> bool:
+        """Envoie l'email d'alerte pour les demandes en retard aux admins"""
+        from services.email_templates_extended import AlerteEmailTemplates
+
+        email_data = AlerteEmailTemplates.alerte_demandes_en_retard(demandes_retard, seuil_jours)
+        success = True
+        for email in admin_emails:
+            result = cls.send_email(
+                to_email=email,
+                subject=email_data['subject'],
+                html_content=email_data['html'],
+                text_content=email_data['text'],
+                async_send=async_send,
+            )
+            if not result:
+                success = False
+        return success
+
+    @classmethod
+    def send_alerte_attestations_en_attente(cls, admin_emails: list, attestations: list, seuil_jours: int = 5, async_send: bool = True) -> bool:
+        """Envoie l'email d'alerte pour les attestations en attente"""
+        from services.email_templates_extended import AlerteEmailTemplates
+
+        email_data = AlerteEmailTemplates.alerte_attestations_en_attente(attestations, seuil_jours)
+        success = True
+        for email in admin_emails:
+            result = cls.send_email(
+                to_email=email,
+                subject=email_data['subject'],
+                html_content=email_data['html'],
+                text_content=email_data['text'],
+                async_send=async_send,
+            )
+            if not result:
+                success = False
+        return success
+
+    @classmethod
+    def send_rappel_mi_stage(cls, admin_emails: list, stagiaires_mi_stage: list, async_send: bool = True) -> bool:
+        """Envoie l'email de rappel mi-stage aux admins"""
+        from services.email_templates_extended import AlerteEmailTemplates
+
+        email_data = AlerteEmailTemplates.rappel_mi_stage(stagiaires_mi_stage)
+        success = True
+        for email in admin_emails:
+            result = cls.send_email(
+                to_email=email,
+                subject=email_data['subject'],
+                html_content=email_data['html'],
+                text_content=email_data['text'],
+                async_send=async_send,
+            )
+            if not result:
+                success = False
+        return success
+
+    @classmethod
+    def send_alerte_stages_proches(cls, admin_emails: list, stages, date_cible, async_send: bool = True) -> bool:
+        """Envoie l'email d'alerte stages débutant bientôt aux admins"""
+        from services.email_templates_extended import AlerteEmailTemplates
+
+        email_data = AlerteEmailTemplates.alerte_stages_proches_email(stages, date_cible)
+        success = True
+        for email in admin_emails:
+            result = cls.send_email(
+                to_email=email,
+                subject=email_data['subject'],
+                html_content=email_data['html'],
+                text_content=email_data['text'],
+                async_send=async_send,
+            )
+            if not result:
+                success = False
+        return success
+
+    @classmethod
+    def send_alerte_stages_finissants(cls, admin_emails: list, stages_info: list, async_send: bool = True) -> bool:
+        """Envoie l'email d'alerte stages finissant bientôt aux admins"""
+        from services.email_templates_extended import AlerteEmailTemplates
+
+        email_data = AlerteEmailTemplates.alerte_stages_finissants_email(stages_info)
+        success = True
+        for email in admin_emails:
+            result = cls.send_email(
+                to_email=email,
+                subject=email_data['subject'],
+                html_content=email_data['html'],
+                text_content=email_data['text'],
+                async_send=async_send,
+            )
+            if not result:
+                success = False
+        return success
+
+    @classmethod
+    def send_recapitulatif_hebdomadaire(cls, admin_emails: list, stats: dict, async_send: bool = True) -> bool:
+        """Envoie le récapitulatif hebdomadaire aux admins"""
+        from services.email_templates_extended import AlerteEmailTemplates
+
+        email_data = AlerteEmailTemplates.recapitulatif_hebdomadaire(stats)
+        success = True
+        for email in admin_emails:
+            result = cls.send_email(
+                to_email=email,
+                subject=email_data['subject'],
+                html_content=email_data['html'],
+                text_content=email_data['text'],
+                async_send=async_send,
+            )
+            if not result:
+                success = False
+        return success

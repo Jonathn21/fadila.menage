@@ -1585,6 +1585,50 @@ class NotificationService:
             return None
     
     @classmethod
+    def notifier_convention_temporaire_generee(cls, demande, user, convention):
+        """Notification quand une convention temporaire est générée lors de la pré-acceptation"""
+        try:
+            nom_complet = f"{demande.etudiant_prenom} {demande.etudiant_nom}"
+            message = (
+                f"Une convention temporaire a été générée pour la demande de {nom_complet} "
+                f"(N° {demande.tracking_id})."
+            )
+
+            notification = cls.envoyer_notification(
+                user=user,
+                titre="Convention temporaire générée",
+                message=message,
+                type_notif='convention',
+                demande=demande,
+                son='success'
+            )
+
+            return notification
+
+        except Exception as e:
+            logger.error(f"❌ Erreur notification convention temporaire: {e}")
+            return None
+
+    @classmethod
+    def broadcast_convention_temporaire_generee(cls, demande, user_acteur, convention):
+        """Diffuse la notification de convention temporaire à tous les utilisateurs actifs"""
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        utilisateurs_actifs = User.objects.filter(is_active=True).exclude(id=user_acteur.id)
+        nom_complet = f"{demande.etudiant_prenom} {demande.etudiant_nom}"
+
+        for utilisateur in utilisateurs_actifs:
+            cls.envoyer_notification(
+                user=utilisateur,
+                titre="Convention temporaire générée",
+                message=f"Une convention temporaire a été générée pour {nom_complet} (N° {demande.tracking_id}).",
+                type_notif='convention',
+                demande=demande,
+                son='chime'
+            )
+
+    @classmethod
     def broadcast_attestation_signee_upload(cls, stagiaire, demande_attestation):
         """
         Diffuse la notification d'upload d'attestation signée à tous les utilisateurs actifs

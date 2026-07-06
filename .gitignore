@@ -26,3 +26,10 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+privkey.pem
+*.save
+curl
+ping
+frontend_incomplete/
+frontend_old_*/

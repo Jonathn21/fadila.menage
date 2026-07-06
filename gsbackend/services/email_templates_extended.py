@@ -937,6 +937,532 @@ Téléphone: +229 21 30 05 06"""
         }
 
 
+    @staticmethod
+    def stagiaire_farewell(stagiaire) -> dict:
+        """Email de fin de stage (dernier jour) au stagiaire"""
+
+        duree = (stagiaire.date_fin - stagiaire.date_debut).days if stagiaire.date_debut else 'N/A'
+
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+
+    <!-- Message principal -->
+    <div style="margin-bottom: 30px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75; margin-bottom: 20px;">
+            Votre stage au sein de la Communauté Électrique du Bénin prend fin aujourd'hui.
+            Nous tenons à vous remercier pour votre engagement et votre contribution durant cette période.
+        </p>
+    </div>
+
+    <!-- Récapitulatif du stage -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Récapitulatif de votre stage
+        </h3>
+
+        <table style="width: 100%; font-size: 15px;">
+            <tr>
+                <td style="padding: 10px 0; width: 140px; color: #666; font-weight: 600;">Stagiaire :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.prenom} {stagiaire.nom}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Service :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.service or 'N/A'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Direction :</td>
+                <td style="padding: 10px 0; color: #333;">{stagiaire.direction or 'N/A'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Période :</td>
+                <td style="padding: 10px 0; color: #333;">Du {stagiaire.date_debut.strftime('%d/%m/%Y')} au {stagiaire.date_fin.strftime('%d/%m/%Y')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; color: #666; font-weight: 600;">Durée :</td>
+                <td style="padding: 10px 0; color: #333;">{duree} jours</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Démarches à effectuer -->
+    <div style="background-color: #F7F8FA; border: 1px solid #ECECEE; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Démarches de fin de stage
+        </h3>
+
+        <ol style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 10px;">Restituer tout matériel ou équipement emprunté</li>
+            <li style="margin-bottom: 10px;">Soumettre votre rapport de stage final</li>
+            <li style="margin-bottom: 10px;">Effectuer votre demande d'attestation de stage</li>
+            <li>Débriefing final avec votre tuteur de stage</li>
+        </ol>
+    </div>
+
+    <!-- Message de remerciement -->
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0; margin-top: 20px;">
+        <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
+            Merci pour votre contribution et nous vous souhaitons plein succès dans la suite de votre parcours
+        </p>
+    </div>
+</div>
+        """
+
+        greeting = get_gender_based_greeting(stagiaire.nom, stagiaire.genre)
+        subject = "Fin de votre stage - Communauté Électrique du Bénin"
+
+        return {
+            'subject': subject,
+            'html': BenchmarkEmailTemplateService.build_benchmark_email(
+                greeting,
+                content,
+                "Service des Stages"
+            ),
+            'text': f"""{subject}
+
+{greeting},
+
+Votre stage au sein de la CEB prend fin aujourd'hui.
+
+RÉCAPITULATIF :
+• Stagiaire : {stagiaire.prenom} {stagiaire.nom}
+• Service : {stagiaire.service or 'N/A'}
+• Direction : {stagiaire.direction or 'N/A'}
+• Période : {stagiaire.date_debut.strftime('%d/%m/%Y')} - {stagiaire.date_fin.strftime('%d/%m/%Y')}
+• Durée : {duree} jours
+
+DÉMARCHES À EFFECTUER :
+1. Restituer tout matériel emprunté
+2. Soumettre votre rapport de stage final
+3. Effectuer votre demande d'attestation de stage
+4. Débriefing final avec votre tuteur
+
+---
+Service des Stages
+Communauté Électrique du Bénin
+Email: stages@cebnet.org"""
+        }
+
+
+class AlerteEmailTemplates:
+    """Templates pour les emails d'alertes et rappels automatiques aux admins"""
+
+    @staticmethod
+    def alerte_demandes_en_retard(demandes_retard, seuil_jours=7) -> dict:
+        """Email d'alerte pour les demandes en attente depuis trop longtemps"""
+
+        nb = len(demandes_retard)
+
+        rows_html = ""
+        for d in demandes_retard:
+            jours = d['jours']
+            couleur = '#DC2626' if jours >= 14 else '#D97706'
+            rows_html += f"""
+            <tr>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{d['tracking_id']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{d['nom']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{d['statut']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px; color: {couleur}; font-weight: 600;">{jours} jours</td>
+            </tr>"""
+
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <div style="background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+        <p style="color: #DC2626; font-size: 15px; font-weight: 600; margin: 0;">
+            {nb} demande(s) en attente depuis plus de {seuil_jours} jours
+        </p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+        <thead>
+            <tr style="background-color: #F7F8FA;">
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">N° Suivi</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Demandeur</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Statut</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Délai</th>
+            </tr>
+        </thead>
+        <tbody>{rows_html}
+        </tbody>
+    </table>
+
+    <div style="text-align: center; background-color: #F7F8FA; padding: 20px; border-radius: 0;">
+        <p style="color: #1F2933; font-size: 15px; margin: 0; font-weight: bold;">
+            Veuillez traiter ces demandes dans les plus brefs délais
+        </p>
+    </div>
+</div>
+        """
+
+        subject = f"[ALERTE] {nb} demande(s) en retard de traitement"
+
+        return {
+            'subject': subject,
+            'html': BenchmarkEmailTemplateService.build_benchmark_email(
+                "Madame, Monsieur", content, "Système d'alertes"
+            ),
+            'text': f"""{subject}
+
+{nb} demande(s) en attente depuis plus de {seuil_jours} jours nécessitent votre attention.
+
+""" + "\n".join([f"• {d['tracking_id']} - {d['nom']} ({d['statut']}) - {d['jours']} jours" for d in demandes_retard]) + """
+
+---
+Système d'alertes automatiques
+Communauté Électrique du Bénin"""
+        }
+
+    @staticmethod
+    def alerte_attestations_en_attente(attestations, seuil_jours=5) -> dict:
+        """Email d'alerte pour les demandes d'attestation non traitées"""
+
+        nb = len(attestations)
+
+        rows_html = ""
+        for a in attestations:
+            rows_html += f"""
+            <tr>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{a['stagiaire']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{a['date_demande']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px; color: #D97706; font-weight: 600;">{a['jours']} jours</td>
+            </tr>"""
+
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <div style="background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+        <p style="color: #D97706; font-size: 15px; font-weight: 600; margin: 0;">
+            {nb} demande(s) d'attestation en attente depuis plus de {seuil_jours} jours
+        </p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+        <thead>
+            <tr style="background-color: #F7F8FA;">
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Stagiaire</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Date demande</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">En attente</th>
+            </tr>
+        </thead>
+        <tbody>{rows_html}
+        </tbody>
+    </table>
+</div>
+        """
+
+        subject = f"[RAPPEL] {nb} attestation(s) en attente de traitement"
+
+        return {
+            'subject': subject,
+            'html': BenchmarkEmailTemplateService.build_benchmark_email(
+                "Madame, Monsieur", content, "Système d'alertes"
+            ),
+            'text': f"""{subject}
+
+{nb} demande(s) d'attestation en attente depuis plus de {seuil_jours} jours.
+
+""" + "\n".join([f"• {a['stagiaire']} - demandée le {a['date_demande']} ({a['jours']} jours)" for a in attestations]) + """
+
+---
+Système d'alertes automatiques
+Communauté Électrique du Bénin"""
+        }
+
+    @staticmethod
+    def rappel_mi_stage(stagiaires_mi_stage) -> dict:
+        """Email de rappel mi-stage pour les admins"""
+
+        nb = len(stagiaires_mi_stage)
+
+        rows_html = ""
+        for s in stagiaires_mi_stage:
+            rows_html += f"""
+            <tr>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s['nom']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s['service']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s['mi_stage_date']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s['jours_restants']} jours</td>
+            </tr>"""
+
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <div style="background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+        <p style="color: #2563EB; font-size: 15px; font-weight: 600; margin: 0;">
+            {nb} stagiaire(s) atteignent la mi-parcours de leur stage
+        </p>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75;">
+            C'est le moment idéal pour faire un point d'avancement avec ces stagiaires.
+        </p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+        <thead>
+            <tr style="background-color: #F7F8FA;">
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Stagiaire</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Service</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Mi-parcours</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Jours restants</th>
+            </tr>
+        </thead>
+        <tbody>{rows_html}
+        </tbody>
+    </table>
+
+    <div style="background-color: #F7F8FA; border-radius: 0; padding: 18px; margin-bottom: 20px;">
+        <h4 style="color: #1F2933; margin: 0 0 10px 0; font-size: 15px; font-weight: bold;">Points à vérifier</h4>
+        <ul style="color: #666; font-size: 15px; line-height: 1.75; padding-left: 20px; margin: 0;">
+            <li style="margin-bottom: 8px;">Progression des objectifs de stage</li>
+            <li style="margin-bottom: 8px;">Intégration dans l'équipe</li>
+            <li style="margin-bottom: 8px;">Difficultés rencontrées</li>
+            <li>Rappel de la soumission du rapport de stage</li>
+        </ul>
+    </div>
+</div>
+        """
+
+        subject = f"[RAPPEL] Mi-parcours pour {nb} stagiaire(s)"
+
+        return {
+            'subject': subject,
+            'html': BenchmarkEmailTemplateService.build_benchmark_email(
+                "Madame, Monsieur", content, "Système de rappels"
+            ),
+            'text': f"""{subject}
+
+{nb} stagiaire(s) atteignent la mi-parcours de leur stage.
+
+""" + "\n".join([f"• {s['nom']} - {s['service']} (mi-parcours: {s['mi_stage_date']}, {s['jours_restants']} jours restants)" for s in stagiaires_mi_stage]) + """
+
+POINTS À VÉRIFIER :
+1. Progression des objectifs
+2. Intégration dans l'équipe
+3. Difficultés rencontrées
+4. Rappel rapport de stage
+
+---
+Système de rappels automatiques
+Communauté Électrique du Bénin"""
+        }
+
+    @staticmethod
+    def alerte_stages_proches_email(stages, date_cible) -> dict:
+        """Email d'alerte aux admins pour les stages débutant bientôt"""
+
+        nb = stages.count()
+
+        rows_html = ""
+        for s in stages:
+            rows_html += f"""
+            <tr>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s.prenom} {s.nom}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s.service or 'N/A'}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s.direction or 'N/A'}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s.type_stage}</td>
+            </tr>"""
+
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <div style="background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+        <p style="color: #2563EB; font-size: 15px; font-weight: 600; margin: 0;">
+            {nb} stagiaire(s) arrivent le {date_cible.strftime('%d/%m/%Y')}
+        </p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+        <thead>
+            <tr style="background-color: #F7F8FA;">
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Stagiaire</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Service</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Direction</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Type</th>
+            </tr>
+        </thead>
+        <tbody>{rows_html}
+        </tbody>
+    </table>
+</div>
+        """
+
+        subject = f"[INFO] {nb} stagiaire(s) arrivent le {date_cible.strftime('%d/%m/%Y')}"
+
+        return {
+            'subject': subject,
+            'html': BenchmarkEmailTemplateService.build_benchmark_email(
+                "Madame, Monsieur", content, "Système de rappels"
+            ),
+            'text': f"""{subject}
+
+{nb} stagiaire(s) débutent leur stage le {date_cible.strftime('%d/%m/%Y')}.
+
+""" + "\n".join([f"• {s.prenom} {s.nom} - {s.service or 'N/A'} ({s.type_stage})" for s in stages]) + """
+
+---
+Système de rappels automatiques
+Communauté Électrique du Bénin"""
+        }
+
+    @staticmethod
+    def alerte_stages_finissants_email(stages_info) -> dict:
+        """Email d'alerte aux admins pour les stages se terminant bientôt"""
+
+        nb = len(stages_info)
+
+        rows_html = ""
+        for s in stages_info:
+            couleur = '#DC2626' if s['jours_restants'] == 0 else '#D97706' if s['jours_restants'] <= 1 else '#6B7280'
+            rows_html += f"""
+            <tr>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s['nom']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s['service']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px;">{s['date_fin']}</td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #ECECEE; font-size: 14px; color: {couleur}; font-weight: 600;">{s['delai']}</td>
+            </tr>"""
+
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    <div style="background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 0; padding: 16px; margin-bottom: 25px;">
+        <p style="color: #D97706; font-size: 15px; font-weight: 600; margin: 0;">
+            {nb} stage(s) se terminent dans les prochains jours
+        </p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+        <thead>
+            <tr style="background-color: #F7F8FA;">
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Stagiaire</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Service</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Date fin</th>
+                <th style="padding: 12px 8px; text-align: left; font-size: 13px; color: #6B7280; border-bottom: 2px solid #ECECEE;">Délai</th>
+            </tr>
+        </thead>
+        <tbody>{rows_html}
+        </tbody>
+    </table>
+</div>
+        """
+
+        subject = f"[ALERTE] {nb} stage(s) se terminent bientôt"
+
+        return {
+            'subject': subject,
+            'html': BenchmarkEmailTemplateService.build_benchmark_email(
+                "Madame, Monsieur", content, "Système d'alertes"
+            ),
+            'text': f"""{subject}
+
+{nb} stage(s) se terminent dans les prochains jours.
+
+""" + "\n".join([f"• {s['nom']} - {s['service']} (fin: {s['date_fin']}, {s['delai']})" for s in stages_info]) + """
+
+---
+Système d'alertes automatiques
+Communauté Électrique du Bénin"""
+        }
+
+    @staticmethod
+    def recapitulatif_hebdomadaire(stats) -> dict:
+        """Email de récapitulatif hebdomadaire pour les admins"""
+
+        content = f"""
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+
+    <div style="margin-bottom: 30px;">
+        <p style="color: #6B7280; font-size: 15px; line-height: 1.75;">
+            Voici le récapitulatif de l'activité de la semaine écoulée sur la plateforme de gestion des stages.
+        </p>
+    </div>
+
+    <!-- Statistiques clés -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Stagiaires
+        </h3>
+        <table style="width: 100%; font-size: 15px;">
+            <tr>
+                <td style="padding: 8px 0; color: #666;">Stagiaires actifs :</td>
+                <td style="padding: 8px 0; color: #333; font-weight: 600; text-align: right;">{stats['stagiaires_actifs']}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; color: #666;">Nouveaux cette semaine :</td>
+                <td style="padding: 8px 0; color: #333; font-weight: 600; text-align: right;">{stats['nouveaux_stages']}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; color: #666;">Stages terminés cette semaine :</td>
+                <td style="padding: 8px 0; color: #333; font-weight: 600; text-align: right;">{stats['stages_termines']}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; color: #666;">Fins prévues cette semaine :</td>
+                <td style="padding: 8px 0; color: #DC2626; font-weight: 600; text-align: right;">{stats['fins_prevues']}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Demandes -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Demandes de stage
+        </h3>
+        <table style="width: 100%; font-size: 15px;">
+            <tr>
+                <td style="padding: 8px 0; color: #666;">Nouvelles demandes :</td>
+                <td style="padding: 8px 0; color: #333; font-weight: 600; text-align: right;">{stats['nouvelles_demandes']}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; color: #666;">En attente de traitement :</td>
+                <td style="padding: 8px 0; color: #D97706; font-weight: 600; text-align: right;">{stats['demandes_en_attente']}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; color: #666;">En retard (&gt; 7 jours) :</td>
+                <td style="padding: 8px 0; color: #DC2626; font-weight: 600; text-align: right;">{stats['demandes_en_retard']}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Attestations -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0; padding: 20px; margin-bottom: 25px;">
+        <h3 style="color: #1F2933; margin: 0 0 15px 0; font-size: 16px; font-weight: bold;">
+            Attestations
+        </h3>
+        <table style="width: 100%; font-size: 15px;">
+            <tr>
+                <td style="padding: 8px 0; color: #666;">Attestations en attente :</td>
+                <td style="padding: 8px 0; color: #D97706; font-weight: 600; text-align: right;">{stats['attestations_en_attente']}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+        """
+
+        subject = f"[HEBDO] Récapitulatif de la semaine - Stages CEB"
+
+        return {
+            'subject': subject,
+            'html': BenchmarkEmailTemplateService.build_benchmark_email(
+                "Madame, Monsieur", content, "Système de rapports"
+            ),
+            'text': f"""{subject}
+
+STAGIAIRES :
+• Actifs : {stats['stagiaires_actifs']}
+• Nouveaux cette semaine : {stats['nouveaux_stages']}
+• Terminés cette semaine : {stats['stages_termines']}
+• Fins prévues cette semaine : {stats['fins_prevues']}
+
+DEMANDES :
+• Nouvelles : {stats['nouvelles_demandes']}
+• En attente : {stats['demandes_en_attente']}
+• En retard (> 7 jours) : {stats['demandes_en_retard']}
+
+ATTESTATIONS :
+• En attente : {stats['attestations_en_attente']}
+
+---
+Système de rapports automatiques
+Communauté Électrique du Bénin"""
+        }
+
+
 class PreferenceEmailTemplates:
     """Templates pour les emails liés aux préférences"""
     
