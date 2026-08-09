@@ -3,36 +3,32 @@
 Site vitrine de **Fadila Ménage**, agence de services domestiques à Lomé (Togo) :
 placement de personnel de maison, nettoyage professionnel et paniers-cadeaux.
 
-## Pages
+Construit avec **[Astro](https://astro.build)** (statique, rapide, bon SEO) et
+**React** pour les formulaires interactifs.
 
-| Fichier | Page |
-|---------|------|
-| `index.html` | Accueil |
-| `nous-connaitre.html` | Présentation de l'agence |
-| `nos-services.html` | Détail des services |
-| `rejoindre.html` | Recrutement |
-| `blog.html` | Blog / actualités |
-| `faq.html` | Foire aux questions |
-| `demander-un-devis.html` | Formulaire de devis + contact |
-
-## Technique
-
-Site **statique** : chaque page est un fichier HTML autonome (CSS et JavaScript
-intégrés). Aucun serveur ni build n'est nécessaire.
-
-- **Polices** : Google Fonts (Archivo, Inter)
-- **Formulaire de devis / candidature** : redirige vers WhatsApp
-- **Carte** : Google Maps intégré
-
-## Lancer en local
-
-Ouvrir `index.html` dans un navigateur, ou servir le dossier :
+## Démarrer
 
 ```bash
-python -m http.server 8000
+npm install
+npm run dev       # serveur de dev sur http://localhost:4321
+npm run build     # génère le site statique dans dist/
+npm run preview   # prévisualise le build de production
 ```
 
-Puis ouvrir http://localhost:8000
+## Structure
+
+| Dossier | Rôle |
+|---------|------|
+| `src/pages/` | Les pages (accueil, nous-connaitre, nos-services, rejoindre, blog, faq, demander-un-devis) |
+| `src/layouts/BaseLayout.astro` | Gabarit commun : `<head>`, en-tête, pied de page, scripts globaux |
+| `src/components/` | `Header` & `Footer` (Astro) ; `DevisForms` & `ApplyForm` (React, îlots) |
+| `src/styles/global.css` | Thème et styles partagés |
+| `public/` | Logo et images |
+
+## Formulaires
+
+Les formulaires (Devis à onglets, Candidature en 2 étapes) sont des composants
+React et envoient la demande **via WhatsApp**.
 
 ## Historique
 
