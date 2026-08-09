@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DevisForms from '../components/DevisForms.jsx';
+---
+<BaseLayout title="Demandez un devis — Fadila Ménage · Lomé">
+  <section class="pagehead"><div class="wrap"><span class="label">Demande de devis</span><h1>Devis</h1><p>Choisissez le formulaire adapté à votre besoin. Nous revenons vers vous sous 24 h avec une proposition adaptée, sans engagement.</p></div></section>
+
+  <section><div class="wrap">
+    <DevisForms client:visible />
+  </div></section>
+
+  <section id="contact"><div class="wrap">
+    <div class="sec-head reveal"><span class="label">Contact</span><h2>Contactez-nous</h2></div>
+    <div class="contact-grid">
+      <div class="contact-card reveal">
+        <div class="ci"><b>Adresse</b><p>Totsi, non loin de l'hôtel Morphée — 05 BP 155, Lomé, Togo</p></div>
+        <div class="ci"><b>Téléphone</b><p>+228 22 25 27 23<br />+228 91 93 27 23<br />+228 97 00 38 53</p></div>
+        <div class="ci" style="border-bottom:0"><b>E-mail</b><p>hello@fadilamenage.com</p></div>
+        <a href="/demander-un-devis" class="btn btn-gold">Demandez un devis <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      </div>
+      <div class="map reveal"><iframe src="https://www.google.com/maps?q=Totsi%20Agou%C3%A9nyiv%C3%A9%20Lom%C3%A9%20Togo&output=embed" loading="lazy" title="Localisation Fadila Ménage"></iframe></div>
+    </div>
+  </div></section>
+</BaseLayout>

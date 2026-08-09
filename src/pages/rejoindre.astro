@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ApplyForm from '../components/ApplyForm.jsx';
+---
+<BaseLayout title="Rejoignez notre équipe — Fadila Ménage · Lomé" active="rejoindre">
+  <section class="pagehead"><div class="wrap"><span class="label">Recrutement</span><h1>Rejoignez notre équipe</h1><p>Aide-ménagère, nounou, cuisinier, chauffeur ou agent de nettoyage : Fadila Ménage recrute, forme et place du personnel sérieux.</p></div></section>
+
+  <section><div class="wrap">
+    <div class="sec-head reveal"><span class="label">Pourquoi nous rejoindre</span><h2>Un emploi stable, une vraie formation</h2></div>
+    <div class="proc">
+      <div class="pstep reveal"><div class="pn">01</div><h3>Un employeur</h3><p>Nous ne faisons pas que vous placer : nous vous employons et vous accompagnons dans la durée.</p></div>
+      <div class="pstep reveal"><div class="pn">02</div><h3>Une formation</h3><p>Vous êtes formé selon nos méthodes, avec l'appui de partenaires du secteur hôtelier.</p></div>
+      <div class="pstep reveal"><div class="pn">03</div><h3>Une paie juste</h3><p>Des conditions de travail dignes et une rémunération transparente.</p></div>
+      <div class="pstep reveal"><div class="pn">04</div><h3>Une mission sociale</h3><p>Nous soutenons l'insertion des jeunes, des femmes et des seniors éloignés de l'emploi.</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec-mist" id="postuler"><div class="wrap">
+    <div class="sec-head center reveal"><span class="label">Candidature</span><h2>Postulez en ligne</h2><p>Deux étapes rapides. Nous étudions votre profil et vous recontactons pour la suite du recrutement.</p></div>
+    <ApplyForm client:visible />
+  </div></section>
+</BaseLayout>

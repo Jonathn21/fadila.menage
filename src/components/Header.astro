@@ -1,0 +1,24 @@
+---
+const { active = '' } = Astro.props;
+const links = [
+  { href: '/', key: 'accueil', label: 'Accueil' },
+  { href: '/nous-connaitre', key: 'nous-connaitre', label: 'Nous connaître' },
+  { href: '/nos-services', key: 'nos-services', label: 'Nos services' },
+  { href: '/rejoindre', key: 'rejoindre', label: 'Rejoignez notre équipe' },
+  { href: '/blog', key: 'blog', label: 'Blog' },
+];
+---
+<div class="util"><div class="wrap util-inner">
+  <div class="u-left"><span>Services domestiques professionnels depuis 2017</span><span>Lomé, Togo</span></div>
+  <div class="u-right"><a href="/demander-un-devis">+228 91 93 27 23</a><span class="lang"><a href="#" class="on">FR</a><a href="#">EN</a></span></div>
+</div></div>
+<header class="masthead">
+  <div class="wrap mast-inner">
+    <a href="/" class="brand"><img class="logo" src="/logo.png" alt="Fadila Ménage" width="46" height="52" /></a>
+    <nav class="mainnav" id="nav">
+      {links.map((l) => <a href={l.href} class={active === l.key ? 'active' : ''}>{l.label}</a>)}
+      <a href="/demander-un-devis" class="btn btn-gold">Demandez un devis</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</header>

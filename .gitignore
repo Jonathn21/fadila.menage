@@ -1,40 +1,20 @@
-# Environnement
-.env
-.env.*
-*.env
-
-# Python / Django
-__pycache__/
-*.pyc
-*.pyo
-
-venv/
-.envrc
-
-# Node / Frontend
+# Dépendances
 node_modules/
+
+# Build Astro
 dist/
-build/
+.astro/
 
-# Logs
-*.log
-
-# IDE
-.vscode/
-.idea/
-
-# OS
+# Système
 .DS_Store
 Thumbs.db
+desktop.ini
 
-privkey.pem
-*.save
-curl
-ping
-frontend_incomplete/
-frontend_old_*/
+# Éditeurs
+.vscode/
+.idea/
+*.swp
 
-docker-compose.override.yml
-
-# Backups base de données
-backups/
+# Divers
+*.log
+.env
