@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from './Select.jsx';
 
 const WA = '22891932723';
 
@@ -18,7 +19,22 @@ const FREQ = [
   '5 fois par semaine ou temps plein',
 ];
 
-function buildMessage(form, title) {
+const TYPE_LOCAL = [
+  { value: 'Bureau', label: 'Bureau', description: 'Local professionnel' },
+  { value: 'Villa', label: 'Villa', description: 'Grande maison avec extérieur' },
+  { value: 'Appartement', label: 'Appartement', description: 'Logement en résidence' },
+  { value: 'Maison ordinaire', label: 'Maison ordinaire', description: 'Habitation individuelle' },
+];
+
+const TYPE_PERSO = [
+  { value: 'Aide-ménagère', label: 'Aide-ménagère', description: 'Entretien du domicile' },
+  { value: 'Nounou', label: 'Nounou', description: 'Garde et éveil des enfants' },
+  { value: 'Cuisinier', label: 'Cuisinier', description: 'Préparation des repas' },
+  { value: 'Chauffeur', label: 'Chauffeur', description: 'Conduite et déplacements' },
+  { value: 'Jardinier', label: 'Jardinier', description: 'Entretien des espaces verts' },
+];
+
+function buildMessage(form, title, extras = []) {
   const parts = [];
   form
     .querySelectorAll('input[type=text],input[type=tel],input[type=email],input[type=date],input[type=number],textarea')
@@ -36,6 +52,9 @@ function buildMessage(form, title) {
     (cb[k] = cb[k] || []).push(el.value);
   });
   Object.keys(cb).forEach((k) => parts.push(k + ' : ' + cb[k].join(', ')));
+  extras.forEach(([k, v]) => {
+    if (v) parts.push(k + ' : ' + v);
+  });
   return 'Bonjour Fadila Ménage, ' + title + '.\n\n' + parts.join('\n');
 }
 
@@ -66,18 +85,54 @@ function Ok({ title, text }) {
   );
 }
 
+// Champs à liste convertis en menu déroulant, requis par onglet
+const REQ = {
+  nettoyage: ['typeLocal', 'freqNet'],
+  personnel: ['perso', 'freqPerso'],
+};
+
 export default function DevisForms() {
   const [active, setActive] = useState('question');
   const [sent, setSent] = useState({});
+  const [sel, setSel] = useState({});
+  const [err, setErr] = useState({});
+
+  const setField = (k) => (v) => {
+    setSel((s) => ({ ...s, [k]: v }));
+    setErr((e) => ({ ...e, [k]: false }));
+  };
+
+  const extrasFor = (tab) => {
+    if (tab === 'nettoyage')
+      return [
+        ['Type de local', sel.typeLocal],
+        ['Fréquence souhaitée', sel.freqNet],
+      ];
+    if (tab === 'personnel')
+      return [
+        ['Type de personnel', sel.perso],
+        ['Fréquence souhaitée', sel.freqPerso],
+      ];
+    return [];
+  };
 
   const submit = (title) => (e) => {
     e.preventDefault();
     const form = e.currentTarget;
+    const missing = (REQ[active] || []).filter((k) => !sel[k]);
+    if (missing.length) {
+      setErr((x) => {
+        const n = { ...x };
+        missing.forEach((k) => (n[k] = true));
+        return n;
+      });
+      return;
+    }
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
-    const msg = buildMessage(form, title);
+    const msg = buildMessage(form, title, extrasFor(active));
     window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank');
     setSent((s) => ({ ...s, [active]: true }));
   };
@@ -136,10 +191,18 @@ export default function DevisForms() {
                 <div className="field"><label>Téléphone</label><input type="tel" data-label="Téléphone" required /></div>
                 <div className="field"><label>Adresse / quartier</label><input type="text" data-label="Adresse" required /></div>
               </div>
-              <Radios label="Type de local" name="type-local" values={['Bureau', 'Villa', 'Appartement', 'Maison ordinaire']} />
+              <div className="field">
+                <label>Type de local</label>
+                <Select value={sel.typeLocal || ''} onChange={setField('typeLocal')} options={TYPE_LOCAL} placeholder="— Sélectionnez —" />
+                {err.typeLocal && <span className="field-err">Veuillez sélectionner un type de local.</span>}
+              </div>
               <Radios label="Nombre de chambres" name="chambres" values={['1', '2', '3', '4', '5 ou plus']} />
               <Radios label="Nombre de WC-douche" name="wc" values={['1', '2', '3', '4', '5 ou plus']} />
-              <Radios label="Fréquence souhaitée" name="freq-net" values={FREQ} />
+              <div className="field">
+                <label>Fréquence souhaitée</label>
+                <Select value={sel.freqNet || ''} onChange={setField('freqNet')} options={FREQ} placeholder="— Sélectionnez une fréquence —" />
+                {err.freqNet && <span className="field-err">Veuillez indiquer une fréquence.</span>}
+              </div>
               <div className="field"><label>Votre budget</label><input type="text" data-label="Budget" placeholder="Ex. 30 000 FCFA / mois" required /></div>
               <div className="field"><label>Demandes spécifiques ?</label><textarea data-label="Demandes spécifiques" placeholder="Rédigez vos commentaires, les détails de votre besoin et vos demandes spécifiques ici…"></textarea></div>
               <button type="submit" className="btn btn-green">Envoyer</button>
@@ -163,8 +226,16 @@ export default function DevisForms() {
                 <div className="field"><label>Téléphone</label><input type="tel" data-label="Téléphone" required /></div>
                 <div className="field"><label>Adresse / quartier</label><input type="text" data-label="Adresse" required /></div>
               </div>
-              <Radios label="Type de personnel" name="perso" values={['Aide-ménagère', 'Nounou', 'Cuisinier', 'Chauffeur', 'Jardinier']} />
-              <Radios label="Fréquence souhaitée" name="freq-perso" values={FREQ} />
+              <div className="field">
+                <label>Type de personnel</label>
+                <Select value={sel.perso || ''} onChange={setField('perso')} options={TYPE_PERSO} placeholder="— Sélectionnez un poste —" />
+                {err.perso && <span className="field-err">Veuillez sélectionner un type de personnel.</span>}
+              </div>
+              <div className="field">
+                <label>Fréquence souhaitée</label>
+                <Select value={sel.freqPerso || ''} onChange={setField('freqPerso')} options={FREQ} placeholder="— Sélectionnez une fréquence —" />
+                {err.freqPerso && <span className="field-err">Veuillez indiquer une fréquence.</span>}
+              </div>
               <div className="field"><label>Votre budget</label><input type="text" data-label="Budget" placeholder="Ex. 50 000 FCFA / mois" required /></div>
               <div className="field"><label>Demandes spécifiques ?</label><textarea data-label="Demandes spécifiques" placeholder="Rédigez vos commentaires, les détails de votre besoin et vos demandes spécifiques ici…"></textarea></div>
               <button type="submit" className="btn btn-green">Envoyer</button>

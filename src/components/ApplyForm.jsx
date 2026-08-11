@@ -1,9 +1,27 @@
 import { useState } from 'react';
+import Select from './Select.jsx';
 
 const WA = '22891932723';
-const OFFRES = ['Aide-ménagère', 'Nounou', 'Cuisinier', 'Chauffeur', 'Jardinier', 'Agent de nettoyage'];
-const STATUTS = ["En recherche d'emploi", 'En poste', 'Étudiant(e)', 'Autre'];
-const EXP = ['Aucune', "Moins d'un an", '1 à 3 ans', 'Plus de 3 ans'];
+const OFFRES = [
+  { value: 'Aide-ménagère', label: 'Aide-ménagère', description: 'Entretien du domicile' },
+  { value: 'Nounou', label: 'Nounou', description: "Garde et éveil des enfants" },
+  { value: 'Cuisinier', label: 'Cuisinier', description: 'Préparation des repas' },
+  { value: 'Chauffeur', label: 'Chauffeur', description: 'Conduite et déplacements' },
+  { value: 'Jardinier', label: 'Jardinier', description: 'Entretien des espaces verts' },
+  { value: 'Agent de nettoyage', label: 'Agent de nettoyage', description: 'Nettoyage de locaux' },
+];
+const STATUTS = [
+  { value: "En recherche d'emploi", label: "En recherche d'emploi", description: 'Disponible immédiatement' },
+  { value: 'En poste', label: 'En poste', description: 'Actuellement en activité' },
+  { value: 'Étudiant(e)', label: 'Étudiant(e)', description: 'En cours d’études' },
+  { value: 'Autre', label: 'Autre', description: 'Autre situation' },
+];
+const EXP = [
+  { value: 'Aucune', label: 'Aucune', description: 'Débutant motivé' },
+  { value: "Moins d'un an", label: "Moins d'un an", description: 'Première expérience' },
+  { value: '1 à 3 ans', label: '1 à 3 ans', description: 'Expérience confirmée' },
+  { value: 'Plus de 3 ans', label: 'Plus de 3 ans', description: 'Professionnel expérimenté' },
+];
 
 export default function ApplyForm() {
   const [step, setStep] = useState(1);
@@ -59,24 +77,15 @@ export default function ApplyForm() {
           <h3>Nous recrutons</h3>
           <div className="field">
             <label>Choisissez l'offre d'emploi concernée</label>
-            <select value={offre} onChange={(e) => setOffre(e.target.value)} required>
-              <option value="" disabled>— Sélectionnez —</option>
-              {OFFRES.map((o) => <option key={o}>{o}</option>)}
-            </select>
+            <Select value={offre} onChange={setOffre} options={OFFRES} placeholder="— Sélectionnez un poste —" />
           </div>
           <div className="field">
             <label>Quel est votre statut d'emploi ?</label>
-            <select value={statut} onChange={(e) => setStatut(e.target.value)} required>
-              <option value="" disabled>— Sélectionnez —</option>
-              {STATUTS.map((o) => <option key={o}>{o}</option>)}
-            </select>
+            <Select value={statut} onChange={setStatut} options={STATUTS} placeholder="— Sélectionnez —" />
           </div>
           <div className="field">
             <label>Avez-vous des expériences antérieures ?</label>
-            <select value={exp} onChange={(e) => setExp(e.target.value)} required>
-              <option value="" disabled>— Sélectionnez —</option>
-              {EXP.map((o) => <option key={o}>{o}</option>)}
-            </select>
+            <Select value={exp} onChange={setExp} options={EXP} placeholder="— Sélectionnez —" />
           </div>
           <div className="apply-actions">
             <button type="button" className="btn btn-gold" disabled={!step1ok} onClick={() => setStep(2)}>

@@ -3,7 +3,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Accueil — Fadila Ménage · Lomé" active="accueil">
   <section class="hero" id="top">
-    <div class="hero-bg"><img src="https://images.unsplash.com/photo-1724491801484-efca6936866a?fm=jpg&q=72&w=1700&auto=format&fit=crop" alt="Personnel de maison Fadila" /></div>
+    <div class="hero-bg">
+      <img src="/images/hero/aide-menagere.jpg" alt="Aide-ménagère Fadila au travail" class="on" width="1680" height="945" />
+      <img src="/images/hero/nettoyage.jpg" alt="Nettoyage professionnel Fadila" loading="lazy" width="1680" height="945" />
+      <img src="/images/hero/chauffeur.jpg" alt="Chauffeur Fadila" loading="lazy" width="1680" height="945" />
+    </div>
     <div class="hero-overlay"></div>
     <div class="wrap hero-inner"><div class="hero-content">
       <span class="label on-green">Aide-ménagères, nounous, cuisiniers, chauffeurs · Entretien et nettoyage des locaux · Conception de paniers-cadeaux</span>
@@ -30,32 +34,49 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <p>Vous voulez rendre votre maison un peu plus belle aujourd'hui ? Vous avez besoin d'une entreprise de nettoyage professionnel ? Ou bien souhaitez-vous engager une aide-ménagère ou un cuisinier à temps plein, une nounou ou un chauffeur à temps partiel ? N'hésitez plus, contactez-nous !</p>
         <a href="/demander-un-devis" class="btn btn-gold">Demandez un devis <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
       </div>
-      <div class="fimg"><img src="https://images.unsplash.com/photo-1591451855781-9eb0f9726a33?fm=jpg&q=70&w=1100&auto=format&fit=crop" alt="Une aide de maison auprès d'un enfant" loading="lazy" /></div>
+      <div class="fimg"><img src="/images/hero/nounou-bebe.jpg" alt="Nounou Fadila auprès d'un enfant" loading="lazy" width="900" height="1134" /></div>
     </div>
   </div></section>
 
-  <section class="sec-mist"><div class="wrap">
+  <section class="sec-mist has-drops">
+    <div class="drops" aria-hidden="true">
+      <span class="drop d-orange s3" style="top:-26px;left:6%"></span>
+      <span class="drop d-rose s2" style="top:40px;left:2%"></span>
+      <span class="drop d-blue s1" style="bottom:8%;right:4%"></span>
+      <span class="drop d-green s2" style="bottom:16%;right:12%"></span>
+    </div>
+    <div class="wrap">
     <div class="sec-head reveal"><span class="label">Nos prestations</span><h2>Ce que nous faisons pour vous</h2><p>Un personnel formé, vérifié et accompagné dans la durée — pour les familles comme pour les entreprises.</p></div>
     <div class="svc-grid">
-      <div class="svc reveal"><div class="svc-ic"><i class="fa-solid fa-baby"></i></div><h3>Nounou & baby-sitting</h3><p>Une garde attentive et fiable pour vos enfants, à domicile — un soir, à temps partiel ou à temps plein.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
-      <div class="svc reveal"><div class="svc-ic"><i class="fa-solid fa-house"></i></div><h3>Aide-ménagère</h3><p>L'entretien de votre intérieur, au quotidien ou ponctuellement, avec soin et discrétion.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
-      <div class="svc reveal"><div class="svc-ic"><i class="fa-solid fa-utensils"></i></div><h3>Cuisinier</h3><p>Des repas préparés chez vous, pour le quotidien comme pour vos réceptions.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
-      <div class="svc reveal"><div class="svc-ic"><i class="fa-solid fa-car"></i></div><h3>Chauffeur</h3><p>Un chauffeur ponctuel et prudent pour vos déplacements à Lomé.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
-      <div class="svc reveal"><div class="svc-ic"><i class="fa-solid fa-building"></i></div><h3>Bureaux & entreprises</h3><p>Des locaux professionnels propres et accueillants, en ponctuel ou en contrat.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
-      <div class="svc reveal"><div class="svc-ic"><i class="fa-solid fa-broom"></i></div><h3>Nettoyage régulier</h3><p>Un entretien planifié à votre rythme, quotidien ou hebdomadaire.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
-      <div class="svc reveal"><div class="svc-ic"><i class="fa-solid fa-spray-can-sparkles"></i></div><h3>Produits d'entretien</h3><p>Des produits d'entretien de qualité, livrés chez vous.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
-      <div class="svc reveal"><div class="svc-ic"><i class="fa-solid fa-gift"></i></div><h3>Paniers-cadeaux</h3><p>Des paniers-cadeaux soignés, pour toutes les occasions.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="svc reveal a-rose"><div class="svc-ic"><i class="fa-solid fa-baby"></i></div><h3>Nounou & baby-sitting</h3><p>Une garde attentive et fiable pour vos enfants, à domicile — un soir, à temps partiel ou à temps plein.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="svc reveal a-orange"><div class="svc-ic"><i class="fa-solid fa-house"></i></div><h3>Aide-ménagère</h3><p>L'entretien de votre intérieur, au quotidien ou ponctuellement, avec soin et discrétion.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="svc reveal a-amber"><div class="svc-ic"><i class="fa-solid fa-utensils"></i></div><h3>Cuisinier</h3><p>Des repas préparés chez vous, pour le quotidien comme pour vos réceptions.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="svc reveal a-blue"><div class="svc-ic"><i class="fa-solid fa-car"></i></div><h3>Chauffeur</h3><p>Un chauffeur ponctuel et prudent pour vos déplacements à Lomé.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="svc reveal a-indigo"><div class="svc-ic"><i class="fa-solid fa-building"></i></div><h3>Bureaux & entreprises</h3><p>Des locaux professionnels propres et accueillants, en ponctuel ou en contrat.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="svc reveal a-teal"><div class="svc-ic"><i class="fa-solid fa-broom"></i></div><h3>Nettoyage régulier</h3><p>Un entretien planifié à votre rythme, quotidien ou hebdomadaire.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="svc reveal a-green"><div class="svc-ic"><i class="fa-solid fa-spray-can-sparkles"></i></div><h3>Produits d'entretien</h3><p>Des produits d'entretien de qualité, livrés chez vous.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="svc reveal a-plum"><div class="svc-ic"><i class="fa-solid fa-gift"></i></div><h3>Paniers-cadeaux</h3><p>Des paniers-cadeaux soignés, pour toutes les occasions.</p><a href="/nos-services" class="more">En savoir plus <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
     </div>
   </div></section>
 
-  <section class="stats"><div class="wrap">
+  <section class="stats">
+    <video class="stats-bg" autoplay muted loop playsinline preload="none" poster="/images/video/nettoyage-bg-poster.jpg">
+      <source src="/images/video/nettoyage-bg.mp4" type="video/mp4" />
+    </video>
+    <div class="wrap">
     <div class="stat"><b data-count="97" data-suffix="%">0</b><span>De clients satisfaits</span></div>
     <div class="stat"><b data-count="67" data-suffix="%">0</b><span>De nouveaux clients depuis 2019</span></div>
     <div class="stat"><b data-count="24" data-suffix="h">0</b><span>De délai max pour une réponse sur-mesure</span></div>
     <div class="stat"><b data-count="150" data-suffix="+">0</b><span>Employés formés selon nos méthodes</span></div>
   </div></section>
 
-  <section><div class="wrap"><div class="social reveal">
+  <section class="has-drops">
+    <div class="drops" aria-hidden="true">
+      <span class="drop d-plum s2" style="top:12%;left:8%"></span>
+      <span class="drop d-amber s1" style="top:24%;right:9%"></span>
+      <span class="drop d-teal s2" style="bottom:14%;left:14%"></span>
+    </div>
+    <div class="wrap"><div class="social reveal">
     <i class="fa-solid fa-earth-africa gl"></i>
     <h2>Insertion sociale et professionnelle des jeunes</h2>
     <p>Fadila Ménage promeut l'insertion sociale et professionnelle des personnes exclues du marché du travail : demandeurs d'emploi, jeunes et femmes sans qualification, seniors. Soucieux de l'environnement, notre vision est de promouvoir l'éco-nettoyage en Afrique.</p>

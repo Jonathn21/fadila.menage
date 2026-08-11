@@ -13,8 +13,8 @@ const faqs = [
 ];
 ---
 <BaseLayout title="FAQ — Fadila Ménage · Lomé">
-  <section class="pagehead"><div class="wrap"><span class="label">Aide</span><h1>Foire aux questions</h1><p>Les réponses aux questions les plus fréquentes des familles et des entreprises.</p></div></section>
-  <section><div class="wrap faq" style="max-width:860px">
+  <section class="pagehead has-drops"><div class="drops" aria-hidden="true"><span class="drop d-teal s3" style="top:-28px;right:9%"></span><span class="drop d-amber s2" style="bottom:16%;right:18%"></span><span class="drop d-rose s1" style="top:34%;right:4%"></span></div><div class="wrap"><span class="label">Aide</span><h1>Foire aux questions</h1><p>Les réponses aux questions les plus fréquentes des familles et des entreprises.</p></div></section>
+  <section class="has-drops"><div class="drops" aria-hidden="true"><span class="drop d-blue s2" style="top:6%;left:4%"></span><span class="drop d-plum s1" style="bottom:12%;right:5%"></span></div><div class="wrap faq" style="max-width:860px;position:relative;z-index:2">
     {faqs.map((f) => (
       <details class="reveal"><summary>{f.q}</summary><div class="ans">{f.a}</div></details>
     ))}

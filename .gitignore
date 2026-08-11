@@ -15,6 +15,9 @@ desktop.ini
 .idea/
 *.swp
 
+# Réglages locaux Claude Code
+.claude/settings.local.json
+
 # Divers
 *.log
 .env

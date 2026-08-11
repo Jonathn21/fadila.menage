@@ -41,7 +41,27 @@ const {
           a.addEventListener('click', () => nav.classList.remove('open'))
         );
       }
-      // Animations au scroll
+      // Diaporama du héros (fondu enchaîné)
+      const heroBg = document.querySelector('.hero-bg');
+      if (heroBg) {
+        const slides = [...heroBg.querySelectorAll('img')];
+        if (slides.length > 1) {
+          let i = 0;
+          setInterval(() => {
+            slides[i].classList.remove('on');
+            i = (i + 1) % slides.length;
+            slides[i].classList.add('on');
+          }, 5000);
+        }
+      }
+      // Header : ombre douce dès qu'on défile
+      const mast = document.querySelector('header.masthead');
+      if (mast) {
+        const onScroll = () => mast.classList.toggle('scrolled', window.scrollY > 8);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+      }
+      // Animations au scroll (avec cascade entre voisins)
       const io = new IntersectionObserver(
         (es) => {
           es.forEach((e) => {
@@ -53,7 +73,14 @@ const {
         },
         { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
       );
-      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      document.querySelectorAll('.reveal').forEach((el) => {
+        const sibs = [...el.parentElement.children].filter((c) =>
+          c.classList.contains('reveal')
+        );
+        const i = sibs.indexOf(el);
+        if (i > 0) el.style.transitionDelay = i * 70 + 'ms';
+        io.observe(el);
+      });
       // Compteurs animés
       const counters = document.querySelectorAll('.stat b[data-count]');
       if (counters.length) {
