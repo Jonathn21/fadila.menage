@@ -50,9 +50,9 @@ img{max-width:100%}
 .btn-out-dark:hover{border-color:var(--green);background:var(--mist)}
 
 /* ---------- Top utility bar ---------- */
-.util{background:var(--green-deep);color:#EADFCF;font-size:.82rem}
+.util{background:var(--green-deep);color:#fff;font-size:.82rem}
 .util-inner{display:flex;justify-content:space-between;align-items:center;height:40px;gap:20px}
-.util a{color:#EADFCF;transition:color .15s}
+.util a{color:#fff;transition:color .15s}
 .util a:hover{color:#fff}
 .util .u-left{display:flex;gap:22px}
 .util .u-right{display:flex;gap:18px;align-items:center}
