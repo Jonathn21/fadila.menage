@@ -55,7 +55,7 @@ function buildMessage(form, title, extras = []) {
   extras.forEach(([k, v]) => {
     if (v) parts.push(k + ' : ' + v);
   });
-  return 'Bonjour Fadila Ménage, ' + title + '.\n\n' + parts.join('\n');
+  return 'Bonjour Cocon, ' + title + '.\n\n' + parts.join('\n');
 }
 
 function Radios({ label, name, values }) {
@@ -157,7 +157,7 @@ export default function DevisForms() {
 
       {active === 'question' &&
         (sent.question ? (
-          <Ok title="Demande envoyée" text="Merci. L'équipe Fadila Ménage vous recontacte sous 24 h." />
+          <Ok title="Demande envoyée" text="Merci. L'équipe Cocon vous recontacte sous 24 h." />
         ) : (
           <div className="tabpanel">
             <form className="qform" onSubmit={submit("j'ai une question")} noValidate>

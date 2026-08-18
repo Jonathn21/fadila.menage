@@ -47,7 +47,7 @@ export default function ApplyForm() {
     form.querySelectorAll('input[type=text],input[type=email],input[type=url]').forEach((el) => {
       if (el.value.trim()) parts.push((el.dataset.label || 'Champ') + ' : ' + el.value.trim());
     });
-    const msg = 'Bonjour Fadila Ménage, je souhaite postuler.\n\n' + parts.join('\n');
+    const msg = 'Bonjour Cocon, je souhaite postuler.\n\n' + parts.join('\n');
     window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank');
     setSent(true);
   };
