@@ -688,10 +688,10 @@ footer{background:rgba(120,52,18,.42);backdrop-filter:blur(8px);border-top:1px s
 .statcard .s span{display:block;margin-top:6px;font-size:.82rem;color:rgba(255,255,255,.75)}
 @media(max-width:620px){.statcard{grid-template-columns:1fr 1fr;gap:22px 8px}}
 
-/* Logos partenaires « texte » (placeholders fictifs) */
-.plogo{font-family:'Archivo';font-weight:800;font-size:1.05rem;color:#9a8d82;letter-spacing:-.01em;
-  display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
-.plogo .pe{font-size:1.2rem}
+/* Logos partenaires icônes (placeholders fictifs, monochromes) */
+.plogo{display:inline-flex;color:#a99c90;transition:color .18s ease}
+.plogo:hover{color:#C7500F}
+.plogo svg{width:48px;height:48px;display:block}
 
 /* Avis clients */
 .reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
