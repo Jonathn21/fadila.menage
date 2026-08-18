@@ -688,6 +688,17 @@ footer{background:rgba(120,52,18,.42);backdrop-filter:blur(8px);border-top:1px s
 .statcard .s span{display:block;margin-top:6px;font-size:.82rem;color:rgba(255,255,255,.75)}
 @media(max-width:620px){.statcard{grid-template-columns:1fr 1fr;gap:22px 8px}}
 
+/* Bouton WhatsApp flottant */
+.wa-fab{position:fixed;right:20px;bottom:20px;z-index:85;width:58px;height:58px;border-radius:50%;
+  background:#25D366;color:#fff;display:grid;place-items:center;font-size:31px;text-decoration:none;
+  box-shadow:0 12px 28px -8px rgba(0,0,0,.45);transition:transform .18s ease}
+.wa-fab:hover{transform:scale(1.08);color:#fff}
+.wa-fab::before{content:"";position:absolute;inset:0;border-radius:50%;background:#25D366;z-index:-1;
+  animation:waPulse 2.4s ease-out infinite}
+@keyframes waPulse{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(1.7);opacity:0}}
+@media(max-width:560px){.wa-fab{right:15px;bottom:15px;width:54px;height:54px;font-size:29px}}
+@media(prefers-reduced-motion:reduce){.wa-fab::before{animation:none;display:none}}
+
 /* Logos partenaires icônes (placeholders fictifs, monochromes) */
 .plogo{display:inline-flex;color:#a99c90;transition:color .18s ease}
 .plogo:hover{color:#C7500F}

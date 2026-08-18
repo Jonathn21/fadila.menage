@@ -5,9 +5,11 @@ import Footer from '../components/Footer.astro';
 
 const {
   title = 'Cocon · Lomé',
-  description = "Cocon — placement de personnel de maison, nettoyage professionnel et paniers-cadeaux à Lomé, depuis 2026.",
+  description = "Cocon — aide-ménagère, nounou, cuisinier, chauffeur et nettoyage professionnel à Lomé. Un personnel formé et vérifié. Devis gratuit sous 24 h.",
   active = '',
 } = Astro.props;
+const ogImage = new URL('/og.png', Astro.site).href;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
 ---
 <!doctype html>
 <html lang="fr">
@@ -16,6 +18,21 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#E68243" />
+    <meta property="og:site_name" content="Cocon" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -31,6 +48,15 @@ const {
     <Header active={active} />
     <slot />
     <Footer />
+    <a
+      class="wa-fab"
+      href="https://wa.me/22891932723?text=Bonjour%20Cocon%2C%20j'aimerais%20des%20informations."
+      target="_blank"
+      rel="noopener"
+      aria-label="Contacter Cocon sur WhatsApp"
+    >
+      <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+    </a>
     <script>
       // Tiroir de navigation
       const menuBtn = document.getElementById('menuBtn');
