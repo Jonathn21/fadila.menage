@@ -597,14 +597,17 @@ header.masthead{background:rgba(233,136,74,.72);backdrop-filter:blur(12px);borde
 .field label,.qform legend{color:#fff}
 .qform .sub,.qform .req-note{color:rgba(255,255,255,.78)}
 .qform .opts label{color:rgba(255,255,255,.92)}
-.field input,.field select,.qform textarea,.sel-btn{background:#fff;color:#241E1A;border-color:rgba(255,255,255,.55)}
-.field input::placeholder,.qform textarea::placeholder{color:#8b8178}
-.sel-btn.placeholder .sel-val{color:#8b8178}
+.field input,.field select,.qform textarea,.sel-btn{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.4)}
+.field input::placeholder,.qform textarea::placeholder{color:rgba(255,255,255,.62)}
+.sel-btn.placeholder .sel-val{color:rgba(255,255,255,.62)}
+.field input:focus,.field select:focus,.qform textarea:focus,.sel.open .sel-btn,.sel-btn:focus-visible{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.16)}
+.sel-arrow{color:#fff}
 .field select option{color:#241E1A;background:#fff}
-.sel-list{background:#fff;border-color:rgba(0,0,0,.08)}
-.sel-opt-label{color:#241E1A}
-.sel-opt-desc{color:#6E635B}
-.sel-opt.active{background:#F4EEE1}
+.sel-list{background:rgba(70,34,14,.97);backdrop-filter:blur(10px);border-color:rgba(255,255,255,.18)}
+.sel-opt-label{color:#fff}
+.sel-opt-desc{color:rgba(255,255,255,.72)}
+.sel-opt.active{background:rgba(255,255,255,.14)}
+.sel-opt.selected{background:rgba(255,255,255,.1)}
 .step-dot{background:rgba(255,255,255,.24);color:#fff}
 
 /* Contact */
@@ -666,6 +669,11 @@ footer{background:rgba(120,52,18,.42);backdrop-filter:blur(8px);border-top:1px s
 /* Emoji dans les tuiles services */
 .svc-ic.emoji{font-size:28px;line-height:1}
 .svc-detail .item .ic.emoji{font-size:28px;line-height:1}
+
+/* Avatars équipe en initiales (sans photo) */
+.member .avatar{background:rgba(255,255,255,.16)}
+.member .avatar .ini{display:grid;place-items:center;width:100%;height:100%;
+  font-family:'Archivo';font-weight:800;font-size:2.4rem;color:#fff}
 
 /* Carte de stats « appli » */
 .statcard{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;

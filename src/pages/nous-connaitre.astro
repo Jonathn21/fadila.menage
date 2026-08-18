@@ -2,55 +2,53 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const team = [
-  { name: 'Loukman', photo: '/images/equipe/loukman.jpg' },
-  { name: 'Dr. Kpelafia', photo: '/images/equipe/kpelafia.jpg' },
-  { name: 'John', photo: '/images/equipe/john.jpg' },
-  { name: 'Audrey', photo: '/images/equipe/audrey.jpg' },
-  { name: 'Ahmed', photo: '/images/equipe/ahmed.jpg' },
-  { name: 'Silvère', photo: '/images/equipe/silvere.jpg' },
-  { name: 'Stephane', photo: '/images/equipe/stephane.jpg' },
-  { name: 'Sandra', photo: '/images/equipe/sandra.jpg' },
+  'Loukman', 'Dr. Kpelafia', 'John', 'Audrey',
+  'Ahmed', 'Silvère', 'Stephane', 'Sandra',
 ];
 ---
 <BaseLayout title="Nous connaître — Fadila Ménage · Lomé" active="nous-connaitre">
-  <section class="pagehead has-photo"><div class="pagehead-media"><img src="/images/bureau.webp" alt="Les bureaux de Fadila Ménage à Lomé" width="1360" height="907" /></div><div class="wrap"><span class="label">L'agence</span><h1>Nous connaître</h1><p>Depuis 2017, Fadila Ménage œuvre pour apporter du bonheur et de la sérénité dans les foyers togolais.</p></div></section>
+  <section class="pagehead">
+    <div class="wrap"><span class="label">L'agence</span><h1>Nous connaître 👋</h1><p>Depuis 2017, Fadila Ménage œuvre pour apporter du bonheur et de la sérénité dans les foyers togolais.</p></div>
+  </section>
 
-  <section class="sec-mist"><div class="wrap">
-    <div class="sec-head center reveal"><span class="label">Notre histoire</span><h2>Une aventure lancée en 2017</h2></div>
-    <div class="histoire reveal">
-      <div class="hist-media">
-        <img src="/images/equipe/histoire-bg.jpg" alt="L'équipe Fadila Ménage" width="1680" height="950" loading="lazy" />
-        <div class="hist-badge"><b>2017</b><span>Année de lancement</span></div>
-      </div>
-      <div class="hist-text">
-        <p class="lead-p">Créée en 2017 au sein du Fadila Group, Fadila Ménage est spécialisée dans le placement de personnel de maison, le nettoyage professionnel et la conception de paniers-cadeaux.</p>
-        <p>Notre métier ne se limite pas à la mise en relation. Nous sommes à la fois <strong>recruteur, formateur et employeur</strong> : nous sélectionnons nos agents, les formons selon nos méthodes — avec l'appui de partenaires du secteur hôtelier — puis les accompagnons tout au long de leurs missions.</p>
-        <p><strong>Notre mission :</strong> apporter le bonheur et la joie dans vos foyers, en vous offrant un personnel fiable, formé et vérifié.</p>
-        <a href="/nos-services" class="btn btn-green">Découvrez nos services <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-      </div>
-    </div>
-  </div></section>
-
+  <!-- NOTRE HISTOIRE -->
   <section class="has-drops">
-    <div class="drops" aria-hidden="true"><span class="drop d-green s2" style="top:8%;left:5%"></span><span class="drop d-amber s1" style="top:20%;right:6%"></span><span class="drop d-plum s2" style="bottom:10%;left:10%"></span></div>
+    <div class="drops" aria-hidden="true"><span class="drop d-orange s2" style="top:8%;left:5%"></span><span class="drop d-teal s1" style="bottom:12%;right:6%"></span></div>
     <div class="wrap">
-    <div class="sec-head center reveal"><span class="label">À la découverte de nos équipes</span><h2>Celles et ceux qui font Fadila Ménage</h2><p>Fadila Ménage a la chance de compter de nombreux professionnels parmi son équipe. Des aide-ménagères aux nounous en passant par les cuisiniers, chauffeurs et jardiniers, sans oublier l'équipe administrative, chaque membre a pour objectif de satisfaire nos clients. Apprenez à connaître l'équipe et contactez-nous si vous avez des questions.</p></div>
-    <div class="team">
-      {team.map((m) => (
-        <figure class="member reveal"><div class="avatar"><img src={m.photo} alt={m.name} width="118" height="118" loading="lazy" /></div><figcaption><b>{m.name}</b><span>Équipe Fadila Ménage</span></figcaption></figure>
-      ))}
-    </div>
-  </div></section>
-
-  <section class="sec-mist"><div class="wrap">
-    <div class="feature reveal">
-      <div class="fpanel" style="background:var(--teal-deep)">
-        <i class="fa-solid fa-spray-can-sparkles gl"></i>
-        <h2>Trouver la solution la plus adaptée à vos besoins</h2>
-        <p>Nous fournissons toujours un service de qualité, et nous sommes particulièrement fiers des prestations de suivi que nous proposons. Lorsque vous travaillez avec nous, vous profitez de prestations uniques. Nous ne sommes satisfaits de notre travail que lorsque nos clients le sont aussi.</p>
-        <a href="/rejoindre" class="btn btn-gold">Rejoignez notre équipe <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      <div class="card reveal" style="border-radius:26px;padding:34px 30px">
+        <span class="label">Notre histoire</span>
+        <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;margin-top:10px">Une aventure lancée en 2017</h2>
+        <p class="lead-p" style="margin-top:16px;font-size:1.1rem;color:#fff">Créée en 2017 au sein du Fadila Group, Fadila Ménage est spécialisée dans le placement de personnel de maison, le nettoyage professionnel et la conception de paniers-cadeaux.</p>
+        <p style="margin-top:12px;color:rgba(255,255,255,.86)">Notre métier ne se limite pas à la mise en relation. Nous sommes à la fois <strong style="color:#fff">recruteur, formateur et employeur</strong> : nous sélectionnons nos agents, les formons selon nos méthodes — avec l'appui de partenaires du secteur hôtelier — puis les accompagnons tout au long de leurs missions.</p>
+        <p style="margin-top:12px;color:rgba(255,255,255,.86)"><strong style="color:#fff">Notre mission :</strong> apporter le bonheur et la joie dans vos foyers, avec un personnel fiable, formé et vérifié.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;margin-top:22px">
+          <div style="display:flex;align-items:baseline;gap:10px"><b style="font-family:'Archivo';font-weight:800;font-size:2.2rem;color:#fff">2017</b><span style="color:rgba(255,255,255,.78)">année de lancement</span></div>
+          <a href="/nos-services" class="btn btn-white">Découvrez nos services →</a>
+        </div>
       </div>
-      <div class="fimg"><img src="/images/equipe/agent-nettoyage.jpg" alt="Agent de nettoyage Fadila Ménage" width="760" height="960" loading="lazy" /></div>
+    </div>
+  </section>
+
+  <!-- ÉQUIPE -->
+  <section class="has-drops">
+    <div class="drops" aria-hidden="true"><span class="drop d-plum s2" style="top:10%;right:8%"></span><span class="drop d-green s1" style="bottom:14%;left:10%"></span></div>
+    <div class="wrap">
+      <div class="sec-head center reveal"><span class="label">Notre équipe</span><h2>Celles et ceux qui font Fadila Ménage</h2><p>Des aides-ménagères aux nounous, cuisiniers, chauffeurs et jardiniers, sans oublier l'équipe administrative — chacun a pour objectif de vous satisfaire.</p></div>
+      <div class="team">
+        {team.map((name) => (
+          <figure class="member reveal"><div class="avatar"><span class="ini">{name.replace('Dr. ', '').charAt(0)}</span></div><figcaption><b>{name}</b><span>Équipe Fadila Ménage</span></figcaption></figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section><div class="wrap">
+    <div class="ctacard reveal">
+      <div style="font-size:38px;line-height:1">✨</div>
+      <h2>Trouvons la solution la plus adaptée à vos besoins</h2>
+      <p>Nous ne sommes satisfaits de notre travail que lorsque vous l'êtes aussi. Rejoignez une équipe qui accompagne ses agents dans la durée.</p>
+      <a href="/rejoindre" class="btn btn-white">Rejoignez notre équipe →</a>
     </div>
   </div></section>
 </BaseLayout>

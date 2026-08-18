@@ -1,56 +1,59 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ApplyForm from '../components/ApplyForm.jsx';
+
+const steps = [
+  { n: '01', t: 'Un employeur', d: 'Nous ne faisons pas que vous placer : nous vous employons et vous accompagnons dans la durée.' },
+  { n: '02', t: 'Une formation', d: "Vous êtes formé selon nos méthodes, avec l'appui de partenaires du secteur hôtelier." },
+  { n: '03', t: 'Une paie juste', d: 'Des conditions de travail dignes et une rémunération transparente.' },
+  { n: '04', t: 'Une mission sociale', d: "Nous soutenons l'insertion des jeunes, des femmes et des seniors éloignés de l'emploi." },
+];
+const metiers = ['🧹 Aides-ménagères', '🍼 Nounous & baby-sitters', '🍳 Cuisiniers', '🚗 Chauffeurs', '🌿 Jardiniers & coursiers'];
 ---
 <BaseLayout title="Rejoignez notre équipe — Fadila Ménage · Lomé" active="rejoindre">
-  <section class="pagehead has-photo">
-    <div class="pagehead-media"><img src="/images/equipe/histoire-bg.jpg" alt="L'équipe Fadila Ménage" width="1680" height="950" /></div>
-    <div class="wrap"><span class="label">Recrutement</span><h1>Rejoignez notre équipe</h1><p>Aide-ménagère, nounou, cuisinier, chauffeur ou agent de nettoyage : Fadila Ménage recrute, forme et place du personnel sérieux.</p></div>
+  <section class="pagehead">
+    <div class="wrap"><span class="label">Recrutement</span><h1>Rejoignez notre équipe 💼</h1><p>Aide-ménagère, nounou, cuisinier, chauffeur ou agent de nettoyage : Fadila Ménage recrute, forme et place du personnel sérieux.</p></div>
   </section>
 
+  <!-- POURQUOI -->
   <section class="has-drops">
-    <div class="drops" aria-hidden="true"><span class="drop d-orange s3" style="top:-26px;left:6%"></span><span class="drop d-teal s2" style="top:14%;right:7%"></span><span class="drop d-plum s2" style="bottom:12%;left:12%"></span></div>
+    <div class="drops" aria-hidden="true"><span class="drop d-orange s2" style="top:8%;left:6%"></span><span class="drop d-teal s1" style="bottom:12%;right:7%"></span></div>
     <div class="wrap">
-    <div class="sec-head reveal"><span class="label">Pourquoi nous rejoindre</span><h2>Un emploi stable, une vraie formation</h2></div>
-    <div class="proc">
-      <div class="pstep reveal"><div class="pn">01</div><h3>Un employeur</h3><p>Nous ne faisons pas que vous placer : nous vous employons et vous accompagnons dans la durée.</p></div>
-      <div class="pstep reveal"><div class="pn">02</div><h3>Une formation</h3><p>Vous êtes formé selon nos méthodes, avec l'appui de partenaires du secteur hôtelier.</p></div>
-      <div class="pstep reveal"><div class="pn">03</div><h3>Une paie juste</h3><p>Des conditions de travail dignes et une rémunération transparente.</p></div>
-      <div class="pstep reveal"><div class="pn">04</div><h3>Une mission sociale</h3><p>Nous soutenons l'insertion des jeunes, des femmes et des seniors éloignés de l'emploi.</p></div>
-    </div>
-  </div></section>
-
-  <section class="sec-mist"><div class="wrap">
-    <div class="feature reveal">
-      <div class="fpanel">
-        <i class="fa-solid fa-user-check gl"></i>
-        <h2>Les métiers que nous recrutons</h2>
-        <ul>
-          <li>Aides-ménagères et agents d'entretien</li>
-          <li>Nounous et baby-sitters</li>
-          <li>Cuisiniers</li>
-          <li>Chauffeurs</li>
-          <li>Jardiniers et coursiers</li>
-        </ul>
-        <p>Débutant motivé ou professionnel expérimenté : chacun est formé à nos méthodes avant d'être placé chez nos clients.</p>
-        <a href="#postuler" class="btn btn-gold">Postuler maintenant <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      <div class="sec-head reveal"><span class="label">Pourquoi nous rejoindre</span><h2>Un emploi stable, une vraie formation</h2></div>
+      <div class="proc">
+        {steps.map((s) => (
+          <div class="pstep reveal"><div class="pn">{s.n}</div><h3>{s.t}</h3><p>{s.d}</p></div>
+        ))}
       </div>
-      <div class="fimg"><img src="/images/equipe/agent-nettoyage.jpg" alt="Agent de nettoyage Fadila Ménage" loading="lazy" width="760" height="960" /></div>
+    </div>
+  </section>
+
+  <!-- MÉTIERS -->
+  <section><div class="wrap">
+    <div class="card reveal" style="border-radius:26px;padding:32px 28px">
+      <div style="font-size:38px;line-height:1">🧑‍🔧</div>
+      <h2 style="font-size:clamp(1.5rem,3vw,2rem);font-weight:800;margin-top:8px">Les métiers que nous recrutons</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:18px">
+        {metiers.map((m) => (
+          <span style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:9px 16px;font-family:'Archivo';font-weight:600;font-size:.95rem">{m}</span>
+        ))}
+      </div>
+      <p style="margin-top:18px;color:rgba(255,255,255,.86)">Débutant motivé ou professionnel expérimenté : chacun est formé à nos méthodes avant d'être placé chez nos clients.</p>
+      <a href="#postuler" class="btn btn-white" style="margin-top:20px">Postuler maintenant →</a>
     </div>
   </div></section>
 
-  <section class="cta-video">
-    <video class="stats-bg" autoplay muted loop playsinline preload="none" poster="/images/video/nettoyage-bg-poster.jpg">
-      <source src="/images/video/nettoyage-bg.mp4" type="video/mp4" />
-    </video>
-    <div class="wrap reveal">
-      <span class="label">Depuis 2017</span>
+  <!-- IMPACT -->
+  <section><div class="wrap">
+    <div class="ctacard reveal">
+      <div style="font-size:38px;line-height:1">🌍</div>
       <h2>Plus de 150 jeunes formés, plus de 100 emplois créés</h2>
       <p>Fadila Ménage promeut l'insertion sociale et professionnelle des personnes éloignées du marché du travail. Rejoignez une équipe qui accompagne ses agents dans la durée.</p>
-      <a href="#postuler" class="btn btn-gold">Déposer ma candidature <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      <a href="#postuler" class="btn btn-white">Déposer ma candidature →</a>
     </div>
-  </section>
+  </div></section>
 
+  <!-- CANDIDATURE -->
   <section id="postuler"><div class="wrap">
     <div class="sec-head center reveal"><span class="label">Candidature</span><h2>Postulez en ligne</h2><p>Deux étapes rapides. Nous étudions votre profil et vous recontactons pour la suite du recrutement.</p></div>
     <ApplyForm client:visible />

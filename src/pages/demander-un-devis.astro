@@ -3,9 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import DevisForms from '../components/DevisForms.jsx';
 ---
 <BaseLayout title="Demandez un devis — Fadila Ménage · Lomé">
-  <section class="pagehead has-photo">
-    <div class="pagehead-media"><img src="/images/services/entete-devis.jpg" alt="Personnel Fadila Ménage" width="1680" height="760" /></div>
-    <div class="wrap"><span class="label">Demande de devis</span><h1>Devis</h1><p>Choisissez le formulaire adapté à votre besoin. Nous revenons vers vous sous 24 h avec une proposition adaptée, sans engagement.</p></div>
+  <section class="pagehead">
+    <div class="wrap"><span class="label">Demande de devis</span><h1>Demandez un devis 📝</h1><p>Choisissez le formulaire adapté à votre besoin. Nous revenons vers vous sous 24 h avec une proposition adaptée, sans engagement.</p></div>
   </section>
 
   <section class="has-drops">
@@ -23,7 +22,12 @@ import DevisForms from '../components/DevisForms.jsx';
         <div class="ci" style="border-bottom:0"><b>E-mail</b><p>hello@fadilamenage.com</p></div>
         <a href="/demander-un-devis" class="btn btn-gold">Demandez un devis <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
       </div>
-      <figure class="map reveal"><img src="/images/locaux-fadila.webp" alt="Les locaux de Fadila Ménage à Totsi, Lomé" width="1360" height="907" loading="lazy" /><figcaption><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Nos locaux à Totsi, Lomé</figcaption></figure>
+      <div class="contact-card reveal">
+        <div class="ci"><b>📍 Zone d'intervention</b><p>Lomé et ses environs — Région maritime, Togo</p></div>
+        <div class="ci"><b>🕒 Horaires</b><p>Du lundi au samedi, 7 h – 19 h</p></div>
+        <div class="ci" style="border-bottom:0"><b>⚡ Délai de réponse</b><p>Une proposition sous 24 h, sans engagement</p></div>
+        <a href="tel:+22891932723" class="btn btn-ghost" style="margin-top:20px">📞 Appeler l'agence</a>
+      </div>
     </div>
   </div></section>
 </BaseLayout>
