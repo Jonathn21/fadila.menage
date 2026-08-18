@@ -540,3 +540,78 @@ header.masthead.scrolled{box-shadow:0 10px 30px -18px rgba(30,24,21,.4)}
   .member:hover .avatar{transform:translateZ(34px) scale(1.05)}
   .member:hover figcaption{transform:translateZ(18px)}
 }
+
+/* ==================================================================
+   THÈME « APPLI » — fond dégradé chaud + surfaces translucides.
+   Ajouté en dernier : redéfinit le socle sans réécrire les composants.
+   ================================================================== */
+:root{
+  --ink:#ffffff;
+  --slate:rgba(255,255,255,.76);
+  --line:rgba(255,255,255,.22);
+  --mist:rgba(255,255,255,.10);
+  --mist-2:rgba(255,255,255,.18);
+}
+body{
+  color:#fff;
+  background:linear-gradient(168deg,#F5AC71 0%,#E9884A 46%,#DA6A2C 100%);
+  background-attachment:fixed;
+}
+.sec-mist{background:rgba(255,255,255,.07)}
+.ctaband{background:rgba(255,255,255,.09)}
+.sec-head p{color:rgba(255,255,255,.82)}
+.label{color:#FFE7D3}
+
+/* Cartes translucides */
+.svc,.pstep,.art,.member,.svc-detail .item,.contact-card,.card,.faq details,.hero-panel{
+  background:rgba(255,255,255,.14);
+  border-color:rgba(255,255,255,.22);
+}
+.svc p,.pstep p,.member span,.art p,.svc-detail .item p{color:rgba(255,255,255,.8)}
+.svc .more,.art .more{color:#fff}
+.faq summary::after{color:#fff}
+.faq .ans{color:rgba(255,255,255,.82)}
+.art .tag{background:#fff;color:#D9662A}
+.art .date{color:rgba(255,255,255,.6)}
+
+/* En-tête translucide */
+header.masthead{background:rgba(233,136,74,.72);backdrop-filter:blur(12px);border-bottom-color:rgba(255,255,255,.2)}
+.mainnav a:not(.btn){color:#fff}
+.mainnav a:not(.btn):hover,.mainnav a.active:not(.btn){color:#fff;border-color:#fff}
+.burger span{background:#fff}
+@media(max-width:900px){.mainnav{background:rgba(218,106,44,.97);border-bottom-color:rgba(255,255,255,.2)}.mainnav a:not(.btn){border-bottom-color:rgba(255,255,255,.16)}}
+
+/* Boutons secondaires clairs sur l'orange */
+.btn-out-dark{color:#fff;border-color:rgba(255,255,255,.55)}
+.btn-out-dark:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.14)}
+
+/* Onglets devis */
+.tab{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.22)}
+.tab i{color:#FFE7D3}
+.tab.active{background:#fff;color:#D9662A;border-color:#fff}
+.tab.active i{color:#D9662A}
+.devis-intro{color:rgba(255,255,255,.82)}
+
+/* Formulaires : champs BLANCS + texte foncé pour la lisibilité */
+.qform,.applyform{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.24)}
+.field label,.qform legend{color:#fff}
+.qform .sub,.qform .req-note{color:rgba(255,255,255,.78)}
+.qform .opts label{color:rgba(255,255,255,.92)}
+.field input,.field select,.qform textarea,.sel-btn{background:#fff;color:#241E1A;border-color:rgba(255,255,255,.55)}
+.field input::placeholder,.qform textarea::placeholder{color:#8b8178}
+.sel-btn.placeholder .sel-val{color:#8b8178}
+.field select option{color:#241E1A;background:#fff}
+.sel-list{background:#fff;border-color:rgba(0,0,0,.08)}
+.sel-opt-label{color:#241E1A}
+.sel-opt-desc{color:#6E635B}
+.sel-opt.active{background:#F4EEE1}
+.step-dot{background:rgba(255,255,255,.24);color:#fff}
+
+/* Contact */
+.contact-card .ci{border-bottom-color:rgba(255,255,255,.2)}
+.contact-card .ci b{color:#FFE7D3}
+.contact-card .ci p{color:#fff}
+
+/* Pied de page : ton chaud translucide */
+footer{background:rgba(120,52,18,.42);backdrop-filter:blur(8px);border-top:1px solid rgba(255,255,255,.16)}
+.foot-col a:hover{color:#FFE7D3}
