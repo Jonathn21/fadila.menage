@@ -1,31 +1,56 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const services = [
+  { emo: '🧹', a: 'a-orange', t: 'Aide-ménagère', d: "L'entretien de votre intérieur, au quotidien ou ponctuellement, avec soin et discrétion." },
+  { emo: '🍼', a: 'a-rose', t: 'Nounou & baby-sitting', d: 'Une garde attentive et fiable pour vos enfants — un soir, à temps partiel ou plein.' },
+  { emo: '🍳', a: 'a-amber', t: 'Cuisinier', d: 'Des repas préparés chez vous, pour le quotidien comme pour vos réceptions.' },
+  { emo: '🚗', a: 'a-blue', t: 'Chauffeur', d: 'Un chauffeur ponctuel et prudent pour vos déplacements à Lomé.' },
+  { emo: '🌿', a: 'a-green', t: 'Jardinier', d: 'Entretien des espaces verts et petits travaux extérieurs.' },
+  { emo: '🧽', a: 'a-teal', t: 'Nettoyage professionnel', d: 'Bureaux, commerces et locaux : entretien planifié, ponctuel ou en contrat.' },
+];
 ---
 <BaseLayout title="Nos services — Fadila Ménage · Lomé" active="nos-services">
-  <section class="pagehead has-photo">
-    <div class="pagehead-media"><img src="/images/services/entete-services.jpg" alt="Équipe Fadila Ménage au travail" width="1680" height="760" /></div>
-    <div class="wrap"><span class="label">Nos prestations</span><h1>Nos services</h1><p>Vous pouvez compter sur Fadila Ménage pour satisfaire et même dépasser vos besoins et vos attentes. Apprenez-en plus sur les services que nous proposons ci-dessous, et contactez-nous si vous souhaitez en savoir plus sur une offre en particulier.</p></div>
+  <section class="pagehead">
+    <div class="wrap"><span class="label">Nos prestations</span><h1>Nos services 🧡</h1><p>Un personnel formé, vérifié et accompagné dans la durée — pour les familles comme pour les entreprises.</p></div>
   </section>
+
+  <!-- LES MÉTIERS -->
   <section class="has-drops">
-    <div class="drops" aria-hidden="true">
-      <span class="drop d-blue s1" style="top:-24px;right:7%"></span>
-      <span class="drop d-amber s2" style="top:8%;left:3%"></span>
-      <span class="drop d-rose s2" style="bottom:12%;right:5%"></span>
-    </div>
+    <div class="drops" aria-hidden="true"><span class="drop d-teal s2" style="top:6%;right:6%"></span><span class="drop d-orange s1" style="bottom:10%;left:4%"></span></div>
     <div class="wrap">
-    <div class="svc-detail">
-      <div class="item reveal"><div class="ic"><i class="fa-solid fa-broom"></i></div><h3>Nettoyage et entretien</h3><p>Nettoyage ponctuel ou par fréquence souhaitée, selon vos besoins, au domicile ou aux bureaux : dépoussiérage des meubles et surfaces, aspiration des sols, époussetage des plinthes, essuyage des appareils électroménagers, lavage de la vaisselle, nettoyage des WC et douches, essuyage des comptoirs et robinets, etc.</p></div>
-      <div class="item reveal" style="background:var(--gold-deep);border-color:var(--gold-deep)"><div class="ic" style="background:rgba(255,255,255,.16);color:#fff"><i class="fa-solid fa-people-group"></i></div><h3 style="color:#fff">Personnel de ménage</h3><p style="color:#EFE7D6">Notre équipe de professionnels expérimentés se tient à votre disposition : aides-ménagères, nounous, cuisiniers, chauffeurs, jardiniers et cavistes. Ils sont sélectionnés minutieusement après un processus d'évaluation rigoureux. Nous organisons également des stages de perfectionnement pour améliorer nos performances et mieux vous satisfaire.</p></div>
-      <div class="item reveal" style="background:var(--teal-deep);border-color:var(--teal-deep)"><div class="ic" style="background:rgba(255,255,255,.14);color:#fff"><i class="fa-solid fa-basket-shopping"></i></div><h3 style="color:#fff">Conception de panier-cadeau</h3><p style="color:#E9ECDB">Quelle que soit l'occasion, envoyez un joli panier-cadeau à un proche. Nous proposons des paniers de champagne, cartes de vœux, bouquets de fleurs, chocolats, fruits, etc. Ne ratez jamais une occasion de faire plaisir à un proche.</p></div>
-      <div class="item reveal"><div class="ic"><i class="fa-solid fa-bullseye"></i></div><h3>Insertion professionnelle</h3><p>Fadila Ménage promeut l'insertion sociale et professionnelle des personnes exclues du marché du travail : demandeurs d'emploi, jeunes et femmes sans qualification, seniors. Depuis sa création en 2017, nous avons formé plus de 150 jeunes et créé plus de 100 emplois ponctuels et CDD.</p></div>
+      <div class="svc-grid">
+        {services.map((s) => (
+          <div class={'svc reveal ' + s.a}>
+            <div class="svc-ic emoji">{s.emo}</div>
+            <h3>{s.t}</h3>
+            <p>{s.d}</p>
+          </div>
+        ))}
+      </div>
     </div>
-    <div style="margin-top:40px;display:flex;gap:14px;flex-wrap:wrap"><a href="/demander-un-devis" class="btn btn-gold">Demandez un devis <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a href="/faq" class="btn btn-out-dark">Questions fréquentes</a></div>
+  </section>
+
+  <!-- 3 PÔLES -->
+  <section><div class="wrap">
+    <div class="sec-head reveal"><span class="label">Notre métier</span><h2>Trois pôles, un seul objectif</h2></div>
+    <div class="svc-detail">
+      <div class="item reveal"><div class="ic emoji">🧽</div><h3>Nettoyage & entretien</h3><p>Nettoyage ponctuel ou par fréquence, au domicile comme aux bureaux : dépoussiérage, sols, sanitaires, vitres, électroménager, vaisselle… selon vos besoins.</p></div>
+      <div class="item reveal" style="background:var(--gold-deep);border-color:var(--gold-deep)"><div class="ic emoji" style="background:rgba(255,255,255,.18)">👥</div><h3 style="color:#fff">Personnel de ménage</h3><p style="color:#F4E7D9">Aides-ménagères, nounous, cuisiniers, chauffeurs et jardiniers — sélectionnés avec rigueur, formés à nos méthodes, puis placés et suivis chez vous.</p></div>
+      <div class="item reveal" style="background:#0C9C8B;border-color:#0C9C8B"><div class="ic emoji" style="background:rgba(255,255,255,.18)">🎁</div><h3 style="color:#fff">Paniers-cadeaux</h3><p style="color:#E4F3F0">Champagne, fleurs, chocolats, fruits, cartes de vœux… Composez un joli panier pour un proche, quelle que soit l'occasion.</p></div>
+      <div class="item reveal"><div class="ic emoji">🌍</div><h3>Insertion professionnelle</h3><p>Nous formons et employons des jeunes, des femmes et des personnes éloignées de l'emploi : plus de 150 jeunes formés et 100 emplois créés depuis 2017.</p></div>
+    </div>
+    <div style="margin-top:34px;display:flex;gap:12px;flex-wrap:wrap">
+      <a href="/demander-un-devis" class="btn btn-white">Demander un devis →</a>
+      <a href="/faq" class="btn btn-ghost">Questions fréquentes</a>
+    </div>
   </div></section>
-  <section class="sec-mist"><div class="wrap">
-    <div class="sec-head center reveal"><span class="label">Témoignage</span></div>
-    <figure style="max-width:720px;margin:0 auto;text-align:center">
-      <i class="fa-solid fa-quote-left" style="font-size:2.6rem;color:var(--gold-deep);opacity:.35"></i>
-      <blockquote style="font-family:'Archivo';font-weight:600;font-style:italic;font-size:1.4rem;line-height:1.45;color:var(--ink);margin-top:14px">Nous sommes très ravis de la disponibilité et du sérieux de votre équipe.</blockquote>
-    </figure>
+
+  <!-- TÉMOIGNAGE -->
+  <section><div class="wrap">
+    <div class="ctacard reveal">
+      <div style="font-size:34px;line-height:1">💬</div>
+      <p style="font-family:'Archivo';font-weight:600;font-style:italic;font-size:1.3rem;line-height:1.45;color:#fff;max-width:640px;margin:14px auto 0">« Nous sommes très ravis de la disponibilité et du sérieux de votre équipe. »</p>
+    </div>
   </div></section>
 </BaseLayout>
