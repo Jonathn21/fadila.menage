@@ -66,8 +66,18 @@ const {
         (es) => {
           es.forEach((e) => {
             if (e.isIntersecting) {
-              e.target.classList.add('in');
-              io.unobserve(e.target);
+              const el = e.target;
+              el.classList.add('in');
+              io.unobserve(el);
+              // Effacer le délai de stagger une fois l'apparition finie,
+              // pour que le survol 3D reste instantané.
+              el.addEventListener(
+                'transitionend',
+                () => {
+                  el.style.transitionDelay = '';
+                },
+                { once: true }
+              );
             }
           });
         },
@@ -107,6 +117,30 @@ const {
           { threshold: 0.5 }
         );
         counters.forEach((c) => cio.observe(c));
+      }
+      // Inclinaison 3D légère des cartes en suivant la souris
+      const canTilt =
+        window.matchMedia('(hover:hover) and (pointer:fine)').matches &&
+        !window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+      if (canTilt) {
+        const MAX = 9; // amplitude max (deg), volontairement discrète
+        document.querySelectorAll('.svc, .member').forEach((card) => {
+          let raf = null;
+          card.addEventListener('mousemove', (e) => {
+            const r = card.getBoundingClientRect();
+            const px = (e.clientX - r.left) / r.width - 0.5;
+            const py = (e.clientY - r.top) / r.height - 0.5;
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+              card.style.setProperty('--ry', (px * MAX).toFixed(2) + 'deg');
+              card.style.setProperty('--rx', (-py * MAX).toFixed(2) + 'deg');
+            });
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.setProperty('--rx', '0deg');
+            card.style.setProperty('--ry', '0deg');
+          });
+        });
       }
     </script>
   </body>
