@@ -646,10 +646,6 @@ footer{background:rgba(120,52,18,.42);backdrop-filter:blur(8px);border-top:1px s
 .apphero .hero-cta{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}
 .hero-visual{position:relative;min-height:200px;display:flex;align-items:center;justify-content:center}
 .hero-illus{width:100%;height:auto;max-height:380px;object-fit:contain;display:block;position:relative;z-index:1}
-@media(prefers-reduced-motion:no-preference){
-  .hero-illus{animation:heroFloat 5.5s ease-in-out infinite}
-  @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
-}
 .hero-visual .blob{position:absolute;inset:9% 10%;background:rgba(255,255,255,.16);
   border-radius:52% 48% 46% 54%/54% 46% 54% 46%}
 .hero-visual .hero-emoji{position:absolute;inset:0;display:grid;place-items:center;
