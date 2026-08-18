@@ -1,23 +1,53 @@
 ---
 const { active = '' } = Astro.props;
 const links = [
-  { href: '/', key: 'accueil', label: 'Accueil' },
-  { href: '/nous-connaitre', key: 'nous-connaitre', label: 'Nous connaître' },
-  { href: '/nos-services', key: 'nos-services', label: 'Nos services' },
-  { href: '/rejoindre', key: 'rejoindre', label: 'Rejoignez notre équipe' },
+  { href: '/', key: 'accueil', emo: '🏠', label: 'Accueil' },
+  { href: '/nos-services', key: 'nos-services', emo: '🧹', label: 'Nos services' },
+  { href: '/nous-connaitre', key: 'nous-connaitre', emo: '👋', label: 'Nous connaître' },
+  { href: '/rejoindre', key: 'rejoindre', emo: '💼', label: "Rejoindre l'équipe" },
+  { href: '/faq', key: 'faq', emo: '❓', label: 'Questions fréquentes' },
 ];
 ---
-<div class="util"><div class="wrap util-inner">
-  <div class="u-left"><span>Services domestiques professionnels depuis 2017</span><span>Lomé, Togo</span></div>
-  <div class="u-right"><a href="/demander-un-devis">+228 91 93 27 23</a></div>
-</div></div>
-<header class="masthead">
-  <div class="wrap mast-inner">
-    <a href="/" class="brand"><img class="logo" src="/logo.png" alt="Fadila Ménage" width="46" height="52" /></a>
-    <nav class="mainnav" id="nav">
-      {links.map((l) => <a href={l.href} class={active === l.key ? 'active' : ''}>{l.label}</a>)}
-      <a href="/demander-un-devis" class="btn btn-gold">Demandez un devis</a>
-    </nav>
-    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+<header class="appbar">
+  <div class="wrap appbar-inner">
+    <button class="hamb" id="menuBtn" aria-label="Ouvrir le menu" aria-controls="drawer" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <a href="/" class="appbar-logo" aria-label="Fadila Ménage — accueil"><img src="/logo.png" alt="Fadila Ménage" width="46" height="52" /></a>
+    <a href="/demander-un-devis" class="appbar-cta">Devis</a>
   </div>
 </header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-top">
+    <span class="drawer-eyebrow">Menu</span>
+    <button class="hamb" id="drawerClose" aria-label="Fermer le menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+
+  <a href="/" class="drawer-brand">
+    <img src="/logo.png" alt="Fadila Ménage" width="46" height="52" />
+    <span><strong>Fadila Ménage</strong><small>Services à domicile · Lomé</small></span>
+  </a>
+
+  <hr class="ddash" />
+
+  <nav class="dnav">
+    {links.map((l) => (
+      <a href={l.href} class={'dlink' + (active === l.key ? ' active' : '')}>
+        <span class="emo">{l.emo}</span>{l.label}
+      </a>
+    ))}
+  </nav>
+
+  <hr class="ddash" />
+
+  <a href="/demander-un-devis" class="dcta">Demander un devis →</a>
+
+  <hr class="ddash" />
+
+  <a href="tel:+22891932723" class="dcontact"><span class="emo">📞</span>+228 91 93 27 23</a>
+  <div class="dcontact"><span class="emo">📍</span>Totsi, non loin de l'hôtel Morphée — Lomé</div>
+</aside>

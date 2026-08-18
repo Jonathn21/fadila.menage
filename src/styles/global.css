@@ -670,3 +670,50 @@ footer{background:rgba(120,52,18,.42);backdrop-filter:blur(8px);border-top:1px s
 .ctacard h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:#fff}
 .ctacard p{margin:12px auto 0;max-width:52ch;color:rgba(255,255,255,.84)}
 .ctacard .btn{margin-top:22px}
+
+/* ==================================================================
+   BARRE D'APPLI MINIMALISTE + TIROIR DE NAVIGATION
+   ================================================================== */
+.appbar{position:sticky;top:0;z-index:60;background:rgba(233,136,74,.55);
+  backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.18)}
+.appbar-inner{display:flex;align-items:center;justify-content:space-between;height:64px;gap:14px}
+.hamb{width:44px;height:44px;border-radius:14px;border:0;background:transparent;color:#fff;
+  display:grid;place-items:center;cursor:pointer;transition:background .18s}
+.hamb:hover{background:rgba(255,255,255,.16)}
+.hamb svg{width:24px;height:24px}
+.appbar-logo{display:flex;align-items:center}
+.appbar-logo img{height:40px;width:auto;display:block;filter:drop-shadow(0 2px 6px rgba(120,55,20,.3))}
+.appbar-cta{font-family:'Archivo';font-weight:700;font-size:.9rem;padding:9px 18px;border-radius:999px;
+  background:#fff;color:#D9662A;transition:transform .16s,color .16s}
+.appbar-cta:hover{transform:translateY(-2px);color:#B85320}
+
+.scrim{position:fixed;inset:0;background:rgba(60,28,10,.46);opacity:0;visibility:hidden;
+  transition:opacity .3s;z-index:90}
+.scrim.show{opacity:1;visibility:visible}
+
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(84%,338px);z-index:100;padding:18px 18px 26px;
+  background:linear-gradient(162deg,rgba(226,150,108,.98),rgba(198,116,70,.99));backdrop-filter:blur(8px);
+  transform:translateX(-104%);transition:transform .32s cubic-bezier(.22,1,.36,1);
+  display:flex;flex-direction:column;gap:2px;overflow-y:auto;
+  box-shadow:26px 0 70px -22px rgba(60,25,8,.6)}
+.drawer.show{transform:none}
+.drawer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.drawer-eyebrow{font-family:'Archivo';font-weight:700;font-size:.72rem;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(255,255,255,.7);padding-left:6px}
+.drawer-brand{display:flex;align-items:center;gap:12px;padding:8px 6px 4px;color:#fff}
+.drawer-brand img{height:46px;width:auto}
+.drawer-brand strong{font-family:'Archivo';font-weight:800;font-size:1.1rem;display:block;line-height:1.1}
+.drawer-brand small{font-size:.78rem;color:rgba(255,255,255,.75)}
+.ddash{border:0;border-top:1.6px dashed rgba(255,255,255,.42);margin:12px 4px}
+.dnav{display:flex;flex-direction:column;gap:2px}
+.dlink{display:flex;align-items:center;gap:14px;padding:13px 10px;border-radius:14px;
+  font-family:'Archivo';font-weight:600;font-size:1.04rem;color:#fff;transition:background .16s}
+.dlink:hover{background:rgba(255,255,255,.14)}
+.dlink.active{background:rgba(255,255,255,.2)}
+.dlink .emo{font-size:19px;width:24px;text-align:center;flex:0 0 auto}
+.dcta{display:block;margin:6px 2px;padding:15px;border-radius:16px;background:#fff;color:#D9662A;
+  font-family:'Archivo';font-weight:800;font-size:1rem;text-align:center;transition:transform .16s}
+.dcta:hover{transform:translateY(-2px)}
+.dcontact{display:flex;align-items:center;gap:12px;padding:11px 8px;color:rgba(255,255,255,.92);font-size:.95rem}
+.dcontact .emo{font-size:17px;width:22px;text-align:center;flex:0 0 auto}
+@media(max-width:560px){.appbar-inner{height:58px}.appbar-logo img{height:34px}}

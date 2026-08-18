@@ -32,14 +32,33 @@ const {
     <slot />
     <Footer />
     <script>
-      // Menu burger (mobile)
-      const burger = document.getElementById('burger');
-      const nav = document.getElementById('nav');
-      if (burger && nav) {
-        burger.addEventListener('click', () => nav.classList.toggle('open'));
-        nav.querySelectorAll('a').forEach((a) =>
-          a.addEventListener('click', () => nav.classList.remove('open'))
-        );
+      // Tiroir de navigation
+      const menuBtn = document.getElementById('menuBtn');
+      const drawer = document.getElementById('drawer');
+      const scrim = document.getElementById('scrim');
+      const drawerClose = document.getElementById('drawerClose');
+      if (menuBtn && drawer && scrim) {
+        const openD = () => {
+          drawer.classList.add('show');
+          scrim.classList.add('show');
+          menuBtn.setAttribute('aria-expanded', 'true');
+          drawer.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        };
+        const closeD = () => {
+          drawer.classList.remove('show');
+          scrim.classList.remove('show');
+          menuBtn.setAttribute('aria-expanded', 'false');
+          drawer.setAttribute('aria-hidden', 'true');
+          document.body.style.overflow = '';
+        };
+        menuBtn.addEventListener('click', openD);
+        scrim.addEventListener('click', closeD);
+        if (drawerClose) drawerClose.addEventListener('click', closeD);
+        drawer.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeD));
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && drawer.classList.contains('show')) closeD();
+        });
       }
       // Diaporama du héros (fondu enchaîné)
       const heroBg = document.querySelector('.hero-bg');
