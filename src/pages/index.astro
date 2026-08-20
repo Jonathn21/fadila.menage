@@ -2,24 +2,29 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const quick = [
-  { emo: '🧹', label: 'Ménage' },
-  { emo: '🍼', label: 'Nounou' },
-  { emo: '🍳', label: 'Cuisinier' },
-  { emo: '🚗', label: 'Chauffeur' },
-  { emo: '🌿', label: 'Jardin' },
-  { emo: '🎁', label: 'Panier' },
+  { emo: '📍', label: 'Terrains', href: '/terrains' },
+  { emo: '📅', label: 'Événements', href: '/evenements' },
+  { emo: '👥', label: 'Équipes', href: '/equipes' },
+  { emo: '⚔️', label: 'Défis', href: '/defis' },
+  { emo: '📸', label: 'Feed', href: '/communaute' },
 ];
 
-const services = [
-  { emo: '🧹', a: 'a-orange', t: 'Aide-ménagère', d: "L'entretien de votre intérieur, au quotidien ou ponctuellement, avec soin et discrétion." },
-  { emo: '🍼', a: 'a-rose', t: 'Nounou & baby-sitting', d: 'Une garde attentive et fiable pour vos enfants — un soir, à temps partiel ou plein.' },
-  { emo: '🍳', a: 'a-amber', t: 'Cuisinier', d: 'Des repas préparés chez vous, pour le quotidien comme pour vos réceptions.' },
-  { emo: '🚗', a: 'a-blue', t: 'Chauffeur', d: 'Un chauffeur ponctuel et prudent pour vos déplacements à Lomé.' },
-  { emo: '🧽', a: 'a-teal', t: 'Nettoyage pro', d: 'Bureaux, commerces et locaux : un entretien planifié, ponctuel ou en contrat.' },
-  { emo: '🎁', a: 'a-plum', t: 'Paniers-cadeaux', d: 'Des paniers soignés pour toutes les occasions, livrés à un proche.' },
+const features = [
+  { emo: '📍', a: 'a-orange', t: 'Trouve un terrain', d: 'Les terrains près de chez toi, avec photos, quartier et infos pratiques.', href: '/terrains' },
+  { emo: '👥', a: 'a-blue', t: 'Crée ou rejoins une équipe', d: 'Monte ton équipe, invite tes potes, gère tes membres.', href: '/equipes' },
+  { emo: '⚔️', a: 'a-teal', t: 'Lance un défi', d: 'Défie une autre équipe, fixez la date et le terrain. Que le meilleur gagne.', href: '/defis' },
+  { emo: '📅', a: 'a-amber', t: 'Événements & tournois', d: 'Entraînements, matchs et tournois à venir dans tout le Togo.', href: '/evenements' },
+  { emo: '📸', a: 'a-rose', t: 'Partage & réagis', d: 'Poste tes photos et vidéos, like et commente celles de la communauté.', href: '/communaute' },
+  { emo: '🔔', a: 'a-plum', t: 'Reste notifié', d: 'Défis reçus, matchs, réactions : tu es toujours au courant.', href: '/connexion' },
+];
+
+const feed = [
+  { ini: 'K', accent: 'a-orange', name: 'Kossi A.', team: 'Lomé Ballers', txt: 'Gros match hier au terrain de Bè 🔥 Merci à tous ceux qui sont venus !', likes: 42, com: 8, emo: '🏀' },
+  { ini: 'A', accent: 'a-blue', name: 'Ama D.', team: 'Kara Warriors', txt: 'On lance un défi aux Lomé Ballers 💪 Qui est chaud ?', likes: 67, com: 21, emo: '⚔️' },
+  { ini: 'M', accent: 'a-teal', name: 'Mensah T.', team: 'Sokodé Storm', txt: 'Tournoi 3x3 ce week-end à Sokodé. Inscriptions ouvertes 🏆', likes: 30, com: 5, emo: '🏆' },
 ];
 ---
-<BaseLayout title="Accueil — Cocon · Lomé" active="accueil">
+<BaseLayout title="Basket Togo — La communauté du basket togolais" active="accueil">
   <!-- HERO -->
   <section class="apphero has-drops">
     <div class="drops" aria-hidden="true">
@@ -28,18 +33,18 @@ const services = [
     </div>
     <div class="wrap">
       <div class="hero-copy">
-        <span class="label">Services à domicile · Lomé · depuis 2026</span>
-        <h1>Faites de votre maison<br /><span class="hl">un vrai cocon.</span></h1>
-        <p>Aide-ménagère, nounou, cuisinier, chauffeur, nettoyage professionnel… Un personnel formé, vérifié et suivi — pour que votre intérieur reste un havre de paix.</p>
+        <span class="label">Communauté · Lomé & tout le Togo</span>
+        <h1>Le basket togolais,<br /><span class="hl">enfin réuni.</span></h1>
+        <p>Trouve un terrain, rejoins une équipe, lance un défi, partage tes matchs. Toute la scène basket du Togo dans une seule appli.</p>
         <div class="hero-cta">
-          <a href="/demander-un-devis" class="btn btn-white">Demander un devis →</a>
-          <a href="/nos-services" class="btn btn-ghost">Nos services</a>
+          <a href="/connexion" class="btn btn-white">Créer un compte →</a>
+          <a href="/terrains" class="btn btn-ghost">Explorer</a>
         </div>
       </div>
       <div class="hero-visual" aria-hidden="true">
-        <img class="hero-illus" src="/images/illus/cleaning-anim.svg" alt="Services de ménage Cocon" />
-        <span class="drop d-teal s2" style="top:2%;right:0"></span>
-        <span class="drop d-orange s1" style="bottom:0;left:2%"></span>
+        <span class="hero-emoji">🏀</span>
+        <span class="drop d-teal s2" style="top:2%;right:4%"></span>
+        <span class="drop d-orange s1" style="bottom:4%;left:6%"></span>
       </div>
     </div>
   </section>
@@ -48,91 +53,67 @@ const services = [
   <section class="quickwrap"><div class="wrap">
     <div class="quick">
       {quick.map((q) => (
-        <a href="/nos-services" class="qa"><span class="disc">{q.emo}</span><span>{q.label}</span></a>
+        <a href={q.href} class="qa"><span class="disc">{q.emo}</span><span>{q.label}</span></a>
       ))}
     </div>
   </div></section>
 
-  <!-- SERVICES -->
+  <!-- FONCTIONNALITÉS -->
   <section class="has-drops">
     <div class="drops" aria-hidden="true">
       <span class="drop d-rose s2" style="top:6%;right:6%"></span>
       <span class="drop d-teal s1" style="bottom:10%;left:4%"></span>
     </div>
     <div class="wrap">
-      <div class="sec-head reveal"><span class="label">Nos prestations</span><h2>Ce que nous faisons pour vous</h2><p>Un personnel formé et vérifié, pour les familles comme pour les entreprises.</p></div>
+      <div class="sec-head reveal"><span class="label">Ce que tu peux faire</span><h2>Tout le basket, au même endroit</h2><p>Une plateforme pensée pour les joueurs, les équipes et les fans.</p></div>
       <div class="svc-grid">
-        {services.map((s) => (
-          <a href="/nos-services" class={'svc reveal ' + s.a}>
-            <div class="svc-ic emoji">{s.emo}</div>
-            <h3>{s.t}</h3>
-            <p>{s.d}</p>
-            <span class="more">En savoir plus →</span>
+        {features.map((f) => (
+          <a href={f.href} class={'svc reveal ' + f.a}>
+            <div class="svc-ic emoji">{f.emo}</div>
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+            <span class="more">Découvrir →</span>
           </a>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- CHIFFRES -->
+  <!-- COMMENT ÇA MARCHE -->
   <section><div class="wrap">
-    <div class="statcard reveal">
-      <div class="s"><b>24 h</b><span>Réponse à votre demande</span></div>
-      <div class="s"><b>100 %</b><span>Agents formés &amp; vérifiés</span></div>
-      <div class="s"><b>7j/7</b><span>Une équipe disponible</span></div>
-      <div class="s"><b>0 F</b><span>Devis, sans engagement</span></div>
+    <div class="sec-head reveal"><span class="label">En 3 étapes</span><h2>Rejoins le mouvement</h2></div>
+    <div class="proc">
+      <div class="pstep reveal"><div class="pn">01</div><h3>Crée ton compte</h3><p>Gratuit, en une minute. Choisis ton pseudo et ton quartier.</p></div>
+      <div class="pstep reveal"><div class="pn">02</div><h3>Rejoins une équipe</h3><p>Trouve ton équipe ou crée la tienne et invite tes potes.</p></div>
+      <div class="pstep reveal"><div class="pn">03</div><h3>Joue & partage</h3><p>Lance des défis, joue tes matchs, poste tes meilleurs moments.</p></div>
     </div>
   </div></section>
 
-  <!-- ENGAGEMENT -->
-  <section class="has-drops">
-    <div class="drops" aria-hidden="true">
-      <span class="drop d-green s2" style="top:14%;left:8%"></span>
-      <span class="drop d-amber s1" style="bottom:16%;right:8%"></span>
-    </div>
-    <div class="wrap">
-      <div class="social reveal">
-        <div style="font-size:44px;line-height:1;margin-bottom:10px">🌍</div>
-        <h2>Une mission sociale</h2>
-        <p>Cocon forme et emploie localement — en priorité des jeunes, des femmes et des personnes éloignées de l'emploi — et promeut l'éco-nettoyage. Un métier utile, un accompagnement dans la durée.</p>
-        <a href="/nous-connaitre" class="btn btn-white" style="margin-top:22px">Nos engagements →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONFIANCE -->
-  <section><div class="wrap">
-    <div style="background:#fff;border-radius:24px;padding:32px 24px;text-align:center;box-shadow:0 20px 44px -28px rgba(90,40,10,.5)">
-      <span class="label" style="color:#C7500F">Ils nous font confiance</span>
-      <div style="margin-top:28px;display:flex;flex-wrap:wrap;gap:26px 48px;justify-content:center;align-items:center">
-        <span class="plogo" title="Partenaire"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 4l17 10v20L24 44 7 34V14z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="24" r="6" fill="currentColor"/></svg></span>
-        <span class="plogo" title="Partenaire"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="19" cy="24" r="12" stroke="currentColor" stroke-width="3"/><circle cx="31" cy="24" r="12" stroke="currentColor" stroke-width="3"/></svg></span>
-        <span class="plogo" title="Partenaire"><svg viewBox="0 0 48 48" fill="currentColor" aria-hidden="true"><rect x="7" y="22" width="8" height="19" rx="2"/><rect x="20" y="9" width="8" height="32" rx="2"/><rect x="33" y="26" width="8" height="15" rx="2"/></svg></span>
-        <span class="plogo" title="Partenaire"><svg viewBox="0 0 48 48" fill="currentColor" aria-hidden="true"><path d="M39 8C21 8 11 18 11 32c0 3 .6 5.8 1.7 8C31 40 41 28 41 14c0-2.4-.6-4.4-2-6z"/></svg></span>
-        <span class="plogo" title="Partenaire"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="7" fill="currentColor"/><path d="M24 3v7M24 38v7M3 24h7M38 24h7M9 9l5 5M34 34l5 5M39 9l-5 5M14 34l-5 5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></span>
-      </div>
-    </div>
-  </div></section>
-
-  <!-- AVIS -->
+  <!-- FEED (aperçu démo) -->
   <section class="has-drops">
     <div class="drops" aria-hidden="true"><span class="drop d-amber s2" style="top:8%;right:6%"></span><span class="drop d-teal s1" style="bottom:12%;left:5%"></span></div>
     <div class="wrap">
-      <div class="sec-head center reveal"><span class="label">Avis clients</span><h2>Ils nous recommandent</h2></div>
+      <div class="sec-head center reveal"><span class="label">Communauté</span><h2>Ça bouge en ce moment</h2></div>
       <div class="reviews">
-        <figure class="review reveal"><div class="stars">★★★★★</div><blockquote>« Une aide-ménagère sérieuse et ponctuelle. Ma maison n'a jamais été aussi propre — je recommande Cocon les yeux fermés. »</blockquote><figcaption><span class="rv-ini">A</span><span><b>Ama K.</b><small>Agoè, Lomé</small></span></figcaption></figure>
-        <figure class="review reveal"><div class="stars">★★★★★</div><blockquote>« Nous confions l'entretien de nos bureaux à Cocon. Équipe professionnelle, fiable et discrète. Rien à redire. »</blockquote><figcaption><span class="rv-ini">K</span><span><b>Koffi M.</b><small>Entreprise · Totsi</small></span></figcaption></figure>
-        <figure class="review reveal"><div class="stars">★★★★★</div><blockquote>« Notre nounou est adorable et très pro avec les enfants. Le suivi de l'équipe rassure vraiment. Merci ! »</blockquote><figcaption><span class="rv-ini">S</span><span><b>Sarah D.</b><small>Baguida</small></span></figcaption></figure>
+        {feed.map((p) => (
+          <figure class={'review reveal ' + p.accent}>
+            <figcaption style="margin-top:0"><span class="rv-ini">{p.ini}</span><span><b>{p.name}</b><small>{p.team}</small></span></figcaption>
+            <blockquote>{p.emo} {p.txt}</blockquote>
+            <div class="stars" style="color:rgba(255,255,255,.8);font-family:'Archivo';font-weight:700;font-size:.9rem;letter-spacing:0">❤️ {p.likes} · 💬 {p.com}</div>
+          </figure>
+        ))}
       </div>
+      <div style="text-align:center;margin-top:28px"><a href="/communaute" class="btn btn-white">Voir le feed →</a></div>
     </div>
   </section>
 
   <!-- CTA -->
   <section><div class="wrap">
     <div class="ctacard reveal">
-      <h2>Prêt à vous simplifier la vie ?</h2>
-      <p>Dites-nous votre besoin — nous revenons vers vous sous 24 h avec une proposition adaptée, sans engagement.</p>
-      <a href="/demander-un-devis" class="btn btn-white">Demander un devis →</a>
+      <div style="font-size:40px;line-height:1">🏀</div>
+      <h2>Prêt à entrer sur le terrain ?</h2>
+      <p>Rejoins des centaines de joueurs togolais. C'est gratuit, et ça commence maintenant.</p>
+      <a href="/connexion" class="btn btn-white">Créer mon compte →</a>
     </div>
   </div></section>
 </BaseLayout>

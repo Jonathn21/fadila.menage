@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Connexion — Basket Togo" active="connexion">
+  <section class="pagehead">
+    <div class="wrap"><span class="label">Ton compte</span><h1>Rejoins Basket Togo 🏀</h1><p>Crée ton compte pour rejoindre une équipe, lancer des défis et partager tes matchs.</p></div>
+  </section>
+
+  <section class="has-drops">
+    <div class="drops" aria-hidden="true"><span class="drop d-orange s2" style="top:6%;left:6%"></span><span class="drop d-teal s1" style="bottom:10%;right:7%"></span></div>
+    <div class="wrap" style="max-width:480px">
+      <form class="qform" id="authForm" novalidate>
+        <h2>Créer un compte</h2>
+        <p class="sub">Gratuit, en une minute.</p>
+        <div class="field"><label>Pseudo</label><input type="text" placeholder="Ex. KossiBaller" required /></div>
+        <div class="field"><label>Téléphone</label><input type="tel" placeholder="+228 …" required /></div>
+        <div class="field"><label>Quartier / ville</label><input type="text" placeholder="Ex. Bè, Lomé" /></div>
+        <div class="field"><label>Mot de passe</label><input type="password" placeholder="••••••••" required /></div>
+        <button type="submit" class="btn btn-white" style="width:100%;justify-content:center">Créer mon compte →</button>
+        <p class="req-note">Déjà un compte ? La connexion arrivera avec l'authentification (Phase 1).</p>
+        <p id="authMsg" style="display:none;margin-top:14px;text-align:center;font-family:'Archivo';font-weight:700;color:#FFD24D"></p>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const f = document.getElementById('authForm');
+    const msg = document.getElementById('authMsg');
+    if (f) {
+      f.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (msg) {
+          msg.textContent = '✅ Prototype — l\'inscription réelle arrive avec Supabase (Phase 1).';
+          msg.style.display = 'block';
+        }
+      });
+    }
+  </script>
+</BaseLayout>

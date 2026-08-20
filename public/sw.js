@@ -1,17 +1,16 @@
 /* Cocon — Service Worker (PWA hors-ligne) */
-const CACHE = 'cocon-v1';
+const CACHE = 'basket-togo-v1';
 const PRECACHE = [
   '/',
-  '/nos-services',
-  '/tarifs',
-  '/nous-connaitre',
-  '/rejoindre',
-  '/demander-un-devis',
-  '/faq',
+  '/terrains',
+  '/evenements',
+  '/equipes',
+  '/defis',
+  '/communaute',
+  '/connexion',
   '/favicon.svg',
   '/icon-192.png',
   '/icon-512.png',
-  '/images/illus/cleaning-anim.svg',
 ];
 
 self.addEventListener('install', (e) => {

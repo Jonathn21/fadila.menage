@@ -1,7 +1,7 @@
 {
-  "name": "Cocon — Services à domicile",
-  "short_name": "Cocon",
-  "description": "Aide-ménagère, nounou, cuisinier, chauffeur et nettoyage professionnel à Lomé. Devis gratuit sous 24 h.",
+  "name": "Basket Togo — La communauté du basket togolais",
+  "short_name": "Basket Togo",
+  "description": "Trouve un terrain, rejoins une équipe, lance un défi, partage tes matchs. Toute la scène basket du Togo.",
   "lang": "fr",
   "start_url": "/",
   "scope": "/",
@@ -9,7 +9,7 @@
   "orientation": "portrait",
   "background_color": "#E68243",
   "theme_color": "#E68243",
-  "categories": ["lifestyle", "business"],
+  "categories": ["sports", "social", "lifestyle"],
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
@@ -17,7 +17,7 @@
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Demander un devis", "short_name": "Devis", "url": "/demander-un-devis", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Nos services", "short_name": "Services", "url": "/nos-services", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Terrains", "short_name": "Terrains", "url": "/terrains" },
+    { "name": "Communauté", "short_name": "Feed", "url": "/communaute" }
   ]
 }
