@@ -797,3 +797,86 @@ footer{background:rgba(120,52,18,.42);backdrop-filter:blur(8px);border-top:1px s
 .dcontact{display:flex;align-items:center;gap:12px;padding:11px 8px;color:rgba(255,255,255,.92);font-size:.95rem}
 .dcontact .emo{font-size:17px;width:22px;text-align:center;flex:0 0 auto}
 @media(max-width:560px){.appbar-inner{height:58px}.appbar-logo img{height:34px}}
+
+/* ==================================================================
+   THÈME « NIGHT COURT » (Basket Togo) — sombre, énergie, glow
+   Dernier bloc : repasse tout le site en sombre.
+   ================================================================== */
+:root{
+  --energy:#FF5A1F;   /* orange énergie */
+  --volt:#C6FF3D;     /* vert acide électrique */
+}
+body{
+  color:#fff;
+  font-family:'Manrope',system-ui,sans-serif;
+  background:#0B0B0F;
+  background-image:
+    radial-gradient(1200px 620px at 82% -12%, rgba(255,90,31,.22), transparent 60%),
+    radial-gradient(900px 520px at -12% 112%, rgba(198,255,61,.13), transparent 55%);
+  background-attachment:fixed;
+}
+/* Typo display sportive */
+.apphero h1,.pagehead h1,.sec-head h2,.ctacard h2{
+  font-family:'Anton','Archivo',sans-serif;font-weight:400;letter-spacing:.01em;line-height:.98;text-transform:uppercase;
+}
+.brandname{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.03em;font-size:1.5rem}
+.apphero h1 .hl{color:var(--energy)}
+.label{color:var(--volt)}
+.sec-head p,.apphero p{color:rgba(255,255,255,.72)}
+
+/* Sections décoratives → sombres */
+.sec-mist{background:rgba(255,255,255,.03)}
+.ctaband{background:rgba(255,255,255,.04)}
+.drops{display:none}
+
+/* Cartes en verre sombre + glow au survol */
+.svc,.review,.pstep,.card,.ctacard,.statcard,.svc-detail .item,.contact-card,.qform,.applyform,.faq details{
+  background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.10);backdrop-filter:blur(6px);
+}
+.svc:hover,.svc-detail .item:hover,.contact-card:hover{
+  border-color:rgba(255,90,31,.6);box-shadow:0 20px 54px -14px rgba(255,90,31,.4)!important;
+}
+.svc p,.pstep p,.member span,.svc-detail .item p{color:rgba(255,255,255,.7)}
+.svc .more{color:var(--volt)}
+.svc .svc-ic{background:rgba(255,255,255,.06);color:var(--accent,var(--energy))}
+.svc:hover .svc-ic{background:var(--accent,var(--energy));color:#0B0B0F}
+
+/* En-tête & tiroir sombres */
+.appbar{background:rgba(11,11,15,.72);backdrop-filter:blur(14px);border-bottom-color:rgba(255,255,255,.08)}
+.appbar-cta{background:var(--energy);color:#fff}
+.appbar-cta:hover{background:#ff6e3a;color:#fff;box-shadow:0 8px 22px -6px rgba(255,90,31,.7)}
+.brandmark{color:#fff}
+.drawer{background:linear-gradient(162deg,rgba(22,22,28,.99),rgba(11,11,15,.995))}
+.dcta{background:var(--energy);color:#fff}
+.drawer-brand small{color:rgba(255,255,255,.6)}
+
+/* Boutons */
+.btn-white{background:var(--energy);color:#fff}
+.btn-white:hover{background:#ff6e3a;color:#fff;transform:translateY(-2px);box-shadow:0 12px 32px -8px rgba(255,90,31,.65)}
+.btn-ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.28)}
+.btn-ghost:hover{background:rgba(255,255,255,.12);border-color:#fff;color:#fff}
+
+/* Chips d'actions */
+.qa .disc{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10)}
+.qa:hover .disc{background:rgba(255,90,31,.18);border-color:var(--energy)}
+.qa span{color:rgba(255,255,255,.82)}
+
+/* Chiffres & feed */
+.statcard .s b{color:var(--energy)}
+.review .rv-ini{border-color:var(--accent,var(--energy))}
+
+/* Formulaires sombres */
+.field label,.qform legend{color:#fff}
+.field input,.field select,.qform textarea,.sel-btn{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.16)}
+.field input::placeholder,.qform textarea::placeholder{color:rgba(255,255,255,.45)}
+.sel-list{background:#15151b}
+
+/* Pied de page */
+footer{background:rgba(0,0,0,.55);border-top-color:rgba(255,255,255,.08)}
+.foot-col a:hover{color:var(--volt)}
+
+/* Ballon du hero : rotation « 3D » */
+@media(prefers-reduced-motion:no-preference){
+  .hero-visual .hero-emoji{animation:ballSpin 6s linear infinite}
+  @keyframes ballSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+}
