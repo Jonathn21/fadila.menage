@@ -885,3 +885,22 @@ footer{background:rgba(0,0,0,.55);border-top-color:rgba(255,255,255,.08)}
 .apphero.cine h1{font-size:clamp(2.7rem,9vw,5.2rem);line-height:.94}
 .apphero.cine p{max-width:34ch;margin-top:14px}
 @media(min-width:900px){.apphero.cine{min-height:84vh}.apphero.cine .hero-copy{padding:0 32px 64px}.apphero.cine p{max-width:46ch}}
+
+/* ===== Profil / Auth (Basket Togo) ===== */
+.card{border-radius:20px;padding:22px}
+.profile-head{display:flex;align-items:center;gap:16px}
+.profile-avatar{width:72px;height:72px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+  font-family:'Anton',sans-serif;font-size:2rem;color:#0B0B0F;background:var(--energy);
+  box-shadow:0 10px 26px -8px rgba(255,90,31,.6)}
+.profile-id{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.profile-id b{font-family:'Archivo';font-weight:800;font-size:1.25rem;color:#fff}
+.profile-id span{color:rgba(255,255,255,.72);font-size:.9rem}
+.profile-edit{padding:9px 16px;font-size:.85rem;flex:0 0 auto}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.mini-stat{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:18px 10px;text-align:center}
+.mini-stat b{display:block;font-family:'Anton',sans-serif;font-size:1.9rem;color:var(--energy);line-height:1}
+.mini-stat span{font-size:.78rem;color:rgba(255,255,255,.6);margin-top:4px;display:block}
+/* Pastille utilisateur dans la barre (connecté) */
+.appbar-user{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#fff;font-family:'Archivo';font-weight:700;font-size:.9rem}
+.appbar-user .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--energy);color:#0B0B0F;font-family:'Anton',sans-serif;font-size:1rem}
+@media(max-width:560px){.appbar-user .lbl{display:none}}
