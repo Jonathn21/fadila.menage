@@ -1,34 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const teams = [
-  { emo: '🟠', a: 'a-orange', t: 'Lomé Ballers', q: 'Bè, Lomé', m: 12, w: 8, l: 3 },
-  { emo: '🔵', a: 'a-blue', t: 'Kara Warriors', q: 'Kara', m: 10, w: 6, l: 4 },
-  { emo: '🟢', a: 'a-teal', t: 'Sokodé Storm', q: 'Sokodé', m: 14, w: 9, l: 2 },
-  { emo: '🟣', a: 'a-plum', t: 'Atakpamé Kings', q: 'Atakpamé', m: 9, w: 4, l: 5 },
-];
+import Equipes from '../components/Equipes.jsx';
 ---
 <BaseLayout title="Équipes — Basket Togo" active="equipes">
   <section class="pagehead">
-    <div class="wrap"><span class="label">Le club</span><h1>Équipes 👥</h1><p>Rejoins une équipe existante ou crée la tienne et invite tes coéquipiers.</p></div>
+    <div class="wrap"><span class="label">La communauté</span><h1>Équipes 👥</h1><p>Rejoins une équipe de ta ville, ou crée la tienne et invite tes potes.</p></div>
   </section>
-
-  <section class="has-drops">
-    <div class="drops" aria-hidden="true"><span class="drop d-blue s2" style="top:6%;left:5%"></span><span class="drop d-orange s1" style="bottom:10%;right:6%"></span></div>
-    <div class="wrap">
-      <div class="svc-grid">
-        {teams.map((e) => (
-          <div class={'svc reveal ' + e.a}>
-            <div class="svc-ic emoji">{e.emo}</div>
-            <h3>{e.t}</h3>
-            <p style="color:#fff;font-weight:600;margin-top:6px">📍 {e.q} · {e.m} membres</p>
-            <p>Bilan : <strong style="color:#fff">{e.w} V</strong> · {e.l} D</p>
-            <span class="more">Voir l'équipe →</span>
-          </div>
-        ))}
-      </div>
-      <div style="text-align:center;margin-top:30px"><a href="/connexion" class="btn btn-white">➕ Créer mon équipe</a></div>
-      <p class="req-note" style="text-align:center">Démo — équipes et membres réels en Phase 3.</p>
-    </div>
-  </section>
+  <section><div class="wrap">
+    <Equipes client:load />
+  </div></section>
 </BaseLayout>

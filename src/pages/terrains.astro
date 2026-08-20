@@ -1,34 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const terrains = [
-  { emo: '🏀', a: 'a-orange', t: 'Terrain de Bè', q: 'Bè-Kpota, Lomé', d: 'Bitume · 2 paniers · éclairé le soir', tag: 'Populaire' },
-  { emo: '🏀', a: 'a-blue', t: 'Playground Adidogomé', q: 'Adidogomé, Lomé', d: 'Bitume · 1 panier · libre en journée', tag: 'Libre' },
-  { emo: '🏀', a: 'a-teal', t: 'Terrain Kara Centre', q: 'Kara', d: 'Béton · 2 paniers · club sur place', tag: 'Club' },
-  { emo: '🏀', a: 'a-amber', t: 'City Stade Sokodé', q: 'Sokodé', d: 'Bitume · 2 paniers · souvent animé', tag: 'Animé' },
-];
+import Terrains from '../components/Terrains.jsx';
 ---
 <BaseLayout title="Terrains — Basket Togo" active="terrains">
   <section class="pagehead">
-    <div class="wrap"><span class="label">Où jouer</span><h1>Terrains 📍</h1><p>Trouve les terrains près de chez toi. Ajoute les tiens et aide la communauté.</p></div>
+    <div class="wrap"><span class="label">Où jouer</span><h1>Terrains 📍</h1><p>Trouve un terrain près de chez toi, avec le quartier, la surface et les infos pratiques.</p></div>
   </section>
-
-  <section class="has-drops">
-    <div class="drops" aria-hidden="true"><span class="drop d-orange s2" style="top:6%;left:5%"></span><span class="drop d-teal s1" style="bottom:10%;right:6%"></span></div>
-    <div class="wrap">
-      <div class="svc-grid">
-        {terrains.map((c) => (
-          <div class={'svc reveal ' + c.a}>
-            <div class="svc-ic emoji">{c.emo}</div>
-            <h3>{c.t}</h3>
-            <p style="color:#fff;font-weight:600;margin-top:6px">📍 {c.q}</p>
-            <p>{c.d}</p>
-            <span class="more">Voir le terrain →</span>
-          </div>
-        ))}
-      </div>
-      <div style="text-align:center;margin-top:30px"><a href="/connexion" class="btn btn-white">➕ Ajouter un terrain</a></div>
-      <p class="req-note" style="text-align:center">Démo — les vrais terrains seront ajoutés par la communauté (Phase 2).</p>
-    </div>
-  </section>
+  <section><div class="wrap">
+    <Terrains client:load />
+  </div></section>
 </BaseLayout>

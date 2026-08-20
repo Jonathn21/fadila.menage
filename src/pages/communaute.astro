@@ -1,34 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const feed = [
-  { ini: 'K', a: 'a-orange', name: 'Kossi A.', team: 'Lomé Ballers · Bè', txt: 'Gros match hier au terrain de Bè 🔥 Merci à tous ceux qui sont venus, on remet ça dimanche !', likes: 42, com: 8, emo: '🏀' },
-  { ini: 'A', a: 'a-blue', name: 'Ama D.', team: 'Kara Warriors', txt: 'On lance officiellement un défi aux Lomé Ballers 💪 Rendez-vous samedi. Qui est chaud ?', likes: 67, com: 21, emo: '⚔️' },
-  { ini: 'M', a: 'a-teal', name: 'Mensah T.', team: 'Sokodé Storm', txt: 'Tournoi 3x3 ce week-end à Sokodé 🏆 Inscriptions ouvertes, ramenez vos équipes !', likes: 30, com: 5, emo: '🏆' },
-  { ini: 'F', a: 'a-plum', name: 'Farida K.', team: 'Atakpamé Kings', txt: 'Nouveau maillot de l\'équipe 🔥🟣 On est prêts pour la saison.', likes: 51, com: 12, emo: '👕' },
-  { ini: 'J', a: 'a-amber', name: 'Jean-Luc', team: 'Fan · Lomé', txt: 'Ce dunk hier 😱 Le basket togolais monte, respect à tous les joueurs.', likes: 88, com: 17, emo: '😱' },
-  { ini: 'S', a: 'a-rose', name: 'Sarah B.', team: 'Coach · Kara', txt: 'Cherche 2 joueurs U18 pour compléter l\'équipe. MP si intéressé 🙌', likes: 24, com: 9, emo: '📣' },
-];
+import Feed from '../components/Feed.jsx';
 ---
 <BaseLayout title="Communauté — Basket Togo" active="communaute">
   <section class="pagehead">
-    <div class="wrap"><span class="label">Le feed</span><h1>Communauté 📸</h1><p>Photos, vidéos et actus de la scène basket togolaise. Like, commente, partage.</p></div>
+    <div class="wrap"><span class="label">Le feed</span><h1>Communauté 📸</h1><p>Les photos, vidéos et actus de la scène basket togolaise.</p></div>
   </section>
-
-  <section class="has-drops">
-    <div class="drops" aria-hidden="true"><span class="drop d-teal s2" style="top:5%;right:5%"></span><span class="drop d-orange s1" style="bottom:8%;left:5%"></span></div>
-    <div class="wrap">
-      <div class="reviews">
-        {feed.map((p) => (
-          <figure class={'review reveal ' + p.a}>
-            <figcaption style="margin-top:0"><span class="rv-ini">{p.ini}</span><span><b>{p.name}</b><small>{p.team}</small></span></figcaption>
-            <blockquote>{p.emo} {p.txt}</blockquote>
-            <div class="stars" style="color:rgba(255,255,255,.8);font-family:'Archivo';font-weight:700;font-size:.9rem;letter-spacing:0">❤️ {p.likes} · 💬 {p.com}</div>
-          </figure>
-        ))}
-      </div>
-      <div style="text-align:center;margin-top:30px"><a href="/connexion" class="btn btn-white">📸 Publier un post</a></div>
-      <p class="req-note" style="text-align:center">Démo — publication de photos/vidéos, likes et commentaires réels en Phase 4.</p>
-    </div>
-  </section>
+  <section><div class="wrap" style="max-width:620px">
+    <Feed client:load />
+  </div></section>
 </BaseLayout>

@@ -904,3 +904,41 @@ footer{background:rgba(0,0,0,.55);border-top-color:rgba(255,255,255,.08)}
 .appbar-user{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#fff;font-family:'Archivo';font-weight:700;font-size:.9rem}
 .appbar-user .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--energy);color:#0B0B0F;font-family:'Anton',sans-serif;font-size:1rem}
 @media(max-width:560px){.appbar-user .lbl{display:none}}
+
+/* ===== Terrains & Équipes (Basket Togo) ===== */
+.court-card,.team-card{position:relative;display:flex;flex-direction:column}
+.court-thumb{height:118px;border-radius:14px;margin-bottom:14px;display:grid;place-items:center;font-size:34px;
+  background:linear-gradient(135deg,rgba(255,90,31,.28),rgba(11,11,15,.45)),
+    repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 9px,transparent 9px 18px)}
+.badge{position:absolute;top:16px;right:16px;font-family:'Archivo';font-weight:800;font-size:.68rem;letter-spacing:.05em;
+  text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.badge.ok{background:rgba(198,255,61,.18);color:var(--volt)}
+.badge.off{background:rgba(255,255,255,.1);color:rgba(255,255,255,.55)}
+.court-loc{color:rgba(255,255,255,.7);font-size:.9rem;margin-top:4px}
+.court-meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;font-size:.84rem;color:rgba(255,255,255,.78)}
+.team-crest{width:54px;height:54px;border-radius:15px;display:grid;place-items:center;
+  font-family:'Anton',sans-serif;font-size:1.6rem;color:#0B0B0F;background:var(--accent,var(--energy));margin-bottom:14px}
+
+/* ===== Feed ===== */
+.feed{display:flex;flex-direction:column;gap:16px}
+.composer{display:flex;gap:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:16px}
+.composer textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;
+  color:#fff;font-family:inherit;font-size:.98rem;padding:12px 14px;resize:vertical;min-height:54px}
+.composer textarea::placeholder{color:rgba(255,255,255,.45)}
+.composer textarea:focus{outline:none;border-color:var(--energy)}
+.composer-actions{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:10px}
+.composer-media{font-size:.82rem;color:rgba(255,255,255,.55)}
+.composer .btn{padding:9px 18px}
+.post{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:18px}
+.post-head{display:flex;align-items:center;gap:12px}
+.post-head b{font-family:'Archivo';font-weight:800;display:block;font-size:.98rem;color:#fff}
+.post-head small{color:rgba(255,255,255,.55);font-size:.8rem}
+.post-txt{margin-top:12px;color:rgba(255,255,255,.92);line-height:1.5}
+.post-media{margin-top:12px;height:200px;border-radius:14px;display:grid;place-items:center;font-size:34px;color:rgba(255,255,255,.5);
+  background:linear-gradient(135deg,rgba(255,90,31,.18),rgba(11,11,15,.5))}
+.post-media.video{background:linear-gradient(135deg,rgba(122,92,255,.24),rgba(11,11,15,.5))}
+.post-actions{display:flex;gap:8px;margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}
+.pa{flex:1;background:rgba(255,255,255,.05);border:0;border-radius:12px;color:rgba(255,255,255,.82);
+  font-family:'Manrope',sans-serif;font-weight:700;font-size:.86rem;padding:10px;cursor:pointer;transition:background .15s}
+.pa:hover{background:rgba(255,255,255,.1)}
+.pa.on{color:#fff}
