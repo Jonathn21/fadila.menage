@@ -875,8 +875,10 @@ body{
 footer{background:rgba(0,0,0,.55);border-top-color:rgba(255,255,255,.08)}
 .foot-col a:hover{color:var(--volt)}
 
-/* Ballon du hero : rotation « 3D » */
-@media(prefers-reduced-motion:no-preference){
-  .hero-visual .hero-emoji{animation:ballSpin 6s linear infinite}
-  @keyframes ballSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-}
+/* Emplacement média du hero (prêt pour vidéo/photo) */
+.hero-media{width:100%;aspect-ratio:4/5;max-height:440px;border-radius:24px;
+  border:1.5px dashed rgba(255,255,255,.22);background:rgba(255,255,255,.04);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:rgba(255,255,255,.5)}
+.hero-media .hm-ico{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:22px;
+  background:rgba(255,90,31,.16);color:var(--energy)}
+.hero-media small{font-size:.85rem;letter-spacing:.02em}
