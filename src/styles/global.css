@@ -699,6 +699,21 @@ footer{background:rgba(120,52,18,.42);backdrop-filter:blur(8px);border-top:1px s
 @media(max-width:560px){.wa-fab{right:15px;bottom:15px;width:54px;height:54px;font-size:29px}}
 @media(prefers-reduced-motion:reduce){.wa-fab::before{animation:none;display:none}}
 
+/* Bouton « Installer l'appli » (PWA) */
+.pwa-install[hidden]{display:none}
+.pwa-install{position:fixed;left:16px;bottom:22px;z-index:84;display:flex;align-items:center;gap:4px;
+  background:#fff;border-radius:999px;padding:5px 6px 5px 6px;box-shadow:0 12px 28px -8px rgba(0,0,0,.4);
+  animation:pwaIn .35s ease}
+.pwa-btn{display:inline-flex;align-items:center;gap:9px;background:transparent;border:0;cursor:pointer;
+  font-family:'Archivo';font-weight:800;font-size:.95rem;color:#D9662A;padding:8px 8px 8px 12px}
+.pwa-btn .brandmark{color:#D9662A;line-height:0}
+.pwa-close{width:30px;height:30px;border-radius:50%;border:0;background:rgba(30,20,10,.07);color:#8a7f76;
+  font-size:20px;line-height:1;cursor:pointer;flex:0 0 auto}
+.pwa-close:hover{background:rgba(30,20,10,.12)}
+@keyframes pwaIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:560px){.pwa-install{left:12px;bottom:16px}}
+@media(prefers-reduced-motion:reduce){.pwa-install{animation:none}}
+
 /* Logos partenaires icônes (placeholders fictifs, monochromes) */
 .plogo{display:inline-flex;color:#a99c90;transition:color .18s ease}
 .plogo:hover{color:#C7500F}

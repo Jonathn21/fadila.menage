@@ -63,6 +63,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     >
       <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
     </a>
+
+    <div class="pwa-install" id="pwaInstall" hidden>
+      <button type="button" class="pwa-btn" id="pwaBtn">
+        <span class="brandmark"><svg viewBox="0 0 32 32" width="22" height="22" fill="none" aria-hidden="true"><path d="M26 5c-11 0-19 6-19 15 0 2 .4 3.8 1.1 5.4C17 26 24 21 26.5 12.5 27.6 9 27.4 6.9 26 5Z" fill="currentColor"/></svg></span>
+        Installer l'appli
+      </button>
+      <button type="button" class="pwa-close" id="pwaClose" aria-label="Ne plus proposer">×</button>
+    </div>
     <script>
       // PWA : enregistrement du service worker (appli installable + hors-ligne)
       if ('serviceWorker' in navigator) {
@@ -70,6 +78,34 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
           navigator.serviceWorker.register('/sw.js').catch(() => {});
         });
       }
+      // PWA : bouton « Installer l'appli »
+      const pwaBox = document.getElementById('pwaInstall');
+      const pwaBtn = document.getElementById('pwaBtn');
+      const pwaClose = document.getElementById('pwaClose');
+      let deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (pwaBox && localStorage.getItem('pwaDismissed') !== '1') pwaBox.hidden = false;
+      });
+      if (pwaBtn) {
+        pwaBtn.addEventListener('click', async () => {
+          if (!deferredPrompt) return;
+          if (pwaBox) pwaBox.hidden = true;
+          deferredPrompt.prompt();
+          await deferredPrompt.userChoice;
+          deferredPrompt = null;
+        });
+      }
+      if (pwaClose) {
+        pwaClose.addEventListener('click', () => {
+          if (pwaBox) pwaBox.hidden = true;
+          try { localStorage.setItem('pwaDismissed', '1'); } catch (e) {}
+        });
+      }
+      window.addEventListener('appinstalled', () => {
+        if (pwaBox) pwaBox.hidden = true;
+      });
       // Tiroir de navigation
       const menuBtn = document.getElementById('menuBtn');
       const drawer = document.getElementById('drawer');
