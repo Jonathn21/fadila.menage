@@ -25,24 +25,19 @@ const feed = [
 ];
 ---
 <BaseLayout title="Basket Togo — La communauté du basket togolais" active="accueil">
-  <!-- HERO -->
-  <section class="apphero has-drops">
-    <div class="drops" aria-hidden="true">
-      <span class="drop d-teal s2" style="top:12%;left:3%"></span>
-      <span class="drop d-orange s1" style="bottom:14%;left:8%"></span>
-    </div>
-    <div class="wrap">
-      <div class="hero-copy">
-        <span class="label">Communauté · Lomé & tout le Togo</span>
-        <h1>Le basket togolais,<br /><span class="hl">enfin réuni.</span></h1>
-        <p>Trouve un terrain, rejoins une équipe, lance un défi, partage tes matchs. Toute la scène basket du Togo dans une seule appli.</p>
-        <div class="hero-cta">
-          <a href="/connexion" class="btn btn-white">Créer un compte →</a>
-          <a href="/terrains" class="btn btn-ghost">Explorer</a>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="hero-media"><span class="hm-ico">▶</span><small>Vidéo / photo à venir</small></div>
+  <!-- HERO CINÉMATIQUE (vidéo plein écran) -->
+  <section class="apphero cine">
+    <video class="hero-bgvid" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+      <source src="/videos/hero-1.mp4" type="video/mp4" />
+    </video>
+    <div class="cine-overlay" aria-hidden="true"></div>
+    <div class="wrap hero-copy">
+      <span class="label">Communauté · Lomé & tout le Togo</span>
+      <h1>Le basket togolais,<br /><span class="hl">enfin réuni.</span></h1>
+      <p>Trouve un terrain, rejoins une équipe, lance un défi, partage tes matchs. Toute la scène basket du Togo dans une seule appli.</p>
+      <div class="hero-cta">
+        <a href="/connexion" class="btn btn-white">Créer un compte →</a>
+        <a href="/terrains" class="btn btn-ghost">Explorer</a>
       </div>
     </div>
   </section>
