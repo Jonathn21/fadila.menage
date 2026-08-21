@@ -1004,3 +1004,11 @@ footer{background:rgba(0,0,0,.55);border-top-color:rgba(255,255,255,.08)}
 .detail-hero-ph{width:100%;height:100%;display:grid;place-items:center;font-size:76px;
   background:linear-gradient(135deg,rgba(255,90,31,.3),rgba(11,11,15,.6))}
 .event-poster{width:100%;border-radius:16px;display:block}
+
+/* Champ de recherche avec icône */
+.search-field{position:relative;margin-bottom:22px}
+.search-field i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.5);pointer-events:none}
+.search-field input{padding-left:40px}
+/* Icônes inline dans les méta (couleur douce) */
+.court-meta i,.court-loc i,.event-date i{color:rgba(255,255,255,.6);width:1.05em;text-align:center}
+.event-loc i{color:var(--energy)}

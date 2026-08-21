@@ -41,7 +41,7 @@ export default function Feed() {
           <div style={{ flex: 1 }}>
             <textarea placeholder="Quoi de neuf sur les terrains ?" value={draft} onChange={(e) => setDraft(e.target.value)} rows={2}></textarea>
             <div className="composer-actions">
-              <span className="composer-media">📷 Photo · 🎬 Vidéo</span>
+              <span className="composer-media"><i className="fa-solid fa-camera"></i> Photo · <i className="fa-solid fa-video"></i> Vidéo</span>
               <button type="submit" className="btn btn-white" disabled={!draft.trim()}>Publier</button>
             </div>
           </div>
@@ -62,15 +62,15 @@ export default function Feed() {
           <p className="post-txt">{p.txt}</p>
           {p.media && (
             <div className={'post-media ' + p.media}>
-              <span>{p.media === 'video' ? '▶' : '📷'}</span>
+              <i className={'fa-solid ' + (p.media === 'video' ? 'fa-play' : 'fa-image')}></i>
             </div>
           )}
           <footer className="post-actions">
             <button type="button" className={'pa' + (liked[p.id] ? ' on' : '')} onClick={() => toggleLike(p.id)}>
-              {liked[p.id] ? '❤️' : '🤍'} {p.likes}
+              <i className={(liked[p.id] ? 'fa-solid' : 'fa-regular') + ' fa-heart'} style={liked[p.id] ? { color: 'var(--energy)' } : undefined}></i> {p.likes}
             </button>
-            <button type="button" className="pa">💬 {p.coms}</button>
-            <button type="button" className="pa">↗️ Partager</button>
+            <button type="button" className="pa"><i className="fa-regular fa-comment"></i> {p.coms}</button>
+            <button type="button" className="pa"><i className="fa-solid fa-share"></i> Partager</button>
           </footer>
         </article>
       ))}

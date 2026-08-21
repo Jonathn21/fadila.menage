@@ -9,7 +9,7 @@ const defis = [
 ---
 <BaseLayout title="Défis — Basket Togo" active="defis">
   <section class="pagehead">
-    <div class="wrap"><span class="label">Le challenge</span><h1>Défis ⚔️</h1><p>Défie une autre équipe, fixez la date et le terrain. Que le meilleur gagne.</p></div>
+    <div class="wrap"><span class="label">Le challenge</span><h1>Défis <i class="fa-solid fa-hand-fist" style="color:var(--energy)"></i></h1><p>Défie une autre équipe, fixez la date et le terrain. Que le meilleur gagne.</p></div>
   </section>
 
   <section class="has-drops">
@@ -23,14 +23,14 @@ const defis = [
               <span style="font-family:'Archivo';font-weight:800;color:#FFD24D">VS</span>
               <b style="font-family:'Archivo';font-weight:800;font-size:1.15rem">{d.b}</b>
             </div>
-            <div style="text-align:center;margin-top:12px;color:rgba(255,255,255,.86)">📅 {d.when} · 📍 {d.where}</div>
+            <div style="text-align:center;margin-top:12px;color:rgba(255,255,255,.86)"><i class="fa-solid fa-calendar-day"></i> {d.when} · <i class="fa-solid fa-location-dot"></i> {d.where}</div>
             <div style="text-align:center;margin-top:12px">
               <span style={'display:inline-block;border-radius:999px;padding:6px 16px;font-family:Archivo;font-weight:700;font-size:.82rem;' + (d.ok ? 'background:#149A90;color:#fff' : 'background:rgba(255,255,255,.18);color:#fff')}>{d.status}</span>
             </div>
           </div>
         ))}
       </div>
-      <div style="text-align:center;margin-top:30px"><a href="/connexion" class="btn btn-white">⚔️ Lancer un défi</a></div>
+      <div style="text-align:center;margin-top:30px"><a href="/connexion" class="btn btn-white"><i class="fa-solid fa-hand-fist"></i> Lancer un défi</a></div>
       <p class="req-note" style="text-align:center">Démo — défis entre vraies équipes en Phase 3.</p>
     </div>
   </section>

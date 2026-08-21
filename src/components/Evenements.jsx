@@ -77,7 +77,7 @@ export default function Evenements() {
   return (
     <div>
       <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22, flexWrap: 'wrap' }}>
-        <div style={{ fontSize: 30 }}>📅</div>
+        <div style={{ fontSize: 28, color: 'var(--energy)' }}><i className="fa-solid fa-calendar-days"></i></div>
         <div style={{ flex: 1, minWidth: 170 }}>
           <b style={{ fontFamily: 'Archivo', fontSize: '1.1rem' }}>Tu organises un événement ?</b>
           <p style={{ color: 'rgba(255,255,255,.72)', marginTop: 2 }}>Tournoi, match ou entraînement sur l'un de nos terrains.</p>
@@ -133,17 +133,17 @@ export default function Evenements() {
           return (
             <a key={ev.id} className="event-card" href={'/evenement?id=' + ev.id}>
               <div className="event-cover">
-                {ev.img ? <img src={ev.img} alt={ev.titre} loading="lazy" /> : <span>🏀</span>}
+                {ev.img ? <img src={ev.img} alt={ev.titre} loading="lazy" /> : <i className="fa-solid fa-basketball"></i>}
                 <span className="badge type">{ev.type}</span>
               </div>
               <div className="event-body">
                 <h3>{ev.titre}</h3>
-                <p className="event-date">🗓️ {fmtRange(ev.date, ev.dateFin)}</p>
-                {t && <span className="event-loc">📍 {t.nom} — {t.quartier}</span>}
+                <p className="event-date"><i className="fa-solid fa-calendar-day"></i> {fmtRange(ev.date, ev.dateFin)}</p>
+                {t && <span className="event-loc"><i className="fa-solid fa-location-dot"></i> {t.nom} — {t.quartier}</span>}
                 <div className="court-meta">
-                  <span>🎯 {ev.cat}</span>
-                  {ev.equipes ? <span>👥 {ev.equipes} équipes</span> : null}
-                  <span>🎟️ {ev.prix}</span>
+                  <span><i className="fa-solid fa-bullseye"></i> {ev.cat}</span>
+                  {ev.equipes ? <span><i className="fa-solid fa-users"></i> {ev.equipes} équipes</span> : null}
+                  <span><i className="fa-solid fa-ticket"></i> {ev.prix}</span>
                 </div>
                 <div className="event-foot"><small>Organisé par {ev.orga}</small></div>
               </div>

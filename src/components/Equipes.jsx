@@ -18,7 +18,7 @@ export default function Equipes() {
   return (
     <div>
       <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22, flexWrap: 'wrap' }}>
-        <div style={{ fontSize: 32 }}>👥</div>
+        <div style={{ fontSize: 30, color: 'var(--energy)' }}><i className="fa-solid fa-users"></i></div>
         <div style={{ flex: 1, minWidth: 180 }}>
           <b style={{ fontFamily: 'Archivo', fontSize: '1.1rem' }}>Pas encore d'équipe ?</b>
           <p style={{ color: 'rgba(255,255,255,.72)', marginTop: 2 }}>Crée la tienne et invite tes potes.</p>
@@ -33,13 +33,13 @@ export default function Equipes() {
           <article className={'svc team-card ' + e.accent}>
             <div className="team-crest">{e.nom.charAt(0)}</div>
             <h3>{e.nom}</h3>
-            <p className="court-loc">📍 {e.quartier}</p>
+            <p className="court-loc"><i className="fa-solid fa-location-dot"></i> {e.quartier}</p>
             <div className="court-meta">
-              <span>👤 {e.membres + (joined[e.id] ? 1 : 0)} membres</span>
-              <span>🎯 {e.niveau}</span>
+              <span><i className="fa-solid fa-user"></i> {e.membres + (joined[e.id] ? 1 : 0)} membres</span>
+              <span><i className="fa-solid fa-bullseye"></i> {e.niveau}</span>
             </div>
             <button type="button" className={'btn ' + (joined[e.id] ? 'btn-ghost' : 'btn-white')} style={{ marginTop: 14, width: '100%', justifyContent: 'center' }} onClick={() => join(e.id)}>
-              {joined[e.id] ? '✓ Membre' : 'Rejoindre'}
+              {joined[e.id] ? <><i className="fa-solid fa-check"></i> Membre</> : 'Rejoindre'}
             </button>
           </article>
         ))}

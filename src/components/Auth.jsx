@@ -41,7 +41,7 @@ export default function Auth() {
       </div>
 
       <form className="qform" onSubmit={submit} noValidate>
-        <h2>{mode === 'signup' ? 'Rejoins la communauté 🏀' : 'Content de te revoir 👋'}</h2>
+        <h2>{mode === 'signup' ? <>Rejoins la communauté <i className="fa-solid fa-basketball" style={{ color: 'var(--energy)' }}></i></> : <>Content de te revoir <i className="fa-solid fa-hand" style={{ color: 'var(--energy)' }}></i></>}</h2>
         <p className="sub">
           {mode === 'signup'
             ? 'Un pseudo, ton quartier, et c’est parti.'

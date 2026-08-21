@@ -15,7 +15,7 @@ export default function Profile() {
   if (!user) {
     return (
       <div className="ctacard" style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 40 }}>🔒</div>
+        <div style={{ fontSize: 38, color: 'var(--energy)' }}><i className="fa-solid fa-lock"></i></div>
         <h2>Connecte-toi pour voir ton profil</h2>
         <p>Crée ton compte ou connecte-toi pour rejoindre la communauté.</p>
         <a href="/connexion" className="btn btn-white" style={{ marginTop: 18 }}>Se connecter →</a>
@@ -46,8 +46,8 @@ export default function Profile() {
         <div className="profile-avatar">{initial}</div>
         <div className="profile-id">
           <b>@{user.pseudo}</b>
-          <span>📍 {user.quartier || 'Quartier non renseigné'}</span>
-          {user.team && <span>🏀 {user.team}</span>}
+          <span><i className="fa-solid fa-location-dot"></i> {user.quartier || 'Quartier non renseigné'}</span>
+          {user.team && <span><i className="fa-solid fa-basketball"></i> {user.team}</span>}
         </div>
         <button type="button" className="btn btn-ghost profile-edit" onClick={() => setEditing((v) => !v)}>
           {editing ? 'Annuler' : 'Éditer'}
@@ -74,7 +74,7 @@ export default function Profile() {
           {user.bio && <div className="card" style={{ marginTop: 16 }}><b style={{ fontFamily: 'Archivo' }}>À propos</b><p style={{ marginTop: 8, color: 'rgba(255,255,255,.8)' }}>{user.bio}</p></div>}
           <div className="card" style={{ marginTop: 16 }}>
             <b style={{ fontFamily: 'Archivo' }}>Compte</b>
-            <p style={{ marginTop: 8, color: 'rgba(255,255,255,.8)' }}>✉️ {user.email}</p>
+            <p style={{ marginTop: 8, color: 'rgba(255,255,255,.8)' }}><i className="fa-solid fa-envelope"></i> {user.email}</p>
             <button type="button" className="btn btn-ghost" style={{ marginTop: 14 }} onClick={logout}>Se déconnecter</button>
           </div>
         </>

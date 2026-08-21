@@ -31,7 +31,7 @@ export default function EventDetail() {
     return (
       <section><div className="wrap" style={{ maxWidth: 620 }}>
         <div className="ctacard" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 40 }}>🤷</div>
+          <div style={{ fontSize: 40, color: 'var(--energy)' }}><i className="fa-solid fa-circle-question"></i></div>
           <h2>Événement introuvable</h2>
           <a href="/evenements" className="btn btn-white" style={{ marginTop: 16 }}>← Retour aux événements</a>
         </div>
@@ -45,22 +45,22 @@ export default function EventDetail() {
   return (
     <>
       <section className="detail-hero">
-        {ev.img ? <img src={ev.img} alt={ev.titre} /> : <div className="detail-hero-ph">🏀</div>}
+        {ev.img ? <img src={ev.img} alt={ev.titre} /> : <div className="detail-hero-ph"><i className="fa-solid fa-basketball"></i></div>}
         <div className="detail-hero-overlay" aria-hidden="true"></div>
         <a href="/evenements" className="detail-back">← Événements</a>
         <div className="detail-hero-copy">
           <span className="badge type" style={{ position: 'static', display: 'inline-block', marginBottom: 8 }}>{ev.type}</span>
           <h1>{ev.titre}</h1>
-          <p>🗓️ {fmtRange(ev.date, ev.dateFin)}</p>
+          <p><i className="fa-solid fa-calendar-day"></i> {fmtRange(ev.date, ev.dateFin)}</p>
         </div>
       </section>
 
       <section><div className="wrap" style={{ maxWidth: 720 }}>
         <div className="court-meta big">
-          <span>🎯 {ev.cat}</span>
-          {ev.equipes ? <span>👥 {ev.equipes} équipes</span> : null}
-          <span>🎟️ {ev.prix}</span>
-          <span>🧑‍💼 {ev.orga}</span>
+          <span><i className="fa-solid fa-bullseye"></i> {ev.cat}</span>
+          {ev.equipes ? <span><i className="fa-solid fa-users"></i> {ev.equipes} équipes</span> : null}
+          <span><i className="fa-solid fa-ticket"></i> {ev.prix}</span>
+          <span><i className="fa-solid fa-user-tie"></i> {ev.orga}</span>
         </div>
 
         {ev.desc && <><h2 className="detail-section-t">À propos</h2><p style={{ color: 'rgba(255,255,255,.85)', lineHeight: 1.6 }}>{ev.desc}</p></>}
@@ -68,7 +68,7 @@ export default function EventDetail() {
         {t && (
           <>
             <h2 className="detail-section-t">Lieu</h2>
-            <a className="event-loc" href={'/terrains/' + t.id} style={{ fontSize: '1rem' }}>📍 {t.nom} — {t.quartier}</a>
+            <a className="event-loc" href={'/terrains/' + t.id} style={{ fontSize: '1rem' }}><i className="fa-solid fa-location-dot"></i> {t.nom} — {t.quartier}</a>
             <div className="map-embed" style={{ marginTop: 12 }}>
               <iframe src={`https://www.google.com/maps?q=${mapQ}&output=embed`} loading="lazy" title={'Carte — ' + t.nom}></iframe>
             </div>

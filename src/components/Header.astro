@@ -1,13 +1,13 @@
 ---
 const { active = '' } = Astro.props;
 const links = [
-  { href: '/', key: 'accueil', emo: '🏀', label: 'Accueil' },
-  { href: '/terrains', key: 'terrains', emo: '📍', label: 'Terrains' },
-  { href: '/evenements', key: 'evenements', emo: '📅', label: 'Événements' },
-  { href: '/equipes', key: 'equipes', emo: '👥', label: 'Équipes' },
-  { href: '/defis', key: 'defis', emo: '⚔️', label: 'Défis' },
-  { href: '/communaute', key: 'communaute', emo: '📸', label: 'Communauté' },
-  { href: '/profil', key: 'profil', emo: '👤', label: 'Mon profil' },
+  { href: '/', key: 'accueil', icon: 'fa-house', label: 'Accueil' },
+  { href: '/terrains', key: 'terrains', icon: 'fa-location-dot', label: 'Terrains' },
+  { href: '/evenements', key: 'evenements', icon: 'fa-calendar-days', label: 'Événements' },
+  { href: '/equipes', key: 'equipes', icon: 'fa-users', label: 'Équipes' },
+  { href: '/defis', key: 'defis', icon: 'fa-hand-fist', label: 'Défis' },
+  { href: '/communaute', key: 'communaute', icon: 'fa-camera', label: 'Communauté' },
+  { href: '/profil', key: 'profil', icon: 'fa-user', label: 'Mon profil' },
 ];
 ---
 <header class="appbar">
@@ -42,7 +42,7 @@ const links = [
   <nav class="dnav">
     {links.map((l) => (
       <a href={l.href} class={'dlink' + (active === l.key ? ' active' : '')}>
-        <span class="emo">{l.emo}</span>{l.label}
+        <i class={'emo fa-solid ' + l.icon} aria-hidden="true"></i>{l.label}
       </a>
     ))}
   </nav>
@@ -53,8 +53,8 @@ const links = [
 
   <hr class="ddash" />
 
-  <a href="/connexion" class="dcontact" id="authAction"><span class="emo">🔑</span>Se connecter</a>
-  <div class="dcontact"><span class="emo">📍</span>Lomé, Togo</div>
+  <a href="/connexion" class="dcontact" id="authAction"><i class="emo fa-solid fa-right-to-bracket" aria-hidden="true"></i>Se connecter</a>
+  <div class="dcontact"><i class="emo fa-solid fa-location-dot" aria-hidden="true"></i>Lomé, Togo</div>
 </aside>
 
 <script>
@@ -74,7 +74,7 @@ const links = [
       if (dcta) { dcta.href = '/profil'; dcta.textContent = 'Mon profil →'; }
       if (authAction) {
         authAction.href = '#';
-        authAction.innerHTML = '<span class="emo">🚪</span>Se déconnecter';
+        authAction.innerHTML = '<i class="emo fa-solid fa-right-from-bracket" aria-hidden="true"></i>Se déconnecter';
         authAction.addEventListener('click', (e) => { e.preventDefault(); signOut(); location.href = '/'; });
       }
     }

@@ -2,26 +2,26 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const quick = [
-  { emo: '📍', label: 'Terrains', href: '/terrains' },
-  { emo: '📅', label: 'Événements', href: '/evenements' },
-  { emo: '👥', label: 'Équipes', href: '/equipes' },
-  { emo: '⚔️', label: 'Défis', href: '/defis' },
-  { emo: '📸', label: 'Feed', href: '/communaute' },
+  { icon: 'fa-location-dot', label: 'Terrains', href: '/terrains' },
+  { icon: 'fa-calendar-days', label: 'Événements', href: '/evenements' },
+  { icon: 'fa-users', label: 'Équipes', href: '/equipes' },
+  { icon: 'fa-hand-fist', label: 'Défis', href: '/defis' },
+  { icon: 'fa-camera', label: 'Feed', href: '/communaute' },
 ];
 
 const features = [
-  { emo: '📍', a: 'a-orange', t: 'Trouve un terrain', d: 'Les terrains près de chez toi, avec photos, quartier et infos pratiques.', href: '/terrains' },
-  { emo: '👥', a: 'a-blue', t: 'Crée ou rejoins une équipe', d: 'Monte ton équipe, invite tes potes, gère tes membres.', href: '/equipes' },
-  { emo: '⚔️', a: 'a-teal', t: 'Lance un défi', d: 'Défie une autre équipe, fixez la date et le terrain. Que le meilleur gagne.', href: '/defis' },
-  { emo: '📅', a: 'a-amber', t: 'Événements & tournois', d: 'Entraînements, matchs et tournois à venir dans tout le Togo.', href: '/evenements' },
-  { emo: '📸', a: 'a-rose', t: 'Partage & réagis', d: 'Poste tes photos et vidéos, like et commente celles de la communauté.', href: '/communaute' },
-  { emo: '🔔', a: 'a-plum', t: 'Reste notifié', d: 'Défis reçus, matchs, réactions : tu es toujours au courant.', href: '/connexion' },
+  { icon: 'fa-location-dot', a: 'a-orange', t: 'Trouve un terrain', d: 'Les terrains près de chez toi, avec photos, quartier et infos pratiques.', href: '/terrains' },
+  { icon: 'fa-users', a: 'a-blue', t: 'Crée ou rejoins une équipe', d: 'Monte ton équipe, invite tes potes, gère tes membres.', href: '/equipes' },
+  { icon: 'fa-hand-fist', a: 'a-teal', t: 'Lance un défi', d: 'Défie une autre équipe, fixez la date et le terrain. Que le meilleur gagne.', href: '/defis' },
+  { icon: 'fa-calendar-days', a: 'a-amber', t: 'Événements & tournois', d: 'Entraînements, matchs et tournois à venir dans tout le Togo.', href: '/evenements' },
+  { icon: 'fa-camera', a: 'a-rose', t: 'Partage & réagis', d: 'Poste tes photos et vidéos, like et commente celles de la communauté.', href: '/communaute' },
+  { icon: 'fa-bell', a: 'a-plum', t: 'Reste notifié', d: 'Défis reçus, matchs, réactions : tu es toujours au courant.', href: '/connexion' },
 ];
 
 const feed = [
-  { ini: 'K', accent: 'a-orange', name: 'Kossi A.', team: 'Lomé Ballers', txt: 'Gros match hier au terrain de Bè 🔥 Merci à tous ceux qui sont venus !', likes: 42, com: 8, emo: '🏀' },
-  { ini: 'A', accent: 'a-blue', name: 'Ama D.', team: 'Kara Warriors', txt: 'On lance un défi aux Lomé Ballers 💪 Qui est chaud ?', likes: 67, com: 21, emo: '⚔️' },
-  { ini: 'M', accent: 'a-teal', name: 'Mensah T.', team: 'Sokodé Storm', txt: 'Tournoi 3x3 ce week-end à Sokodé. Inscriptions ouvertes 🏆', likes: 30, com: 5, emo: '🏆' },
+  { ini: 'K', accent: 'a-orange', name: 'Kossi A.', team: 'Lomé Ballers', txt: 'Gros match hier au terrain de Bè. Merci à tous ceux qui sont venus !', likes: 42, com: 8 },
+  { ini: 'A', accent: 'a-blue', name: 'Ama D.', team: 'Kara Warriors', txt: 'On lance un défi aux Lomé Ballers. Qui est chaud ?', likes: 67, com: 21 },
+  { ini: 'M', accent: 'a-teal', name: 'Mensah T.', team: 'Sokodé Storm', txt: 'Tournoi 3x3 ce week-end à Sokodé. Inscriptions ouvertes.', likes: 30, com: 5 },
 ];
 ---
 <BaseLayout title="Basket Togo — La communauté du basket togolais" active="accueil">
@@ -46,23 +46,19 @@ const feed = [
   <section class="quickwrap"><div class="wrap">
     <div class="quick">
       {quick.map((q) => (
-        <a href={q.href} class="qa"><span class="disc">{q.emo}</span><span>{q.label}</span></a>
+        <a href={q.href} class="qa"><span class="disc"><i class={'fa-solid ' + q.icon} aria-hidden="true"></i></span><span>{q.label}</span></a>
       ))}
     </div>
   </div></section>
 
   <!-- FONCTIONNALITÉS -->
-  <section class="has-drops">
-    <div class="drops" aria-hidden="true">
-      <span class="drop d-rose s2" style="top:6%;right:6%"></span>
-      <span class="drop d-teal s1" style="bottom:10%;left:4%"></span>
-    </div>
+  <section>
     <div class="wrap">
       <div class="sec-head reveal"><span class="label">Ce que tu peux faire</span><h2>Tout le basket, au même endroit</h2><p>Une plateforme pensée pour les joueurs, les équipes et les fans.</p></div>
       <div class="svc-grid">
         {features.map((f) => (
           <a href={f.href} class={'svc reveal ' + f.a}>
-            <div class="svc-ic emoji">{f.emo}</div>
+            <div class="svc-ic"><i class={'fa-solid ' + f.icon} aria-hidden="true"></i></div>
             <h3>{f.t}</h3>
             <p>{f.d}</p>
             <span class="more">Découvrir →</span>
@@ -83,16 +79,15 @@ const feed = [
   </div></section>
 
   <!-- FEED (aperçu démo) -->
-  <section class="has-drops">
-    <div class="drops" aria-hidden="true"><span class="drop d-amber s2" style="top:8%;right:6%"></span><span class="drop d-teal s1" style="bottom:12%;left:5%"></span></div>
+  <section>
     <div class="wrap">
       <div class="sec-head center reveal"><span class="label">Communauté</span><h2>Ça bouge en ce moment</h2></div>
       <div class="reviews">
         {feed.map((p) => (
           <figure class={'review reveal ' + p.accent}>
             <figcaption style="margin-top:0"><span class="rv-ini">{p.ini}</span><span><b>{p.name}</b><small>{p.team}</small></span></figcaption>
-            <blockquote>{p.emo} {p.txt}</blockquote>
-            <div class="stars" style="color:rgba(255,255,255,.8);font-family:'Archivo';font-weight:700;font-size:.9rem;letter-spacing:0">❤️ {p.likes} · 💬 {p.com}</div>
+            <blockquote>{p.txt}</blockquote>
+            <div class="stars" style="color:rgba(255,255,255,.8);font-family:'Archivo';font-weight:700;font-size:.9rem;letter-spacing:0"><i class="fa-solid fa-heart" style="color:var(--energy)"></i> {p.likes} · <i class="fa-regular fa-comment"></i> {p.com}</div>
           </figure>
         ))}
       </div>
@@ -103,7 +98,7 @@ const feed = [
   <!-- CTA -->
   <section><div class="wrap">
     <div class="ctacard reveal">
-      <div style="font-size:40px;line-height:1">🏀</div>
+      <div style="font-size:38px;line-height:1;color:var(--energy)"><i class="fa-solid fa-basketball" aria-hidden="true"></i></div>
       <h2>Prêt à entrer sur le terrain ?</h2>
       <p>Rejoins des centaines de joueurs togolais. C'est gratuit, et ça commence maintenant.</p>
       <a href="/connexion" class="btn btn-white">Créer mon compte →</a>
