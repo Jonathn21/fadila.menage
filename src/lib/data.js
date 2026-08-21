@@ -4,12 +4,12 @@
  */
 
 export const terrains = [
-  { id: 't1', nom: 'Terrain de Bè', quartier: 'Bè, Lomé', surface: 'Bitume', paniers: 2, note: 4.6, ouvert: true, accent: 'a-orange' },
-  { id: 't2', nom: 'Playground Agoè', quartier: 'Agoè, Lomé', surface: 'Béton', paniers: 2, note: 4.2, ouvert: true, accent: 'a-teal' },
-  { id: 't3', nom: 'Terrain Université de Lomé', quartier: 'Campus, Lomé', surface: 'Bitume peint', paniers: 4, note: 4.8, ouvert: false, accent: 'a-blue' },
-  { id: 't4', nom: 'City Sport Kara', quartier: 'Kara', surface: 'Résine', paniers: 2, note: 4.4, ouvert: true, accent: 'a-plum' },
-  { id: 't5', nom: 'Terrain de Sokodé', quartier: 'Sokodé', surface: 'Béton', paniers: 2, note: 4.0, ouvert: true, accent: 'a-amber' },
-  { id: 't6', nom: 'Bassar Hoops', quartier: 'Bassar', surface: 'Bitume', paniers: 1, note: 3.9, ouvert: true, accent: 'a-green' },
+  { id: 't1', nom: 'Terrain de Bè', quartier: 'Bè, Lomé', surface: 'Bitume', paniers: 2, note: 4.6, ouvert: true, accent: 'a-orange', img: '/images/terrains/court-1.jpg' },
+  { id: 't2', nom: 'Playground Agoè', quartier: 'Agoè, Lomé', surface: 'Béton', paniers: 2, note: 4.2, ouvert: true, accent: 'a-teal', img: '/images/terrains/court-2.jpg' },
+  { id: 't3', nom: 'Terrain Université de Lomé', quartier: 'Campus, Lomé', surface: 'Bitume peint', paniers: 4, note: 4.8, ouvert: false, accent: 'a-blue', img: '/images/terrains/court-3.jpg' },
+  { id: 't4', nom: 'City Sport Kara', quartier: 'Kara', surface: 'Résine', paniers: 2, note: 4.4, ouvert: true, accent: 'a-plum', img: '/images/terrains/court-4.jpg' },
+  { id: 't5', nom: 'Terrain de Sokodé', quartier: 'Sokodé', surface: 'Béton', paniers: 2, note: 4.0, ouvert: true, accent: 'a-amber', img: '/images/terrains/court-5.jpg' },
+  { id: 't6', nom: 'Bassar Hoops', quartier: 'Bassar', surface: 'Bitume', paniers: 1, note: 3.9, ouvert: true, accent: 'a-green', img: '/images/terrains/court-6.jpg' },
 ];
 
 export const equipes = [
