@@ -1,34 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const events = [
-  { emo: '🏆', a: 'a-orange', t: 'Tournoi 3x3 de Sokodé', d: 'Sam. 24 août · City Stade Sokodé · 16 équipes', badge: 'Inscriptions ouvertes' },
-  { emo: '🤝', a: 'a-blue', t: 'Entraînement ouvert', d: 'Mer. 21 août · Terrain de Bè, Lomé · tous niveaux', badge: 'Gratuit' },
-  { emo: '⚡', a: 'a-teal', t: 'Match amical inter-quartiers', d: 'Dim. 25 août · Adidogomé · Ballers vs Warriors', badge: 'À venir' },
-  { emo: '🎓', a: 'a-plum', t: 'Stage jeunes (U15)', d: 'Vac. sept. · Kara Centre · encadré par des coachs', badge: 'Bientôt' },
-];
+import Evenements from '../components/Evenements.jsx';
 ---
 <BaseLayout title="Événements — Basket Togo" active="evenements">
   <section class="pagehead">
-    <div class="wrap"><span class="label">L'agenda</span><h1>Événements 📅</h1><p>Tournois, entraînements et matchs à venir dans tout le Togo.</p></div>
+    <div class="wrap"><span class="label">L'agenda</span><h1>Événements 📅</h1><p>Tournois, matchs et entraînements à venir, partout au Togo.</p></div>
   </section>
-
-  <section class="has-drops">
-    <div class="drops" aria-hidden="true"><span class="drop d-amber s2" style="top:6%;right:5%"></span><span class="drop d-teal s1" style="bottom:10%;left:6%"></span></div>
-    <div class="wrap">
-      <div class="svc-grid">
-        {events.map((e) => (
-          <div class={'svc reveal ' + e.a}>
-            <div class="svc-ic emoji">{e.emo}</div>
-            <span style="display:inline-block;background:rgba(255,255,255,.2);border-radius:999px;padding:4px 12px;font-family:'Archivo';font-weight:700;font-size:.72rem;margin-bottom:8px">{e.badge}</span>
-            <h3>{e.t}</h3>
-            <p>{e.d}</p>
-            <span class="more">Voir · participer →</span>
-          </div>
-        ))}
-      </div>
-      <div style="text-align:center;margin-top:30px"><a href="/connexion" class="btn btn-white">➕ Créer un événement</a></div>
-      <p class="req-note" style="text-align:center">Démo — création d'événements réelle en Phase 2.</p>
-    </div>
-  </section>
+  <section><div class="wrap" style="max-width:720px">
+    <Evenements client:load />
+  </div></section>
 </BaseLayout>

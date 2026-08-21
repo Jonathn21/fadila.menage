@@ -21,6 +21,20 @@ export const equipes = [
   { id: 'e6', nom: 'Kpalimé Vipers', quartier: 'Kpalimé', membres: 5, niveau: 'Débutant', accent: 'a-rose' },
 ];
 
+export const evenements = [
+  { id: 'ev1', titre: 'Tournoi 3x3 — Jeunes Talents', type: 'Tournoi 3x3', date: '2026-05-16T07:00', terrainId: 't3', cat: 'U14 & U16', prix: 'Gratuit', equipes: 30, img: '/images/events/event-5.jpg', orga: 'Basket Togo' },
+  { id: 'ev2', titre: "Match d'ouverture — Lomé Ballers vs Kara Warriors", type: 'Match', date: '2026-06-28T18:00', terrainId: 't1', cat: 'Open', prix: '1 000 F', equipes: 2, img: '/images/events/event-3.jpg', orga: 'Lomé Ballers' },
+  { id: 'ev3', titre: 'Entraînement collectif ouvert', type: 'Entraînement', date: '2026-06-10T16:30', terrainId: 't2', cat: 'Tous niveaux', prix: 'Gratuit', equipes: null, img: '/images/events/event-4.jpg', orga: 'Agoè Kings' },
+  { id: 'ev4', titre: 'Playoff City Sport Kara', type: 'Tournoi', date: '2026-07-05T15:00', terrainId: 't4', cat: 'Open', prix: '2 000 F', equipes: 8, img: '/images/events/event-6.jpg', orga: 'Kara Warriors' },
+];
+
+export const TYPES_EVENT = ['Tournoi', 'Tournoi 3x3', 'Match', 'Match amical', 'Entraînement', 'Détection'];
+export const CATEGORIES = ['Tous niveaux', 'U14', 'U16', 'U18', 'Open', 'Filles', 'Garçons'];
+
+export function terrainById(id) {
+  return terrains.find((t) => t.id === id) || null;
+}
+
 export const posts = [
   { id: 'p1', auteur: 'Kossi A.', team: 'Lomé Ballers', ini: 'K', accent: 'a-orange', txt: 'Gros match hier au terrain de Bè 🔥 Merci à tous ceux qui sont venus !', likes: 42, coms: 8, media: 'photo', time: 'il y a 2 h' },
   { id: 'p2', auteur: 'Ama D.', team: 'Kara Warriors', ini: 'A', accent: 'a-teal', txt: 'On lance un défi aux Lomé Ballers 💪 Qui est chaud ?', likes: 67, coms: 21, media: null, time: 'il y a 5 h' },
