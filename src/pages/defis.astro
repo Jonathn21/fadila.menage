@@ -1,37 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const defis = [
-  { a: 'Lomé Ballers', b: 'Kara Warriors', when: 'Sam. 24 août · 18 h', where: 'Terrain de Bè', status: 'Accepté', ok: true },
-  { a: 'Sokodé Storm', b: 'Atakpamé Kings', when: 'Dim. 25 août · 16 h', where: 'City Stade Sokodé', status: 'En attente', ok: false },
-  { a: 'Kara Warriors', b: 'Sokodé Storm', when: 'À définir', where: 'Kara Centre', status: 'Proposé', ok: false },
-];
+import Defis from '../components/Defis.jsx';
 ---
 <BaseLayout title="Défis — Basket Togo" active="defis">
   <section class="pagehead">
-    <div class="wrap"><span class="label">Le challenge</span><h1>Défis <i class="fa-solid fa-hand-fist" style="color:var(--energy)"></i></h1><p>Défie une autre équipe, fixez la date et le terrain. Que le meilleur gagne.</p></div>
+    <div class="wrap"><span class="label">Le challenge</span><h1>Défis <i class="fa-solid fa-hand-fist" style="color:var(--energy)"></i></h1><p>Défie une autre équipe : choisis le format, le terrain et la date. Que le meilleur gagne.</p></div>
   </section>
-
-  <section class="has-drops">
-    <div class="drops" aria-hidden="true"><span class="drop d-teal s2" style="top:6%;right:5%"></span><span class="drop d-orange s1" style="bottom:10%;left:6%"></span></div>
-    <div class="wrap">
-      <div style="display:flex;flex-direction:column;gap:16px;max-width:760px;margin:0 auto">
-        {defis.map((d) => (
-          <div class="card reveal" style="border-radius:20px;padding:22px 24px">
-            <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
-              <b style="font-family:'Archivo';font-weight:800;font-size:1.15rem">{d.a}</b>
-              <span style="font-family:'Archivo';font-weight:800;color:#FFD24D">VS</span>
-              <b style="font-family:'Archivo';font-weight:800;font-size:1.15rem">{d.b}</b>
-            </div>
-            <div style="text-align:center;margin-top:12px;color:rgba(255,255,255,.86)"><i class="fa-solid fa-calendar-day"></i> {d.when} · <i class="fa-solid fa-location-dot"></i> {d.where}</div>
-            <div style="text-align:center;margin-top:12px">
-              <span style={'display:inline-block;border-radius:999px;padding:6px 16px;font-family:Archivo;font-weight:700;font-size:.82rem;' + (d.ok ? 'background:#149A90;color:#fff' : 'background:rgba(255,255,255,.18);color:#fff')}>{d.status}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div style="text-align:center;margin-top:30px"><a href="/connexion" class="btn btn-white"><i class="fa-solid fa-hand-fist"></i> Lancer un défi</a></div>
-      <p class="req-note" style="text-align:center">Démo — défis entre vraies équipes en Phase 3.</p>
-    </div>
-  </section>
+  <section><div class="wrap" style="max-width:720px">
+    <Defis client:load />
+  </div></section>
 </BaseLayout>

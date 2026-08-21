@@ -31,6 +31,24 @@ export const evenements = [
 export const TYPES_EVENT = ['Tournoi', 'Tournoi 3x3', 'Match', 'Match amical', 'Entraînement', 'Détection'];
 export const CATEGORIES = ['Tous niveaux', 'U14', 'U16', 'U18', 'Open', 'Filles', 'Garçons'];
 
+export const TYPES_DEFI = [
+  '1 contre 1',
+  '2 contre 2',
+  '3 contre 3 (3x3)',
+  '5 contre 5',
+  'Match amical',
+  'Match classé',
+  'Concours de tirs',
+  'Concours de dunks',
+];
+
+export const defis = [
+  { id: 'd1', type: '5 contre 5', teamA: 'Lomé Ballers', teamB: 'Kara Warriors', terrainId: 't1', date: '2026-08-24T18:00', enjeu: 'Le respect du quartier', status: 'Accepté', auteur: 'Lomé Ballers' },
+  { id: 'd2', type: '3 contre 3 (3x3)', teamA: 'Sokodé Storm', teamB: 'Atakpamé Panthers', terrainId: 't5', date: '2026-08-25T16:00', enjeu: '', status: 'En attente', auteur: 'Sokodé Storm' },
+  { id: 'd3', type: 'Match amical', teamA: 'Agoè Kings', teamB: 'Kpalimé Vipers', terrainId: 't2', date: '2026-09-01T17:00', enjeu: '', status: 'Proposé', auteur: 'Agoè Kings' },
+  { id: 'd4', type: 'Concours de tirs', teamA: 'Kara Warriors', teamB: 'Défi ouvert', terrainId: 't4', date: '2026-09-03T15:00', enjeu: '20 000 F', status: 'Ouvert', auteur: 'Kara Warriors' },
+];
+
 export function terrainById(id) {
   return terrains.find((t) => t.id === id) || null;
 }

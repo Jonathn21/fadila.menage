@@ -1012,3 +1012,22 @@ footer{background:rgba(0,0,0,.55);border-top-color:rgba(255,255,255,.08)}
 /* Icônes inline dans les méta (couleur douce) */
 .court-meta i,.court-loc i,.event-date i{color:rgba(255,255,255,.6);width:1.05em;text-align:center}
 .event-loc i{color:var(--energy)}
+
+/* ===== Défis ===== */
+.defis-list{display:flex;flex-direction:column;gap:16px}
+.defi-card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:20px}
+.defi-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.defi-type{font-family:'Archivo';font-weight:700;font-size:.85rem;color:rgba(255,255,255,.8)}
+.defi-type i{color:var(--energy);margin-right:4px}
+.defi-vs{display:flex;align-items:center;justify-content:center;gap:14px;text-align:center;margin-bottom:6px}
+.defi-team{flex:1;font-family:'Archivo';font-weight:800;font-size:1.1rem;color:#fff;line-height:1.15}
+.defi-vs-badge{flex:0 0 auto;font-family:'Anton',sans-serif;color:var(--energy);font-size:1rem;
+  width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,90,31,.14);border:1px solid rgba(255,90,31,.45)}
+.defi-actions{display:flex;gap:10px;margin-top:16px}
+.defi-actions .btn{flex:1;justify-content:center;padding:11px}
+.defi-top .badge{position:static}
+.badge.d-ok{background:rgba(198,255,61,.18);color:var(--volt)}
+.badge.d-open{background:rgba(255,90,31,.2);color:var(--energy)}
+.badge.d-wait{background:rgba(255,255,255,.14);color:rgba(255,255,255,.8)}
+.badge.d-off{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
