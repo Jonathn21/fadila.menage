@@ -15,19 +15,21 @@ export default function Terrains() {
 
       <div className="svc-grid">
         {list.map((t) => (
-          <article className={'svc court-card ' + t.accent}>
+          <a key={t.id} className={'svc court-card ' + t.accent} href={'/terrains/' + t.id}>
             <div className="court-thumb">
               {t.img ? <img src={t.img} alt={t.nom} loading="lazy" /> : <span>📍</span>}
               <span className={'badge ' + (t.ouvert ? 'ok' : 'off')}>{t.ouvert ? 'Ouvert' : 'Fermé'}</span>
             </div>
-            <h3>{t.nom}</h3>
-            <p className="court-loc">📍 {t.quartier}</p>
-            <div className="court-meta">
-              <span>🏀 {t.paniers} panier{t.paniers > 1 ? 's' : ''}</span>
-              <span>🛣️ {t.surface}</span>
-              <span>⭐ {t.note.toFixed(1)}</span>
+            <div className="court-body">
+              <h3>{t.nom}</h3>
+              <p className="court-loc">📍 {t.quartier}</p>
+              <div className="court-meta">
+                <span>🏀 {t.paniers} panier{t.paniers > 1 ? 's' : ''}</span>
+                <span>🛣️ {t.surface}</span>
+                <span>⭐ {t.note.toFixed(1)}</span>
+              </div>
             </div>
-          </article>
+          </a>
         ))}
       </div>
     </div>
