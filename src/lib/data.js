@@ -22,10 +22,10 @@ export const equipes = [
 ];
 
 export const evenements = [
-  { id: 'ev1', titre: 'Tournoi 3x3 — Jeunes Talents', type: 'Tournoi 3x3', date: '2026-05-16T07:00', terrainId: 't3', cat: 'U14 & U16', prix: 'Gratuit', equipes: 30, img: '/images/events/event-5.jpg', orga: 'Basket Togo' },
-  { id: 'ev2', titre: "Match d'ouverture — Lomé Ballers vs Kara Warriors", type: 'Match', date: '2026-06-28T18:00', terrainId: 't1', cat: 'Open', prix: '1 000 F', equipes: 2, img: '/images/events/event-3.jpg', orga: 'Lomé Ballers' },
-  { id: 'ev3', titre: 'Entraînement collectif ouvert', type: 'Entraînement', date: '2026-06-10T16:30', terrainId: 't2', cat: 'Tous niveaux', prix: 'Gratuit', equipes: null, img: '/images/events/event-4.jpg', orga: 'Agoè Kings' },
-  { id: 'ev4', titre: 'Playoff City Sport Kara', type: 'Tournoi', date: '2026-07-05T15:00', terrainId: 't4', cat: 'Open', prix: '2 000 F', equipes: 8, img: '/images/events/event-6.jpg', orga: 'Kara Warriors' },
+  { id: 'ev1', titre: 'Tournoi 3x3 — Jeunes Talents', type: 'Tournoi 3x3', date: '2026-05-16T07:00', dateFin: '2026-05-17T18:00', terrainId: 't3', cat: 'U14 & U16', prix: 'Gratuit', equipes: 30, img: '/images/events/event-5.jpg', orga: 'Basket Togo', desc: 'Deux jours de compétition 3x3 pour les jeunes talents. Présence obligatoire 30 min avant le premier match.' },
+  { id: 'ev2', titre: "Match d'ouverture — Lomé Ballers vs Kara Warriors", type: 'Match', date: '2026-06-28T18:00', dateFin: null, terrainId: 't1', cat: 'Open', prix: '1 000 F', equipes: 2, img: '/images/events/event-3.jpg', orga: 'Lomé Ballers', desc: 'Le grand match d\'ouverture de la saison. Ambiance garantie !' },
+  { id: 'ev3', titre: 'Entraînement collectif ouvert', type: 'Entraînement', date: '2026-06-10T16:30', dateFin: null, terrainId: 't2', cat: 'Tous niveaux', prix: 'Gratuit', equipes: null, img: '/images/events/event-4.jpg', orga: 'Agoè Kings', desc: 'Séance ouverte à tous : dribble, passe, shoot, physique. Ramène tes potes.' },
+  { id: 'ev4', titre: 'Playoff City Sport Kara', type: 'Tournoi', date: '2026-07-05T15:00', dateFin: '2026-07-06T20:00', terrainId: 't4', cat: 'Open', prix: '2 000 F', equipes: 8, img: '/images/events/event-6.jpg', orga: 'Kara Warriors', desc: 'Le playoff annuel de Kara. 8 équipes, une seule couronne.' },
 ];
 
 export const TYPES_EVENT = ['Tournoi', 'Tournoi 3x3', 'Match', 'Match amical', 'Entraînement', 'Détection'];

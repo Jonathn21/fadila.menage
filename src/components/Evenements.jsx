@@ -13,9 +13,29 @@ function fmtDate(iso) {
   }
 }
 
+function sameDay(a, b) {
+  return new Date(a).toDateString() === new Date(b).toDateString();
+}
+
+function fmtRange(iso, isoFin) {
+  if (!isoFin) return fmtDate(iso);
+  if (sameDay(iso, isoFin)) {
+    const finH = new Date(isoFin).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return `${fmtDate(iso)} → ${finH}`;
+  }
+  return `${fmtDate(iso)} → ${fmtDate(isoFin)}`;
+}
+
+const STORE = 'bt_events';
+function loadStored() {
+  try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch { return []; }
+}
+
 export default function Evenements() {
   const user = getUser();
-  const [events, setEvents] = useState(seed);
+  const [events, setEvents] = useState(() =>
+    (typeof window === 'undefined' ? seed : [...loadStored(), ...seed])
+  );
   const [open, setOpen] = useState(false);
   const [cover, setCover] = useState(null);
   const [err, setErr] = useState('');
@@ -37,14 +57,18 @@ export default function Evenements() {
       titre: d.titre,
       type: d.type,
       date: `${d.jour}T${d.heure || '00:00'}`,
+      dateFin: d.jourFin ? `${d.jourFin}T${d.heureFin || '23:59'}` : null,
       terrainId: d.terrainId,
       cat: d.cat,
       prix: d.prix?.trim() || 'Gratuit',
       equipes: d.equipes ? Number(d.equipes) : null,
+      desc: d.desc?.trim() || '',
       img: cover,
       orga: user.pseudo,
     };
-    setEvents((list) => [ev, ...list]);
+    const stored = [ev, ...loadStored()];
+    try { localStorage.setItem(STORE, JSON.stringify(stored)); } catch (e2) {}
+    setEvents([...stored, ...seed]);
     setOpen(false);
     setCover(null);
     form.reset();
@@ -78,8 +102,12 @@ export default function Evenements() {
             </div>
           </div>
           <div className="frow">
-            <div className="field"><label>Date *</label><input name="jour" type="date" required /></div>
+            <div className="field"><label>Date de début *</label><input name="jour" type="date" required /></div>
             <div className="field"><label>Heure *</label><input name="heure" type="time" required /></div>
+          </div>
+          <div className="frow">
+            <div className="field"><label>Date de fin <span className="opt">(optionnel)</span></label><input name="jourFin" type="date" /></div>
+            <div className="field"><label>Heure de fin <span className="opt">(optionnel)</span></label><input name="heureFin" type="time" /></div>
           </div>
           <div className="field"><label>Terrain * (l'un de nos terrains)</label>
             <select name="terrainId" required defaultValue="">
@@ -103,15 +131,15 @@ export default function Evenements() {
         {events.map((ev) => {
           const t = terrainById(ev.terrainId);
           return (
-            <article key={ev.id} className="event-card">
+            <a key={ev.id} className="event-card" href={'/evenement?id=' + ev.id}>
               <div className="event-cover">
                 {ev.img ? <img src={ev.img} alt={ev.titre} loading="lazy" /> : <span>🏀</span>}
                 <span className="badge type">{ev.type}</span>
               </div>
               <div className="event-body">
                 <h3>{ev.titre}</h3>
-                <p className="event-date">🗓️ {fmtDate(ev.date)}</p>
-                {t && <a className="event-loc" href={'/terrains/' + t.id}>📍 {t.nom} — {t.quartier}</a>}
+                <p className="event-date">🗓️ {fmtRange(ev.date, ev.dateFin)}</p>
+                {t && <span className="event-loc">📍 {t.nom} — {t.quartier}</span>}
                 <div className="court-meta">
                   <span>🎯 {ev.cat}</span>
                   {ev.equipes ? <span>👥 {ev.equipes} équipes</span> : null}
@@ -119,7 +147,7 @@ export default function Evenements() {
                 </div>
                 <div className="event-foot"><small>Organisé par {ev.orga}</small></div>
               </div>
-            </article>
+            </a>
           );
         })}
       </div>
